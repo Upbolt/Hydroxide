@@ -10,11 +10,8 @@ local methods = {
     is_x_closure = true
 }
 
-local current_directory = "upvalue_scanner/"
-local closure = oh.get_file(current_directory, 'objects/closure')
-local upvalue = oh.get_file(current_directory, 'objects/upvalue')
-local table_upvalue = oh.get_file(current_directory, 'objects/table_upvalue')
-
-
+local closure = oh.import('upvalue_scanner/objects/closure')
+local upvalue = oh.import('upvalue_scanner/objects/upvalue')
+local table_upvalue = oh.import('upvalue_scanner/objects/table_upvalue')
 
 return methods

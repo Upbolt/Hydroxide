@@ -1,1 +1,1 @@
-local methods = oh.get_file()
+local methods = oh.import('base/methods')
