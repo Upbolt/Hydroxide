@@ -35,7 +35,7 @@ methods.to_string = function(data)
             end
 
             __tostring = metatable.__tostring
-            metatable.__tostring = function()end
+            metatable.__tostring = nil
             data = tostring(data)
         end
 
@@ -49,6 +49,26 @@ methods.to_string = function(data)
     else
         return tostring(data)
     end
+end
+
+methods.get_path = function(instance)
+    local path = ''
+
+    local instance_name = instance.Name
+
+    if instance_name:gsub('_', ''):find('%p') then
+        
+    end
+
+    if instance == game then
+        return "game"
+    elseif instance == workspace then
+        return "workspace"
+    else
+        path = path .. get_path(instance.Parent) .. '' .. instance.Name
+    end
+
+    return path
 end
 
 return methods

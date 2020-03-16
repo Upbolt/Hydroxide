@@ -1,6 +1,12 @@
 local upvalue = {}
 
-upvalue.new = function()
+upvalue.new = function(closure, index)
+    local object = {}
+
+    return object
+end
+
+upvalue.update = function(update)
     
 end
 
