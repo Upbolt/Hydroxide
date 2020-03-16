@@ -51,4 +51,16 @@ methods.to_string = function(data)
     end
 end
 
+methods.get_path = function(instance)
+	if not instance then
+		return '--[[THIS OBJECT IS PARENTED TO NIL, OR IS DESTROYED]] nil'
+	elseif instance == game then
+		return 'game'
+	elseif instance == workspace then
+		return 'workspace'
+	end
+	
+	return methods.get_path(instance.Parent) .. '.' .. instance.Name
+end
+
 return methods
