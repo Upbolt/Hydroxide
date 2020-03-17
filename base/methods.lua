@@ -58,9 +58,17 @@ methods.get_path = function(instance)
 		return 'game'
 	elseif instance == workspace then
 		return 'workspace'
-	end
+    end
+    
+    local path
+
+    if instance:gsub('_', ''):find('%p') then
+        path = '["' .. instance.Name .. '"]'
+    else
+        path = '.' .. instance.Name
+    end
 	
-	return methods.get_path(instance.Parent) .. '.' .. instance.Name
+	return methods.get_path(instance.Parent) .. path
 end
 
 return methods
