@@ -53,7 +53,7 @@ end
 
 methods.get_path = function(instance)
 	if not instance then
-		return '--[[THIS OBJECT IS PARENTED TO NIL, OR IS DESTROYED]] nil'
+		return "--[[THIS OBJECT IS PARENTED TO NIL, OR IS DESTROYED]] nil"
 	elseif instance == game then
 		return 'game'
 	elseif instance == workspace then
