@@ -1,5 +1,7 @@
 getgenv().oh = {}
 
+local from_disk = true
+
 oh.import = function(asset)
     local asset_type = type(asset)
 
@@ -11,5 +13,8 @@ oh.import = function(asset)
     end
 end
 
-oh.methods = import("base/methods")
-oh.
+oh.methods = oh.import("base/methods")
+oh.import("upvalue_scanner/main")
+
+oh.remote_spy = oh.import("remote_spy/main")
+oh.upvalue_scanner = oh.import("upvalue_scanner/main")
