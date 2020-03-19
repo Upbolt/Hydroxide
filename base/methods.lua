@@ -28,11 +28,11 @@ methods.to_string = function(value)
 
         rawset(mt, "__tostring", nil)
         
-        local str = tostring(value)
+        value = tostring(value)
         
         rawset(mt, "__tostring", __tostring)
 
-        return str
+        return value
     else 
         return tostring(value) 
     end
