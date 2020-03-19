@@ -17,37 +17,24 @@ local methods = {
     is_x_closure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure or false
 }
 
-methods.to_string = function(data)
-    local type = typeof(data)
+methods.to_string = function(value) 
+    if typeof(value) == "userdata" or typeof(value) == "table" then
+        local mt = oh.methods.get_metatable(value)
+        local __tostring = rawget(mt, "__tostring")
 
-    if type == "table" or type == "userdata" then
-        local metatable = methods.get_metatable(data)
-        local readonly 
-        local __tostring
-
-        if not metatable or (metatable and not metatable.__tostring) then
-            return tostring(data)
-        elseif metatable and metatable.__tostring then
-            readonly = methods.is_readonly(metatable)
-
-            if readonly then
-                methods.set_readonly(metatable, false)
-            end
-
-            __tostring = metatable.__tostring
-            metatable.__tostring = nil
-            data = tostring(data)
+        if not mt or (mt and not __tostring)then 
+            return tostring(value) 
         end
 
-        metatable.__tostring = __tostring
+        rawset(mt, "__tostring", nil)
+        
+        local str = tostring(value)
+        
+        rawset(mt, "__tostring", __tostring)
 
-        if readonly then
-            methods.set_readonly(metatable, true)
-        end
-
-        return data
-    else
-        return tostring(data)
+        return str
+    else 
+        return tostring(value) 
     end
 end
 

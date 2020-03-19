@@ -18,3 +18,5 @@ oh.import("upvalue_scanner/main")
 
 oh.remote_spy = oh.import("remote_spy/main")
 oh.upvalue_scanner = oh.import("upvalue_scanner/main")
+
+oh.execute()
