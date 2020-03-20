@@ -12,6 +12,8 @@ local methods = {
     set_upvalue = debug.setupvalue or setupvalue or setupval or false,
     set_readonly = setreadonly or false,
 
+    new_cclosure = newcclosure or false,
+
     is_readonly = isreadonly or false,
     is_l_closure = islclosure or (iscclosure and function(closure) return not iscclosure(closure) end) or false,
     is_x_closure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure or false
@@ -20,7 +22,7 @@ local methods = {
 methods.to_string = function(value) 
     if typeof(value) == "userdata" or typeof(value) == "table" then
         local mt = oh.methods.get_metatable(value)
-        local __tostring = rawget(mt, "__tostring")
+        local __tostring = mt and rawget(mt, "__tostring")
 
         if not mt or (mt and not __tostring)then 
             return tostring(value) 

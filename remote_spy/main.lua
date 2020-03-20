@@ -1,7 +1,13 @@
-local ui = oh.import('remote_spy/ui')
-local remote = oh.import('remote_spy/objects/remote')
+local methods = {
+    get_namecall_method = true,
+    get_metatable = true,
+    check_caller = true
+}
 
-local gmt = oh.methods.get_metatable(game)
+--local ui = oh.import('remote_spy/ui')
+--local remote = oh.import('remote_spy/objects/remote')
+
+local gmt = getrawmetatable(game)
 
 local remote_spy = {}
 local remote_check = {
@@ -11,12 +17,12 @@ local remote_check = {
     BindableFunction = Instance.new("BindableFunction").Invoke
 }
 
-local hook_method = oh.methods.new_cclosure(function(method)
+local hook_method = newcclosure(function(method)
     return function(obj, ...)
-        if remote_check[obj.ClassName] then
+        --[[if remote_check[obj.ClassName] and not oh.is_dead then
             local object = remote.cache[obj] or remote.new(obj)
 
-            if oh.methods.check_caller() or object.ignore then
+            if checkcaller() or object.ignore then
                 return method(obj, ...)
             end
 
@@ -25,17 +31,17 @@ local hook_method = oh.methods.new_cclosure(function(method)
             end
 
             ui.update(obj, ...)
-        end
+        end]]
 
         return method(obj, ...)
     end
 end)
 
 for class_name, method in pairs(remote_check) do
-    oh.methods.hook_function(method, hook_method(method))
+    hookfunction(method, hook_method(method))
 end
 
-oh.methods.hook_function(gmt.__namecall, hook_method(method))
+hookfunction(gmt.__namecall, hook_method(method))
 
 remote_spy.ui = ui
 remote_spy.remote = remote
