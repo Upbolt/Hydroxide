@@ -17,7 +17,7 @@ remote.new = function(instance)
 end
 
 remote.remove = function(object)
-    remote.cache[remote.data] = nil
+    remote.cache[object.data] = nil
 end
 
 return remote
