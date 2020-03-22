@@ -17,29 +17,37 @@ local remote_check = {
     BindableFunction = Instance.new("BindableFunction").Invoke
 }
 
-local hook = function(method, obj, ...)
-    if remote_check[obj.ClassName] and not oh.is_dead then
-        local object = remote.cache[obj] or remote.new(obj)
+local remote_hook = function(method)
+    local h
+    h = oh.methods.hook_function(method, function(obj, ...)
+        if remote_check[obj.ClassName] and not oh.is_dead then
+            print(obj.Name .. ' : ', ...)
+            print(h)
 
-        if oh.methods.check_caller() or object.ignore then
-            return method(obj, ...)
+            local object = remote.cache[obj] or remote.new(obj)
+    
+            if oh.methods.check_caller() or object.ignore then
+                print("called from exploit or ignored")
+                return h(obj, ...)
+            end
+    
+            if object.block then
+                print("blocked object attempted to call")
+                return 
+            end
+            
+            ui.update(obj, ...)
         end
 
-        if object.block then
-            return 
-        end
-
-        ui.update(obj, ...)
-    end
-
-    return method(obj, ...)
-end)
-
-for class_name, method in pairs(remote_check) do
-    local h h = oh.methods.hook_function(method, function(obj, ...) return hook(obj, ...) end)
+        return h(obj, ...)
+    end)
 end
 
-local h h = oh.methods.hook_function(gmt.__namecall, function(obj, ...) return hook(obj, ...) end)
+for class_name, method in pairs(remote_check) do
+    remote_hook(method)
+end
+
+remote_hook(gmt.__namecall)
 
 remote_spy.ui = ui
 remote_spy.remote = remote

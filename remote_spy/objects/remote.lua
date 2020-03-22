@@ -3,6 +3,8 @@ local remote = {}
 remote.cache = {}
 
 remote.new = function(instance)
+    print(instance.Name)
+
     local object = {}
 
     object.remove = remote.remove

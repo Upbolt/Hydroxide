@@ -16,7 +16,7 @@ table.update = function(table)
     local elements = table.elements
 
     for i,v in pairs(elements) do
-        if 
+        --if 
     end
 end
 

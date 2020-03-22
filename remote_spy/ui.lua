@@ -3,11 +3,14 @@ local call_count_width = Vector2.new(1337420, 20)
 
 local ui = {}
 local base = oh.gui.Base
-local assets = oh.gui.assets.RemoteSpy
+local assets = oh.assets.RemoteSpy
 
 local tab = base.Body.Contents.Tabs.RemoteSpy
 local list = tab.List
 local logs = tab.Logs
+
+local list_main = list.Main
+local list_results = list_main.Results.Clip.Contents
 
 local viewing = {
     RemoteEvent = true,
@@ -60,13 +63,13 @@ local new_log = function(remote)
     log.object = object
     
     remote.log = log
-    object.Parent = 
+    object.Parent = list_results
 
     return log
 end
 
-ui.update = function(remote)
-    
+ui.update = function(remote, ...)
+    print("updated " .. remote.Name)
 end
 
 return ui

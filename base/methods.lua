@@ -13,6 +13,7 @@ local methods = {
     set_readonly = setreadonly or false,
 
     new_cclosure = newcclosure or false,
+    hook_function = hookfunction or replaceclosure or false,
 
     is_readonly = isreadonly or false,
     is_l_closure = islclosure or (iscclosure and function(closure) return not iscclosure(closure) end) or false,

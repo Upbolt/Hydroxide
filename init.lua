@@ -13,7 +13,7 @@ oh.import = function(asset)
     if asset_type == "string" then
         return loadstring((from_disk and readfile("oh/" .. asset .. '.lua')) or game:HttpGetAsync("https://raw.githubusercontent.com/nrv-ous/Hydroxide/master/"))()
     elseif asset_type == "number" then
-        return game:GetObjects(asset)[1]
+        return game:GetObjects("rbxassetid://" .. asset)[1]
     end
 end
 
