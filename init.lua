@@ -17,7 +17,7 @@ oh.import = function(asset)
     end
 end
 
-oh.ui = oh.import(4635451696)
+oh.gui = oh.import(4635451696)
 oh.assets = oh.import(4636445983)
 
 oh.methods = oh.import("base/methods")

@@ -2,7 +2,7 @@ local tween_service = game:GetService("TweenService")
 
 local ui = {}
 
-local base = oh.ui.Base
+local base = oh.gui.Base
 
 local body = base.Body
 
