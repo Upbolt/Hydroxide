@@ -1,5 +1,15 @@
-local text_service = game:GetService("TextService")
-local call_count_width = Vector2.new(1337420, 20)
+local text_service = game.GetService(game, "TextService")
+local tween_service = game.GetService(game, "TweenService")
+
+
+local constants = {
+    call_count_width = Vector2.new(1337420, 20),
+    log_size = UDim2.new(0, 0, 0, 25),
+    tween_speed = TweenInfo.new(0.15),
+
+    remote_object_enter = Color3.fromRGB(50, 50, 50),
+    remote_object_leave = Color3.fromRGB(30, 30, 30)
+}
 
 local ui = {}
 local base = oh.gui.Base
@@ -10,31 +20,34 @@ local list = tab.List
 local logs = tab.Logs
 
 local list_main = list.Main
+local list_buttons = list.Remotes
 local list_results = list_main.Results.Clip.Contents
 
-local viewing = {
-    RemoteEvent = true,
-    RemoteFunction = false,
-    BindableEvent = false,
-    BindableFunction = false
+local ui_data = {
+    RemoteEvent = { viewing = true, icon = "rbxassetid://4229806545" },
+    RemoteFunction = { viewing = false, icon = "rbxassetid://4229810474" },
+    BindableEvent = { viewing = false, icon = "rbxassetid://4229809371" },
+    BindableFunction = { viewing = false, icon = "rbxassetid://4229807624" }
 }
 
 local add_call = function(log, params)
     local remote = log.remote
     local object = log.object
-    local call_count = object.Calls
     local remote_name = object.Label
     local remote_icon = object.Icon
+    local call_count = object.Calls
 
     local selected_remote = oh.remote_spy.selected_remote
-    local call_width = text_service:GetTextSize(tostring(remote.calls + 1), 16, "SourceSans", call_count_width).X
+    local call_width = text_service.GetTextSize(text_service, tostring(remote.calls + 1), 16, "SourceSans", call_count_width).X + 10
 
     remote.calls = remote.calls + 1
+
     call_count.Text = remote.calls
+    call_count.Size = UDim2.new(0, call_width, 0, 20)
 
     if not call_count.Text.Fits then
         if remote.calls < 10000 then
-            remote_icon.Position = UDim2.new(0, call_width - 2, 0, 0)
+            remote_icon.Position = UDim2.new(0, call_width - 4, 0, 0)
 
             local icon_width_offset = call_width + remote_icon.AbsoluteSize.X
 
@@ -55,9 +68,15 @@ local add_call = function(log, params)
     end
 end
 
-local new_log = function(remote)
+ui.new_log = function(remote)
     local log = {}
-    local object = assets.RemoteLog:Clone()
+    local data = remote.data
+
+    local object = assets.RemoteLog.Clone(assets.RemoteLog)
+
+    object.Name = data.Name
+    object.Label.Text = data.Name
+    object.Icon.Image = ui_data[data.ClassName].icon 
 
     log.remote = remote
     log.object = object
@@ -65,11 +84,62 @@ local new_log = function(remote)
     remote.log = log
     object.Parent = list_results
 
+    if not ui_data[data.ClassName].viewing then
+        object.Visible = false
+    else
+        list_results.CanvasSize = list_results.CanvasSize + log_size
+    end
+
     return log
 end
 
 ui.update = function(remote, ...)
-    print("updated " .. remote.Name)
+    add_call(remote.log, ...)
+end
+
+for i, button in pairs(list_buttons.GetChildren(list_buttons)) do
+    if button.ClassName == "Frame" then
+        local button_object = button.Button
+        local remote_type = button.Name
+        local enter_animation = tween_service.Create(tween_service, button_object, constants.tween_speed, { ImageColor3 = constants.remote_object_enter })
+        local leave_animation = tween_service.Create(tween_service, button_object, constants.tween_speed, { ImageColor3 = constants.remote_object_leave })
+
+        button_object.MouseButton1Click.Connect(button_object.MouseButton1Click, function()
+            local old = oh.methods.get_context()
+            oh.methods.set_context(6)
+
+            ui_data[remote_type].viewing = not ui_data[remote_type].viewing
+            button_object.ImageColor3 = constants.remote_object_enter
+
+            for k, remote in pairs(remote.cache) do
+                remote.object.Visible = ui_data[remote.data.ClassName].viewing
+            end
+
+            oh.methods.set_context(old)
+        end)
+
+        button_object.MouseEnter.Connect(button_object.MouseEnter, function()
+            local old = oh.methods.get_context()
+            oh.methods.set_context(6)
+
+            if not ui_data[remote_type].viewing then
+                enter_animation.Play(enter_animation)
+            end
+
+            oh.methods.set_context(old)
+        end)
+
+        button_object.MouseLeave.Connect(button_object.MouseLeave, function()
+            local old = oh.methods.get_context()
+            oh.methods.set_context(6)
+
+            if not ui_data[remote_type].viewing then
+                leave_animation.Play(leave_animation)
+            end
+
+            oh.methods.set_context(old)
+        end)
+    end
 end
 
 return ui

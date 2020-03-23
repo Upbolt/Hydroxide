@@ -18,25 +18,30 @@ local remote_check = {
 }
 
 local remote_hook = function(method)
+    local epoch = oh.epoch 
     local h
     h = oh.methods.hook_function(method, function(obj, ...)
-        if remote_check[obj.ClassName] and not oh.is_dead then
-            print(obj.Name .. ' : ', ...)
-            print(h)
+        if remote_check[obj.ClassName] and oh.epoch == epoch then
+            local old = oh.methods.get_context()
+            local object = remote.cache[obj] 
+            
+            oh.methods.set_context(6)
 
-            local object = remote.cache[obj] or remote.new(obj)
-    
+            if not object then
+                object = remote.new(obj)
+                ui.new_log(object)
+            end
+            
             if oh.methods.check_caller() or object.ignore then
-                print("called from exploit or ignored")
                 return h(obj, ...)
             end
-    
+            
             if object.block then
-                print("blocked object attempted to call")
                 return 
             end
             
-            ui.update(obj, ...)
+            ui.update(object, ...)
+            oh.methods.set_context(old)
         end
 
         return h(obj, ...)

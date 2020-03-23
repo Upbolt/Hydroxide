@@ -1,4 +1,5 @@
 local methods = {
+    get_context = (syn and syn.get_thread_identity) or getthreadcontext or false,
     get_metatable = getrawmetatable or debug.getmetatable or false,
     get_constants = debug.getconstants or getconstants or getconsts or false,
     get_upvalues = debug.getupvalues or getupvalues or getupvals or false,
@@ -7,12 +8,14 @@ local methods = {
     get_info = debug.getinfo or getinfo or false,
     get_gc = getgc or false,
 
+    set_context = (syn and syn.set_thread_identity) or setthreadcontext or false,
     set_clipboard = setclipboard or (syn and syn.write_clipboard) or false,
     set_constant = debug.setconstant or setconstant or setconst or false,
     set_upvalue = debug.setupvalue or setupvalue or setupval or false,
     set_readonly = setreadonly or false,
 
     new_cclosure = newcclosure or false,
+    check_caller = checkcaller or false,
     hook_function = hookfunction or replaceclosure or false,
 
     is_readonly = isreadonly or false,
