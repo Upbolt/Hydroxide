@@ -6,6 +6,7 @@ local from_disk = true
 
 getgenv().oh = {}
 oh.events = {}
+oh.hooks = {}
 
 oh.import = function(asset)
     local asset_type = type(asset)

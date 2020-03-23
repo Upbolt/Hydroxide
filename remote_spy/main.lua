@@ -19,9 +19,8 @@ local remote_check = {
 
 local remote_hook = function(method)
     local epoch = oh.epoch 
-    local h
-    h = oh.methods.hook_function(method, function(obj, ...)
-        if remote_check[obj.ClassName] and oh.epoch == epoch then
+    oh.hooks[method] = oh.methods.hook_function(method, function(obj, ...)
+        if remote_check[obj.ClassName] then
             local old = oh.methods.get_context()
             local object = remote.cache[obj] 
             
@@ -44,7 +43,7 @@ local remote_hook = function(method)
             oh.methods.set_context(old)
         end
 
-        return h(obj, ...)
+        return oh.hooks[method](obj, ...)
     end)
 end
 

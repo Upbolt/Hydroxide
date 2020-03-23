@@ -83,6 +83,10 @@ oh.exit = function()
         v:Disconnect()
     end
 
+    for i,v in pairs(oh.hooks) do
+        hookfunction(i, v)
+    end
+
     oh.is_dead = true
     oh.gui:Destroy()
     oh.assets:Destroy()

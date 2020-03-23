@@ -4,8 +4,10 @@ local tween_service = game.GetService(game, "TweenService")
 
 local constants = {
     call_count_width = Vector2.new(1337420, 20),
-    log_size = UDim2.new(0, 0, 0, 25),
     tween_speed = TweenInfo.new(0.15),
+    
+    empty_size = UDim2.new(0, 0, 0, 0),
+    log_size = UDim2.new(0, 0, 0, 30),
 
     remote_object_enter = Color3.fromRGB(50, 50, 50),
     remote_object_leave = Color3.fromRGB(30, 30, 30)
@@ -30,7 +32,7 @@ local ui_data = {
     BindableFunction = { viewing = false, icon = "rbxassetid://4229807624" }
 }
 
-local add_call = function(log, params)
+local add_call = function(log, ...)
     local remote = log.remote
     local object = log.object
     local remote_name = object.Label
@@ -38,7 +40,7 @@ local add_call = function(log, params)
     local call_count = object.Calls
 
     local selected_remote = oh.remote_spy.selected_remote
-    local call_width = text_service.GetTextSize(text_service, tostring(remote.calls + 1), 16, "SourceSans", call_count_width).X + 10
+    local call_width = text_service.GetTextSize(text_service, tostring(remote.calls + 1), 16, "SourceSans", constants.call_count_width).X + 10
 
     remote.calls = remote.calls + 1
 
@@ -87,7 +89,7 @@ ui.new_log = function(remote)
     if not ui_data[data.ClassName].viewing then
         object.Visible = false
     else
-        list_results.CanvasSize = list_results.CanvasSize + log_size
+        list_results.CanvasSize = list_results.CanvasSize + constants.log_size
     end
 
     return log
@@ -97,47 +99,39 @@ ui.update = function(remote, ...)
     add_call(remote.log, ...)
 end
 
-for i, button in pairs(list_buttons.GetChildren(list_buttons)) do
+for i, button in pairs(list_buttons:GetChildren()) do
     if button.ClassName == "Frame" then
         local button_object = button.Button
         local remote_type = button.Name
-        local enter_animation = tween_service.Create(tween_service, button_object, constants.tween_speed, { ImageColor3 = constants.remote_object_enter })
-        local leave_animation = tween_service.Create(tween_service, button_object, constants.tween_speed, { ImageColor3 = constants.remote_object_leave })
+        local enter_animation = tween_service:Create(button_object, constants.tween_speed, { ImageColor3 = constants.remote_object_enter })
+        local leave_animation = tween_service:Create(button_object, constants.tween_speed, { ImageColor3 = constants.remote_object_leave })
 
         button_object.MouseButton1Click.Connect(button_object.MouseButton1Click, function()
-            local old = oh.methods.get_context()
-            oh.methods.set_context(6)
-
             ui_data[remote_type].viewing = not ui_data[remote_type].viewing
             button_object.ImageColor3 = constants.remote_object_enter
 
-            for k, remote in pairs(remote.cache) do
-                remote.object.Visible = ui_data[remote.data.ClassName].viewing
-            end
+            list_results.CanvasSize = constants.empty_size
 
-            oh.methods.set_context(old)
+            for k, remote in pairs(oh.remote_spy.remote.cache) do
+                local object = remote.log.object
+                object.Visible = ui_data[remote.data.ClassName].viewing
+
+                if object.Visible then
+                    list_results.CanvasSize = list_results.CanvasSize + constants.log_size
+                end
+            end
         end)
 
-        button_object.MouseEnter.Connect(button_object.MouseEnter, function()
-            local old = oh.methods.get_context()
-            oh.methods.set_context(6)
-
+        button_object.MouseEnter:Connect(function()
             if not ui_data[remote_type].viewing then
                 enter_animation.Play(enter_animation)
             end
-
-            oh.methods.set_context(old)
         end)
 
-        button_object.MouseLeave.Connect(button_object.MouseLeave, function()
-            local old = oh.methods.get_context()
-            oh.methods.set_context(6)
-
+        button_object.MouseLeave:Connect(function()
             if not ui_data[remote_type].viewing then
                 leave_animation.Play(leave_animation)
             end
-
-            oh.methods.set_context(old)
         end)
     end
 end
