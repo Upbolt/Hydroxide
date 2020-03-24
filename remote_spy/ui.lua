@@ -169,10 +169,6 @@ ui.new_log = function(remote)
 end
 
 ui.update = function(remote, ...)
-    if remote.data.ClassName == "RemoteEvent" then
-        print("event updated")
-    end
-
     increment_call(remote.log, {...})
 end
 
