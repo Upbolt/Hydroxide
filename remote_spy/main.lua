@@ -30,7 +30,11 @@ local remote_hook = function(method)
                 ui.new_log(object)
             end
             
-            if oh.methods.check_caller() or object.ignore then
+            if --[[oh.methods.check_caller() or]] object.ignore then
+                if obj.ClassName == "RemoteEvent" then
+                    print("returned because of caller")
+                end
+
                 return oh.hooks[method](obj, ...)
             end
             

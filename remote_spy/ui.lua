@@ -40,10 +40,12 @@ local ui_data = {
 
 local create_arg = function(call, index, value)
     local arg = assets.RemoteArg.Clone(assets.RemoteArg)
+    local value_type = type(value)
 
-    arg.Icon.Image = oh.ui.icons[type(value)]
+    arg.Icon.Image = oh.ui.icons[value_type]
     arg.Index.Text = index
     arg.Label.Text = oh.methods.to_string(value)
+    arg.Label.TextColor3 = oh.ui.colors[value_type]
 
     call.Size = call.Size + constants.log_size
     arg.Parent = call.Contents
@@ -167,6 +169,10 @@ ui.new_log = function(remote)
 end
 
 ui.update = function(remote, ...)
+    if remote.data.ClassName == "RemoteEvent" then
+        print("event updated")
+    end
+
     increment_call(remote.log, {...})
 end
 

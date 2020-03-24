@@ -64,6 +64,16 @@ ui.icons = {
     ["function"] = "rbxassetid://4666593447"
 }
 
+ui.colors = {
+    ["nil"] = Color3.fromRGB(244, 135, 113),
+    table = Color3.fromRGB(200, 200, 200),
+    string = Color3.fromRGB(225, 150, 85),
+    number = Color3.fromRGB(170, 225, 127),
+    boolean = Color3.fromRGB(127, 200, 255),
+    userdata = Color3.fromRGB(200, 200, 200),
+    ["function"] = Color3.fromRGB(200, 200, 200)
+}
+
 local dragging, dragInput, dragStart, startPos
 
 drag.InputBegan:Connect(function(input)

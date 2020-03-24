@@ -29,7 +29,7 @@ methods.to_string = function(value)
         local mt = oh.methods.get_metatable(value)
         local __tostring = mt and rawget(mt, "__tostring")
 
-        if not mt or (mt and not __tostring)then 
+        if not mt or (mt and not __tostring) then 
             return tostring(value) 
         end
 
