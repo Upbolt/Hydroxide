@@ -14,7 +14,7 @@ oh.import = function(asset)
 
     if asset_type == "string" then
         return loadstring(
-            from_disk and readfile("oh/" .. asset .. '.lua') or 
+            (from_disk and readfile("oh/" .. asset .. '.lua')) or 
             game:HttpGetAsync(("https://raw.githubusercontent.com/%s/%s.lua"):format(github_branch, asset))
         )()
     elseif asset_type == "number" then
