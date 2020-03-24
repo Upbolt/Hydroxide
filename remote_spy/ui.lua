@@ -1,7 +1,6 @@
 local text_service = game.GetService(game, "TextService")
 local tween_service = game.GetService(game, "TweenService")
 
-
 local constants = {
     call_count_width = Vector2.new(1337420, 20),
     tween_speed = TweenInfo.new(0.15),
