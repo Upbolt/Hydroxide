@@ -24,7 +24,8 @@ local methods = {
 }
 
 methods.to_string = function(value) 
-    if typeof(value) == "userdata" or typeof(value) == "table" then
+    local type = typeof(value)
+    if type == "userdata" or type == "table" then
         local mt = oh.methods.get_metatable(value)
         local __tostring = mt and rawget(mt, "__tostring")
 
@@ -38,7 +39,7 @@ methods.to_string = function(value)
         
         rawset(mt, "__tostring", __tostring)
 
-        return value
+        return value  
     else 
         return tostring(value) 
     end
@@ -62,6 +63,40 @@ methods.get_path = function(instance)
     end
 	
 	return methods.get_path(instance.Parent) .. path
+end
+
+methods.charray = function(str)
+	local chars = {}
+
+	for i,v in utf8.codes(str) do
+		chars[i] = v
+	end
+
+	return chars
+end
+
+methods.combine = function(charray)
+	local str = '"'
+
+	for i,v in pairs(charray) do
+		if v < 32 then 
+			str = str .. '" .. string.char(' .. v .. ') .. "'
+		elseif v > 126 then
+			str = str .. '" .. utf8.char(' .. v .. ') .. "'
+		else
+			local char = string.char(v)
+
+			if char == '\\' then
+				str = str .. '\\\\'
+			elseif char == '"' then
+				str = str .. '\\"'
+			else 
+				str = str .. char
+			end
+		end
+	end
+
+	return str .. '"'
 end
 
 return methods

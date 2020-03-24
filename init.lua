@@ -1,4 +1,4 @@
-if oh then
+if oh and oh.exit then
     oh.exit()
 end
 

@@ -6,11 +6,14 @@ local constants = {
     call_count_width = Vector2.new(1337420, 20),
     tween_speed = TweenInfo.new(0.15),
     
-    empty_size = UDim2.new(0, 0, 0, 0),
-    log_size = UDim2.new(0, 0, 0, 30),
+    empty_size = UDim2.new(0, 0, 0, 15),
+    log_size = UDim2.new(0, 0, 0, 25),
 
-    remote_object_enter = Color3.fromRGB(50, 50, 50),
-    remote_object_leave = Color3.fromRGB(30, 30, 30)
+    remote_object_enter = Color3.fromRGB(45, 45, 45),
+    remote_object_leave = Color3.fromRGB(30, 30, 30),
+
+    remote_log_enter = Color3.fromRGB(55, 55, 55),
+    remote_log_leave = Color3.fromRGB(40, 40, 40)
 }
 
 local ui = {}
@@ -25,6 +28,10 @@ local list_main = list.Main
 local list_buttons = list.Remotes
 local list_results = list_main.Results.Clip.Contents
 
+local logs_back = logs.Back
+local logs_object = logs.RemoteObject
+local logs_results = logs.Results.Clip.Contents
+
 local ui_data = {
     RemoteEvent = { viewing = true, icon = "rbxassetid://4229806545" },
     RemoteFunction = { viewing = false, icon = "rbxassetid://4229810474" },
@@ -32,7 +39,33 @@ local ui_data = {
     BindableFunction = { viewing = false, icon = "rbxassetid://4229807624" }
 }
 
-local add_call = function(log, ...)
+local create_arg = function(call, index, value)
+    local arg = assets.RemoteArg.Clone(assets.RemoteArg)
+
+    arg.Icon.Image = oh.ui.icons[type(value)]
+    arg.Index.Text = index
+    arg.Label.Text = oh.methods.to_string(value)
+
+    call.Size = call.Size + constants.log_size
+    arg.Parent = call.Contents
+end
+
+local create_call = function(vargs)
+    local call = assets.CallPod.Clone(assets.CallPod)
+
+    if #vargs == 0 then
+        create_arg(call, 1, nil)
+    else
+        for i,value in pairs(vargs) do
+            create_arg(call, i, value)
+        end
+    end
+    
+    logs_results.CanvasSize = logs_results.CanvasSize + UDim2.new(0, 0, 0, call.AbsoluteSize.Y + 5)
+    call.Parent = logs_results
+end
+
+local increment_call = function(log, vargs)
     local remote = log.remote
     local object = log.object
     local remote_name = object.Label
@@ -46,6 +79,8 @@ local add_call = function(log, ...)
 
     call_count.Text = remote.calls
     call_count.Size = UDim2.new(0, call_width, 0, 20)
+
+    table.insert(remote.logs, vargs)
 
     if not call_count.Text.Fits then
         if remote.calls < 10000 then
@@ -65,8 +100,8 @@ local add_call = function(log, ...)
         end
     end
 
-    if selected_remote then
-
+    if selected_remote == remote then
+        create_call(vargs)
     end
 end
 
@@ -75,6 +110,10 @@ ui.new_log = function(remote)
     local data = remote.data
 
     local object = assets.RemoteLog.Clone(assets.RemoteLog)
+    local button = object.Button
+
+    local enter_animation = tween_service.Create(tween_service, button, constants.tween_speed, { ImageColor3 = constants.remote_log_enter })
+    local leave_animation = tween_service.Create(tween_service, button, constants.tween_speed, { ImageColor3 = constants.remote_log_leave })
 
     object.Name = data.Name
     object.Label.Text = data.Name
@@ -92,12 +131,50 @@ ui.new_log = function(remote)
         list_results.CanvasSize = list_results.CanvasSize + constants.log_size
     end
 
+    button.MouseButton1Click.Connect(button.MouseButton1Click, function() 
+        local old = oh.methods.get_context()
+        oh.methods.set_context(6)
+
+        if oh.remote_spy.selected_remote ~= remote then
+            logs_results.CanvasSize = constants.empty_size
+
+            for i,v in pairs(logs_results.GetChildren(logs_results)) do
+                if v.ClassName == "ImageLabel" then
+                    v.Destroy(v)
+                end
+            end
+
+            for i,args in pairs(remote.logs) do
+                create_call(args)
+            end
+        end
+        
+        list.Visible = false
+        logs.Visible = true
+        
+        oh.remote_spy.selected_remote = remote
+        oh.methods.set_context(old)
+    end)
+    
+    button.MouseEnter.Connect(button.MouseEnter, function()
+        enter_animation.Play(enter_animation)
+    end)
+    
+    button.MouseLeave.Connect(button.MouseLeave, function()
+        leave_animation.Play(leave_animation)
+    end)
+    
     return log
 end
 
 ui.update = function(remote, ...)
-    add_call(remote.log, ...)
+    increment_call(remote.log, {...})
 end
+
+logs_back.MouseButton1Click:Connect(function()
+    list.Visible = true
+    logs.Visible = false
+end)
 
 for i, button in pairs(list_buttons:GetChildren()) do
     if button.ClassName == "Frame" then
@@ -124,13 +201,13 @@ for i, button in pairs(list_buttons:GetChildren()) do
 
         button_object.MouseEnter:Connect(function()
             if not ui_data[remote_type].viewing then
-                enter_animation.Play(enter_animation)
+                enter_animation:Play()
             end
         end)
 
         button_object.MouseLeave:Connect(function()
             if not ui_data[remote_type].viewing then
-                leave_animation.Play(leave_animation)
+                leave_animation:Play()
             end
         end)
     end
