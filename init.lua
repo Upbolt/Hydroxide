@@ -3,6 +3,7 @@ if oh and oh.exit then
 end
 
 local from_disk = true
+local github_branch = "Upbolt/Hydroxide/master"
 
 getgenv().oh = {}
 oh.events = {}
@@ -12,7 +13,10 @@ oh.import = function(asset)
     local asset_type = type(asset)
 
     if asset_type == "string" then
-        return loadstring((from_disk and readfile("oh/" .. asset .. '.lua')) or game:HttpGetAsync("https://raw.githubusercontent.com/nrv-ous/Hydroxide/master/"))()
+        return loadstring(
+            from_disk and readfile("oh/" .. asset .. '.lua') or 
+            game:HttpGetAsync(("https://raw.githubusercontent.com/%s/%s.lua"):format(github_branch, asset))
+        )()
     elseif asset_type == "number" then
         return game:GetObjects("rbxassetid://" .. asset)[1]
     end
