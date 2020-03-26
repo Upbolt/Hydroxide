@@ -24,35 +24,11 @@ local hide_toggle = UDim2.new(0.5, -10, 0, -100)
 
 local showing = true
 
---[[
-    Tab Selection:
-        - Highlight effect when the client hovers their mouse over the tab buttons in the top left
-        - Changes tabs upon clicking a button (if applicible)
-]]
-local current_tab = tabs.Home
-for i,button in pairs(tab_selector:GetChildren()) do
-    if button:IsA("ImageButton") then
-        local enter = tween_service:Create(button, tween_info, { ImageColor3 = enter_color })
-        local leave = tween_service:Create(button, tween_info, { ImageColor3 = leave_color })
+local message_box = oh.import("ui/message_box")
+local input = oh.import("ui/input")
 
-        button.MouseEnter:Connect(function()
-            enter:Play()
-        end)
-
-        button.MouseLeave:Connect(function()
-            leave:Play()
-        end)
-
-        button.MouseButton1Click:Connect(function()
-            local tab = tabs:FindFirstChild(button.Name)
-            if tab then
-                current_tab.Visible = false
-                tab.Visible = true
-                current_tab = tab
-            end
-        end)
-    end
-end
+ui.message_box = message_box
+ui.input = input
 
 ui.icons = {
     ["nil"] = "rbxassetid://4800232219",
@@ -120,6 +96,64 @@ show.MouseButton1Click:Connect(function()
 end)
 
 oh.execute = function()
+    local method_checks = {
+        RemoteSpy = oh.remote_spy.methods,
+        UpvalueScanner = oh.upvalue_scanner.methods
+    }
+    
+    --[[
+        Tab Selection:
+            - Highlight effect when the client hovers their mouse over the tab buttons in the top left
+            - Changes tabs upon clicking a button (if applicible)
+    ]]
+    local current_tab = tabs.Home
+    for i,button in pairs(tab_selector:GetChildren()) do
+        if button:IsA("ImageButton") then
+            local enter = tween_service:Create(button, tween_info, { ImageColor3 = enter_color })
+            local leave = tween_service:Create(button, tween_info, { ImageColor3 = leave_color })
+
+            button.MouseEnter:Connect(function()
+                enter:Play()
+            end)
+
+            button.MouseLeave:Connect(function()
+                leave:Play()
+            end)
+
+            button.MouseButton1Click:Connect(function()
+                local tab = tabs:FindFirstChild(button.Name)
+                local method_check = method_checks[tab.Name]
+                local missing_methods = "" 
+
+                if current_tab == tab then
+                    return
+                end
+
+                for method_name,v in pairs(method_check) do
+                    if not oh.methods[method_name] then
+                        missing_methods = missing_methods .. method_name .. ", "
+                        print(method_name)
+                    end
+                end
+
+                if #missing_methods > 0 then
+                    message_box(
+                        "ok",
+                        "You cannot use this section!", 
+                        "Functions are missing from your exploit! Here is a list of what it needs: " .. missing_methods:sub(1, -3)
+                    )
+                    return
+                end
+
+                if tab then
+                    current_tab.Visible = false
+                    tab.Visible = true
+                    current_tab = tab
+                end
+            end)
+        end
+    end
+
     oh.gui.Parent = game:GetService("CoreGui")
 end
 
@@ -129,7 +163,12 @@ oh.exit = function()
     end
 
     for i,v in pairs(oh.hooks) do
-        hookfunction(i, v)
+        if i == "namecall" then
+            local gmt = oh.methods.get_metatable(game)
+            gmt.__namecall = v
+        else
+            hookfunction(i, v)
+        end
     end
 
     oh.is_dead = true

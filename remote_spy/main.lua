@@ -1,7 +1,10 @@
 local methods = {
-    get_namecall_method = true,
     get_metatable = true,
-    check_caller = true
+    get_context = true,
+    set_context = true,
+    hook_function = true,
+    check_caller = true,
+    new_cclosure = true
 }
 
 local ui = oh.import('remote_spy/ui')
@@ -18,7 +21,7 @@ local remote_check = {
 }
 
 local remote_hook = function(method)
-    oh.hooks[method] = oh.methods.hook_function(method, function(obj, ...)
+    oh.hooks[method] = oh.methods.hook_function(method, newcclosure(function(obj, ...)
         if remote_check[obj.ClassName] then
             local old = oh.methods.get_context()
             local object = remote.cache[obj] 
@@ -30,11 +33,7 @@ local remote_hook = function(method)
                 ui.new_log(object)
             end
             
-            if --[[oh.methods.check_caller() or]] object.ignore then
-                if obj.ClassName == "RemoteEvent" then
-                    print("returned because of caller")
-                end
-
+            if (not issentinelclosure and oh.methods.check_caller()) or object.ignore then
                 return oh.hooks[method](obj, ...)
             end
             
@@ -47,15 +46,53 @@ local remote_hook = function(method)
         end
 
         return oh.hooks[method](obj, ...)
-    end)
+    end))
 end
 
 for class_name, method in pairs(remote_check) do
     remote_hook(method)
 end
 
-remote_hook(gmt.__namecall)
+--[[
+    do not blame me for this ugly code
+    this is all slappy's fault
+    for not letting me be able to hook __namecall with hookfunction
+]]
+if not PROTOSMASHER_LOADED then
+    remote_hook(gmt.__namecall)
+else
+    local nmc = gmt.__namecall
+
+    gmt.__namecall = function(obj, ...)
+        if remote_check[obj.ClassName] then
+            local old = oh.methods.get_context()
+            local object = remote.cache[obj] 
+            
+            oh.methods.set_context(6)
+
+            if not object then
+                object = remote.new(obj)
+                ui.new_log(object)
+            end
+            
+            if oh.methods.check_caller() object.ignore then
+                return nmc(obj, ...)
+            end
+            
+            if object.block then
+                return 
+            end
+            
+            ui.update(object, ...)
+            oh.methods.set_context(old)
+        end
+
+        return nmc(obj, ...)
+    end
+end
+-- end of ugly slappy code
 
 remote_spy.ui = ui
 remote_spy.remote = remote
+remote_spy.methods = methods
 return remote_spy

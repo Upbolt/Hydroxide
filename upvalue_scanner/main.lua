@@ -14,4 +14,8 @@ local closure = oh.import('upvalue_scanner/objects/closure')
 local upvalue = oh.import('upvalue_scanner/objects/upvalue')
 local table_upvalue = oh.import('upvalue_scanner/objects/table_upvalue')
 
-return methods
+local upvalue_scanner = {}
+
+
+upvalue_scanner.methods = methods
+return upvalue_scanner 
