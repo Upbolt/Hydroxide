@@ -75,7 +75,7 @@ else
                 ui.new_log(object)
             end
             
-            if oh.methods.check_caller() object.ignore then
+            if oh.methods.check_caller() and object.ignore then
                 return nmc(obj, ...)
             end
             
