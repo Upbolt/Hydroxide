@@ -1,13 +1,15 @@
 local upvalue = {}
 
+local update = function(upvalue)
+    
+end
+
 upvalue.new = function(closure, index)
     local object = {}
 
-    return object
-end
+    object.update = update
 
-upvalue.update = function(update)
-    
+    return object
 end
 
 return upvalue
