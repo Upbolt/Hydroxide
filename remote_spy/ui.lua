@@ -132,39 +132,40 @@ ui.new_log = function(remote)
         list_results.CanvasSize = list_results.CanvasSize + constants.log_size
     end
 
-    button.MouseButton1Click.Connect(button.MouseButton1Click, function() 
-        local old = oh.methods.get_context()
-        oh.methods.set_context(6)
+    spawn(function()
+        button.MouseButton1Click.Connect(button.MouseButton1Click, function() 
+            local old = oh.methods.get_context()
+            oh.methods.set_context(6)
 
-        if oh.remote_spy.selected_remote ~= remote then
-            logs_results.CanvasSize = constants.empty_size
+            if oh.remote_spy.selected_remote ~= remote then
+                logs_results.CanvasSize = constants.empty_size
 
-            for i,v in pairs(logs_results.GetChildren(logs_results)) do
-                if v.ClassName == "ImageLabel" then
-                    v.Destroy(v)
+                for i,v in pairs(logs_results.GetChildren(logs_results)) do
+                    if v.ClassName == "ImageLabel" then
+                        v.Destroy(v)
+                    end
+                end
+
+                for i,args in pairs(remote.logs) do
+                    create_call(args)
                 end
             end
-
-            for i,args in pairs(remote.logs) do
-                create_call(args)
-            end
-        end
+            
+            list.Visible = false
+            logs.Visible = true
+            
+            oh.remote_spy.selected_remote = remote
+            oh.methods.set_context(old)
+        end)
         
-        list.Visible = false
-        logs.Visible = true
+        button.MouseEnter.Connect(button.MouseEnter, function()
+            enter_animation.Play(enter_animation)
+        end)
         
-        oh.remote_spy.selected_remote = remote
-        oh.methods.set_context(old)
+        button.MouseLeave.Connect(button.MouseLeave, function()
+            leave_animation.Play(leave_animation)
+        end)
     end)
-    
-    button.MouseEnter.Connect(button.MouseEnter, function()
-        enter_animation.Play(enter_animation)
-    end)
-    
-    button.MouseLeave.Connect(button.MouseLeave, function()
-        leave_animation.Play(leave_animation)
-    end)
-    
     return log
 end
 

@@ -17,5 +17,6 @@ local table_upvalue = oh.import('upvalue_scanner/objects/table_upvalue')
 local upvalue_scanner = {}
 
 
+
 upvalue_scanner.methods = methods
 return upvalue_scanner 
