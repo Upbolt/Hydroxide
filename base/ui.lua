@@ -50,6 +50,54 @@ ui.colors = {
     ["function"] = Color3.fromRGB(200, 200, 200)
 }
 
+ui.apply_highlight = function(obj, color_data)
+    local property = (color_data and color_data.property) or "BackgroundColor3"
+    local condition = (color_data and color_data.condition and color_data.condition()) or true
+    local old_color = (color_data and color_data.property and obj[color_data.property]) or obj.BackgroundColor3
+    local new_color = (color_data and color_data.new) or Color3.fromRGB((old_color.r * 255) + 30, (old_color.g * 255) + 30, (old_color.b * 255) + 30)
+    local down_color = (color_data and color_data.down) or Color3.fromRGB((new_color.r * 255) + 30, (new_color.g * 255) + 30, (new_color.b * 255) + 30)
+
+    local new_tween = function()
+        --if condition then
+            local old_context = oh.methods.get_context()
+            oh.methods.set_context(6)
+
+        print'hi'
+
+            local anim = tween_service.Create(tween_service, obj, TweenInfo.new(0.10), {[property] = new_color})
+            anim.Play(anim)
+
+            oh.methods.set_context(old_context)
+        --end
+    end
+
+    local down_tween = function()
+        --if condition then
+            local old_context = oh.methods.get_context()
+            oh.methods.set_context(6)
+
+            local anim = tween_service.Create(tween_service, obj, TweenInfo.new(0.10), {[property] = down_color})
+            
+        print'bye'
+
+            anim.Play(anim)
+
+            oh.methods.set_context(old_context)
+        --end
+    end
+
+    obj.MouseEnter.Connect(obj.MouseEnter, new_tween)
+    obj.MouseLeave.Connect(obj.MouseLeave, down_tween)
+
+    if not (color_data and color_data.mouse2) then
+        obj.MouseButton1Down.Connect(obj.MouseButton1Down, down_tween)
+        obj.MouseButton1Up.Connect(obj.MouseButton1Up, new_tween)
+    else
+        obj.MouseButton2Down.Connect(obj.MouseButton2Down, down_tween)
+        obj.MouseButton2Up:Connect(obj.MouseButton2Up, new_tween)
+    end
+end
+
 local dragging, dragInput, dragStart, startPos
 
 drag.InputBegan:Connect(function(input)
@@ -125,7 +173,7 @@ oh.execute = function()
                 local method_check = method_checks[tab.Name]
                 local missing_methods = "" 
 
-                if current_tab == tab then
+                if current_tab == tab or not method_check then
                     return
                 end
 
