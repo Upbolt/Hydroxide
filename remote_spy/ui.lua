@@ -39,6 +39,8 @@ local ui_data = {
 }
 
 local create_arg = function(call, index, value)
+    print("creating arg")
+
     local arg = assets.RemoteArg.Clone(assets.RemoteArg)
     local value_type = type(value)
 
@@ -122,8 +124,7 @@ ui.new_log = function(remote)
 
     log.remote = remote
     log.object = object
-    
-    remote.log = log
+
     object.Parent = list_results
 
     if not ui_data[data.ClassName].viewing then
@@ -137,6 +138,8 @@ ui.new_log = function(remote)
         oh.methods.set_context(6)
 
         if oh.remote_spy.selected_remote ~= remote then
+            print(remote.data.Name .. ' was selected')
+
             logs_results.CanvasSize = constants.empty_size
 
             for i,v in pairs(logs_results.GetChildren(logs_results)) do
@@ -148,6 +151,8 @@ ui.new_log = function(remote)
             for i,args in pairs(remote.logs) do
                 create_call(args)
             end
+
+            print('created args')
         end
         
         list.Visible = false
@@ -157,7 +162,13 @@ ui.new_log = function(remote)
         oh.methods.set_context(old)
     end)
     
-    oh.ui.apply_highlight(button)
+    button.MouseEnter.Connect(button.MouseEnter, function()
+        enter_animation.Play(enter_animation)
+    end)
+
+    button.MouseLeave.Connect(button.MouseLeave, function()
+        leave_animation.Play(leave_animation)
+    end)
 
     return log
 end

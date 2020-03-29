@@ -20,17 +20,25 @@ local remote_check = {
     BindableFunction = Instance.new("BindableFunction").Invoke
 }
 
+local hydroxide_hook = Instance.new("BindableFunction")
+hydroxide_hook.OnInvoke = function(obj)
+    return ui.new_log(obj)
+end
+
 local remote_hook = function(method)
     oh.hooks[method] = oh.methods.hook_function(method, newcclosure(function(obj, ...)
+        if oh.methods.check_caller() and obj == hydroxide_hook then
+            return oh.hooks[method](obj, ...)
+        end
+
         if remote_check[obj.ClassName] then
-            local old = oh.methods.get_context()
             local object = remote.cache[obj] 
-            
-            oh.methods.set_context(6)
 
             if not object then
                 object = remote.new(obj)
-                ui.new_log(object)
+                object.log = hydroxide_hook.Invoke(hydroxide_hook, object)
+
+                print(object.log)
             end
             
             if (not issentinelclosure and oh.methods.check_caller()) or object.ignore then
@@ -40,9 +48,8 @@ local remote_hook = function(method)
             if object.block then
                 return 
             end
-            
+
             ui.update(object, ...)
-            oh.methods.set_context(old)
         end
 
         return oh.hooks[method](obj, ...)
@@ -64,6 +71,10 @@ else
     local nmc = gmt.__namecall
 
     gmt.__namecall = function(obj, ...)
+        if oh.methods.check_caller() and obj == hydroxide_hook then
+            return oh.hooks[method](obj, ...)
+        end
+
         if remote_check[obj.ClassName] then
             local old = oh.methods.get_context()
             local object = remote.cache[obj] 
@@ -72,7 +83,7 @@ else
 
             if not object then
                 object = remote.new(obj)
-                ui.new_log(object)
+                object.log = hydroxide_hook.Invoke(hydroxide_hook, obj)
             end
             
             if oh.methods.check_caller() and object.ignore then
