@@ -39,8 +39,6 @@ local ui_data = {
 }
 
 local create_arg = function(call, index, value)
-    print("creating arg")
-
     local arg = assets.RemoteArg.Clone(assets.RemoteArg)
     local value_type = type(value)
 
@@ -103,15 +101,16 @@ local increment_call = function(log, vargs)
         end
     end
 
-    if selected_remote == remote then
+    if selected_remote and (selected_remote.data == remote.data) then
         create_call(vargs)
     end
 end
 
 ui.new_log = function(remote)
     local log = {}
+    
     local data = remote.data
-
+    
     local object = assets.RemoteLog.Clone(assets.RemoteLog)
     local button = object.Button
 
@@ -135,11 +134,11 @@ ui.new_log = function(remote)
 
     button.MouseButton1Click.Connect(button.MouseButton1Click, function() 
         local old = oh.methods.get_context()
+        local selected_remote = oh.remote_spy.selected_remote
+
         oh.methods.set_context(6)
 
-        if oh.remote_spy.selected_remote ~= remote then
-            print(remote.data.Name .. ' was selected')
-
+        if selected_remote and (selected_remote.data ~= remote.data) then
             logs_results.CanvasSize = constants.empty_size
 
             for i,v in pairs(logs_results.GetChildren(logs_results)) do
@@ -151,8 +150,6 @@ ui.new_log = function(remote)
             for i,args in pairs(remote.logs) do
                 create_call(args)
             end
-
-            print('created args')
         end
         
         list.Visible = false
@@ -180,6 +177,8 @@ end
 logs_back.MouseButton1Click:Connect(function()
     list.Visible = true
     logs.Visible = false
+
+    oh.remote_spy.selected_remote = nil
 end)
 
 for i, button in pairs(list_buttons:GetChildren()) do
