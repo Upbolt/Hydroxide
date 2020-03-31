@@ -3,8 +3,6 @@ local remote = {}
 remote.cache = {}
 
 remote.new = function(instance)
-    print(instance.Name .. ' was given a table')
-
     local object = {}
 
     object.remove = remote.remove
@@ -13,8 +11,9 @@ remote.new = function(instance)
     object.block = false
     object.calls = 0
     object.logs = {}
-    
+
     remote.cache[instance] = object
+
     return object
 end
 

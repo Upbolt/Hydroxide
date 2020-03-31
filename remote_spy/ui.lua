@@ -30,6 +30,7 @@ local list_results = list_main.Results.Clip.Contents
 local logs_back = logs.Back
 local logs_object = logs.RemoteObject
 local logs_results = logs.Results.Clip.Contents
+local logs_indication = logs.RemoteObject
 
 local ui_data = {
     RemoteEvent = { viewing = true, icon = "rbxassetid://4229806545" },
@@ -66,46 +67,6 @@ local create_call = function(vargs)
     call.Parent = logs_results
 end
 
-local increment_call = function(log, vargs)
-    local remote = log.remote
-    local object = log.object
-    local remote_name = object.Label
-    local remote_icon = object.Icon
-    local call_count = object.Calls
-
-    local selected_remote = oh.remote_spy.selected_remote
-    local call_width = text_service.GetTextSize(text_service, tostring(remote.calls + 1), 16, "SourceSans", constants.call_count_width).X + 10
-
-    remote.calls = remote.calls + 1
-
-    call_count.Text = remote.calls
-    call_count.Size = UDim2.new(0, call_width, 0, 20)
-
-    table.insert(remote.logs, vargs)
-
-    if not call_count.Text.Fits then
-        if remote.calls < 10000 then
-            remote_icon.Position = UDim2.new(0, call_width - 4, 0, 0)
-
-            local icon_width_offset = call_width + remote_icon.AbsoluteSize.X
-
-            remote_name.Position = UDim2.new(0, icon_width_offset, 0, 0)
-            remote_name.Size = UDim2.new(1, -icon_width_offset, 0, 20)
-        else
-            remote_icon.Position = UDim2.new(0, 18, 0, 1)
-            remote_name.Position = UDim2.new(0, 40, 0, 0)
-            remote_name.Size = UDim2.new(1, -40, 0, 20)
-
-            call_count.Text = "..."
-            call_count.Size = UDim2.new(0, 20, 0, 20)
-        end
-    end
-
-    if selected_remote and (selected_remote.data == remote.data) then
-        create_call(vargs)
-    end
-end
-
 ui.new_log = function(remote)
     local log = {}
     
@@ -121,7 +82,6 @@ ui.new_log = function(remote)
     object.Label.Text = data.Name
     object.Icon.Image = ui_data[data.ClassName].icon 
 
-    log.remote = remote
     log.object = object
 
     object.Parent = list_results
@@ -138,14 +98,24 @@ ui.new_log = function(remote)
 
         oh.methods.set_context(6)
 
-        if selected_remote and (selected_remote.data ~= remote.data) then
+        if not selected_remote or (selected_remote and selected_remote ~= remote) then
+            
             logs_results.CanvasSize = constants.empty_size
-
+            
             for i,v in pairs(logs_results.GetChildren(logs_results)) do
                 if v.ClassName == "ImageLabel" then
                     v.Destroy(v)
                 end
             end
+            
+            local data = remote.data
+            local remote_name = data.Name
+            local indication_width = text_service.GetTextSize(text_service, remote_name, 16, "SourceSans", constants.call_count_width).X + 18
+            
+            logs_indication.Position = UDim2.new(1, -(indication_width + 5), 0, 2)
+            logs_indication.Size = UDim2.new(0, indication_width, 0, 20)
+            logs_indication.Label.Text = remote_name
+            logs_indication.Icon.Image = ui_data[data.ClassName].icon
 
             for i,args in pairs(remote.logs) do
                 create_call(args)
@@ -171,7 +141,49 @@ ui.new_log = function(remote)
 end
 
 ui.update = function(remote, ...)
-    increment_call(remote.log, {...})
+    remote.calls = remote.calls + 1
+
+    local vargs = {...}
+
+    local object = remote.log.object
+    local remote_name = object.Label
+    local remote_icon = object.Icon
+    local call_count = object.Calls
+
+    local selected_remote = oh.remote_spy.selected_remote
+    local call_width = text_service.GetTextSize(text_service, tostring(remote.calls), 16, "SourceSans", constants.call_count_width).X + 10
+
+    call_count.Text = remote.calls
+    call_count.Size = UDim2.new(0, call_width, 0, 20)
+
+    if remote.data.ClassName == "RemoteEvent" then
+        print("updated call for: " .. remote.data.Name, "calls: " .. remote.calls)
+    end
+
+    table.insert(remote.logs, vargs)
+
+    if not call_count.Text.Fits then
+        if remote.calls < 10000 then
+            remote_icon.Position = UDim2.new(0, call_width - 4, 0, 0)
+
+            local icon_width_offset = call_width + remote_icon.AbsoluteSize.X
+
+            remote_name.Position = UDim2.new(0, icon_width_offset, 0, 0)
+            remote_name.Size = UDim2.new(1, -icon_width_offset, 0, 20)
+        else
+            remote_icon.Position = UDim2.new(0, 18, 0, 1)
+            remote_name.Position = UDim2.new(0, 40, 0, 0)
+            remote_name.Size = UDim2.new(1, -40, 0, 20)
+
+            call_count.Text = "..."
+            call_count.Size = UDim2.new(0, 20, 0, 20)
+        end
+    end
+
+    if selected_remote and selected_remote.data == remote.data then
+        print("call created")
+        create_call(vargs)
+    end
 end
 
 logs_back.MouseButton1Click:Connect(function()

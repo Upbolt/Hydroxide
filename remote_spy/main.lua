@@ -21,14 +21,16 @@ local remote_check = {
 }
 
 local hydroxide_hook = Instance.new("BindableFunction")
-hydroxide_hook.Name = "hydroxide_hook"
-hydroxide_hook.OnInvoke = function(object)
-    return ui.new_log(object)
+hydroxide_hook.OnInvoke = function(obj)
+    local object = remote.new(obj)
+    object.log = ui.new_log(object)
+
+    return object
 end
 
 local remote_hook = function(method)
     oh.hooks[method] = oh.methods.hook_function(method, newcclosure(function(obj, ...)
-        if oh.methods.check_caller() and obj.Name == "hydroxide_hook" then
+        if oh.methods.check_caller() and obj == hydroxide_hook then
             return oh.hooks[method](obj, ...)
         end
 
@@ -39,8 +41,7 @@ local remote_hook = function(method)
             oh.methods.set_context(6)
 
             if not object then
-                object = remote.new(obj)
-                object.log = hydroxide_hook.Invoke(hydroxide_hook, object)
+                object = hydroxide_hook.Invoke(hydroxide_hook, obj)
             end
             
             if (not issentinelclosure and oh.methods.check_caller()) or object.ignore then
