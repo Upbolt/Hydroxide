@@ -74,7 +74,7 @@ if not PROTOSMASHER_LOADED then
 else
     local nmc = gmt.__namecall
 
-    oh.methods.set_readonly(nmc, false)
+    oh.methods.set_readonly(gmt, false)
 
     gmt.__namecall = function(obj, ...)
         if oh.methods.check_caller() and (obj == hydroxide_hook or obj.Name == "increment_call") then
