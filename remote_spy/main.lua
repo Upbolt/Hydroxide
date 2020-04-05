@@ -30,7 +30,7 @@ end
 
 local remote_hook = function(method)
     oh.hooks[method] = oh.methods.hook_function(method, newcclosure(function(obj, ...)
-        if oh.methods.check_caller() and obj == hydroxide_hook then
+        if oh.methods.check_caller() and (obj == hydroxide_hook or obj.Name == "increment_call") then
             return oh.hooks[method](obj, ...)
         end
 
@@ -74,26 +74,31 @@ if not PROTOSMASHER_LOADED then
 else
     local nmc = gmt.__namecall
 
+    oh.methods.set_readonly(nmc, false)
+
     gmt.__namecall = function(obj, ...)
-        if remote_check[obj.ClassName] then
+        if oh.methods.check_caller() and (obj == hydroxide_hook or obj.Name == "increment_call") then
+            return nmc(obj, ...)
+        end
+
+        if remote_check[obj.ClassName] and (obj.ClassName == "BindableEvent" and obj.Parent) then
             local old = oh.methods.get_context()
             local object = remote.cache[obj] 
             
             oh.methods.set_context(6)
 
             if not object then
-                object = remote.new(obj)
-                ui.new_log(object)
+                object = hydroxide_hook.Invoke(hydroxide_hook, obj)
             end
             
-            if oh.methods.check_caller() and object.ignore then
+            if oh.methods.check_caller() or object.ignore then
                 return nmc(obj, ...)
             end
             
             if object.block then
                 return 
             end
-            
+
             ui.update(object, ...)
             oh.methods.set_context(old)
         end

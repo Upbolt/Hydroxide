@@ -99,7 +99,6 @@ ui.new_log = function(remote)
         oh.methods.set_context(6)
 
         if not selected_remote or (selected_remote and selected_remote ~= remote) then
-            
             logs_results.CanvasSize = constants.empty_size
             
             for i,v in pairs(logs_results.GetChildren(logs_results)) do
@@ -142,7 +141,7 @@ end
 
 ui.update = function(remote, ...)
     remote.calls = remote.calls + 1
-
+    
     local vargs = {...}
 
     local object = remote.log.object
@@ -156,11 +155,11 @@ ui.update = function(remote, ...)
     call_count.Text = remote.calls
     call_count.Size = UDim2.new(0, call_width, 0, 20)
 
-    if remote.data.ClassName == "RemoteEvent" then
-        print("updated call for: " .. remote.data.Name, "calls: " .. remote.calls)
-    end
-
     table.insert(remote.logs, vargs)
+    
+    if selected_remote and selected_remote.data == remote.data then
+        create_call(vargs)
+    end
 
     if not call_count.Text.Fits then
         if remote.calls < 10000 then
@@ -178,11 +177,6 @@ ui.update = function(remote, ...)
             call_count.Text = "..."
             call_count.Size = UDim2.new(0, 20, 0, 20)
         end
-    end
-
-    if selected_remote and selected_remote.data == remote.data then
-        print("call created")
-        create_call(vargs)
     end
 end
 
