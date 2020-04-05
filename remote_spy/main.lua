@@ -81,7 +81,7 @@ else
             return nmc(obj, ...)
         end
 
-        if remote_check[obj.ClassName] and (obj.ClassName == "BindableEvent" and obj.Parent) then
+        if remote_check[obj.ClassName] then
             local old = oh.methods.get_context()
             local object = remote.cache[obj] 
             
