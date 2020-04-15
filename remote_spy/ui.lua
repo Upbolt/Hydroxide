@@ -140,7 +140,7 @@ ui.new_log = function(remote)
 end
 
 ui.update = function(remote, ...)
-    remote.calls = remote.calls + 1
+    remote.calls = (remote.calls or 0) + 1
     
     local vargs = {...}
 

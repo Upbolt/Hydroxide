@@ -20,17 +20,9 @@ local remote_check = {
     BindableFunction = Instance.new("BindableFunction").Invoke
 }
 
-local hydroxide_hook = Instance.new("BindableFunction")
-hydroxide_hook.OnInvoke = function(obj)
-    local object = remote.new(obj)
-    object.log = ui.new_log(object)
-
-    return object
-end
-
 local remote_hook = function(method)
     oh.hooks[method] = oh.methods.hook_function(method, newcclosure(function(obj, ...)
-        if oh.methods.check_caller() and (obj == hydroxide_hook or obj.Name == "increment_call") then
+        if oh.methods.check_caller() and (obj.Name == "increment_call") then
             return oh.hooks[method](obj, ...)
         end
 
@@ -41,7 +33,8 @@ local remote_hook = function(method)
             oh.methods.set_context(6)
 
             if not object then
-                object = hydroxide_hook.Invoke(hydroxide_hook, obj)
+                object = remote.new(obj)
+                object.log = ui.new_log(object)
             end
             
             if (not issentinelclosure and oh.methods.check_caller()) or object.ignore then
@@ -52,7 +45,7 @@ local remote_hook = function(method)
                 return 
             end
 
-            ui.update(object, ...)
+            pcall(ui.update, object, ...)
             oh.methods.set_context(old)
         end
 
@@ -77,18 +70,19 @@ else
     oh.methods.set_readonly(gmt, false)
 
     gmt.__namecall = function(obj, ...)
-        if oh.methods.check_caller() and (obj == hydroxide_hook or obj.Name == "increment_call") then
+        if oh.methods.check_caller() and (obj.Name == "increment_call") then
             return nmc(obj, ...)
         end
 
         if remote_check[obj.ClassName] then
             local old = oh.methods.get_context()
-            local object = remote.cache[obj] 
+            local object = remote.cache[obj]
             
             oh.methods.set_context(6)
 
             if not object then
-                object = hydroxide_hook.Invoke(hydroxide_hook, obj)
+                object = remote.new(obj)
+                object.log = ui.new_log(object)
             end
             
             if oh.methods.check_caller() or object.ignore then
@@ -99,7 +93,7 @@ else
                 return 
             end
 
-            ui.update(object, ...)
+            pcall(ui.update, object, ...)
             oh.methods.set_context(old)
         end
 
