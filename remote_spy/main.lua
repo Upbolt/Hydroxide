@@ -75,7 +75,6 @@ else
         end
 
         if remote_check[obj.ClassName] then
-            warn(obj)
             local old = oh.methods.get_context()
             local object = remote.cache[obj]
             
