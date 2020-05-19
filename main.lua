@@ -241,7 +241,6 @@ end
 
 function Remote.block(remote)
     remote.blocked = not remote.blocked
-
 end
 
 -- Closure
