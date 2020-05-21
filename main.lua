@@ -6,6 +6,7 @@ end
 
 -- Global Methods
 local Methods = {
+    checkCaller = checkcaller or false,
     newCClosure = newcclosure or false,
     hookFunction = hookfunction or false,
     getGc = getgc or false,
@@ -241,23 +242,31 @@ end
 
 function Remote.block(remote)
     remote.blocked = not remote.blocked
+
 end
+
+
 
 -- Closure
 local Closure = {}
 
 function Closure.new(data)
     local object = {}
+    local upvalues = {}
+    local constants = {}
+
+    object.Upvalues = upvalues
+    object.Constants = constants
+    object.Environment = getfenv(data)
 
     return object
 end
 
 -- Explorer
 
-
 -- RemoteSpy
 local RemoteCache = {}
-
+local RemoteAddLog = Instance.new("BindableEvent")
 
 local gameMethods = getMetatable(game)
 local namecall = gameMethods.__namecall
@@ -268,6 +277,7 @@ local remoteMethods = {
     BindableFunction = Instance.new("BindableFunction").Invoke,
 }
 
+setReadOnly(gameMethods, false)
 setmetatable(remoteMethods, {
     __index = {
         FireServer = rawget(remoteMethods, "RemoteEvent"),
@@ -277,29 +287,29 @@ setmetatable(remoteMethods, {
     }
 })
 
-setReadOnly(gameMethods, false)
+function RemoteAddLog.OnInvoke(instance)
+
+end
+
+local remoteHook = function(oldMethod, instance, ...)
+    local results = { oldMethod(instance, ...) }
+
+    return unpack(results)
+end
 
 gameMethods.__namecall = function(instance, ...)
-    local results
-    local namecallMethod = getNamecallMethod()
-    
-    if remoteMethods[namecallMethod] then
-        if string.find(instance.Name, "Function") then
-            results = { namecall(instance, ...) }
-        end
-
-        local object = RemoteCache[instance]
-
-        if not object then
-            
-        end
+    if remoteMethods[getNamecallMethod()] then
+        return remoteHook(namecall, instance, ...)
     end 
 
-    if results then
-        return unpack(results)
-    end
-
     return namecall(instance, ...)
+end
+
+for name, method in pairs(remoteMethods) do
+    local oldMethod
+    oldMethod = hookFunction(method, function(instance, ...)
+        return remoteHook(oldMethod, instance, ...)
+    end)
 end
 
 -- ClosureSpy
@@ -310,9 +320,13 @@ end
 
 local UpvalueCache = {}
 
-RunService.Heartbeat:Connect(function()
+
+
+Hydroixde.Events.UpdateUpvalues = RunService.Heartbeat:Connect(function()
     for func, upvalues in pairs(UpvalueCache) do
-        
+        for index, upvalue in pairs(upvalues) do
+            upvalue:update()
+        end
     end
 end)
 
