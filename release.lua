@@ -1,6 +1,6 @@
 assert(getgenv, "<oh> - Your exploit is not supported")
 
-if Hydroxide then
+if Hydroxide and Hydroxide.exit then
     Hydroxide.exit()
 end
 
