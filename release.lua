@@ -428,7 +428,7 @@ local InstanceCache = {}
 -- RemoteSpy
 local RemoteCache = {}
 local RemoteIgnore = {}
-local RemoteAddLog = Instance.new("BindableEvent")
+local RemoteAddLog = Instance.new("BindableFunction")
 
 local gameMethods = getMetatable(game)
 local namecall = gameMethods.__namecall
