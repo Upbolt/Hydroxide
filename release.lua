@@ -558,7 +558,7 @@ local function scanUpvalues(query)
     return upvalues
 end
 
-Hydroixde.Events.UpdateUpvalues = RunService.Heartbeat:Connect(function()
+Hydroxide.Events.UpdateUpvalues = RunService.Heartbeat:Connect(function()
     for func, upvalues in pairs(UpvalueCache) do
         for index, upvalue in pairs(upvalues) do
             upvalue:update()
