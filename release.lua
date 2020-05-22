@@ -460,7 +460,7 @@ setmetatable(remoteMethods, {
 })
 
 function RemoteAddLog.OnInvoke(instance)
-
+    return "yes"
 end
 
 local function remoteHook(oldMethod, instance, ...)
