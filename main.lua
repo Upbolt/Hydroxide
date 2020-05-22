@@ -29,6 +29,132 @@ local Methods = {
     isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure or false
 }
 
+function Methods.userdataValue(data)
+    local dataType = typeof(data)
+
+    if dataType == "Instance" then
+        return getPath(data)
+    elseif 
+        dataType == "Vector3" or
+        dataType == "Vector2" or
+        dataType == "CFrame" or
+        dataType == "Color3" or
+        dataType == "UDim2" 
+    then
+        return dataType .. ".new(" .. tostring(data) .. ")"
+    elseif dataType == "Ray" then
+        local split = tostring(data):split('}, ')
+        local origin = split[1]:gsub('{', "Vector3.new("):gsub('}', ')')
+        local direction = split[2]:gsub('{', "Vector3.new("):gsub('}', ')')
+        return "Ray.new(" .. origin .. "), " .. direction .. ')'
+    elseif dataType == "ColorSequence" then
+        return "ColorSequence.new(" .. dataToString(v.Keypoints) .. ')'
+    elseif dataType == "ColorSequenceKeypoint" then
+        return "ColorSequenceKeypoint.new(" .. data.Time .. ", Color3.new(" .. tostring(data.Value) .. "))"
+    end
+
+    return toString(data)
+end
+
+function Methods.getPath(instance)
+    local name = instance.Name
+    local head = '.' .. name
+    
+    if not instance.Parent and instance ~= game then
+        return head .. " --[[ PARENTED TO NIL OR DESTROYED ]]"
+    end
+    
+    if instance == game then
+        return "game"
+    elseif instance == workspace then
+        return "workspace"
+    else
+        local success, result = pcall(game.GetService, game, instance.ClassName)
+        
+        if result then
+            head = ':GetService("' .. instance.ClassName .. '")'
+        elseif instance == players.LocalPlayer then
+            head = '.LocalPlayer' 
+        else
+            local nonAlphaNum = name:gsub('[%w_]', '')
+            local noPunct = nonAlphaNum:gsub('[%s%p]', '')
+            
+            if tonumber(name:sub(1, 1)) or (#nonAlphaNum ~= 0 and #noPunct == 0) then
+                head = '["' .. name:gsub('"', '\\"'):gsub('\\', '\\\\') .. '"]'
+            elseif #nonAlphaNum ~= 0 and #noPunct > 0 then
+                head = '[' .. toUnicode(name) .. ']'
+            end
+        end
+    end
+    
+    return getPath(instance.Parent) .. head
+end
+
+function Methods.toString(value)
+    local dataType = typeof(value)
+
+    if dataType == "userdata" or dataType == "table" then
+        local mt = getMetatable(value)
+        local __tostring = mt and rawget(mt, "__tostring")
+
+        if not mt or (mt and not __tostring) then 
+            return tostring(value) 
+        end
+
+        rawset(mt, "__tostring", nil)
+        
+        value = tostring(value)
+        
+        rawset(mt, "__tostring", __tostring)
+
+        return value 
+    elseif type(value) == "userdata" then
+        return userdataValue(value)
+    else
+        return tostring(value) 
+    end
+end
+
+function Methods.dataToString(data, root, indents)
+    local dataType = type(data)
+
+    if dataType == "userdata" then
+        return userdataValue(data)
+    elseif dataType == "string" then
+        if #(data:gsub('%w', ''):gsub('%s', ''):gsub('%p', '')) > 0 then
+            local success, result = pcall(toUnicode, data)
+            return (success and result) or toString(data)
+        else
+            return ('"%s"'):format(data:gsub('"', '\\"'))
+        end
+    elseif dataType == "table" then
+        indents = indents or 1
+        root = root or data
+
+        local head = '{\n'
+        local elements = 0
+        local indent = ('\t'):rep(indents)
+        
+        for i,v in pairs(data) do
+            if i ~= root and v ~= root then
+                head = head .. ("%s[%s] = %s,\n"):format(indent, dataToString(i, root, indents + 1), dataToString(v, root, indents + 1))
+            else
+                head = head .. ("%sOH_CYCLIC_PROTECTION,\n"):format(indent)
+            end
+
+            elements = elements + 1
+        end
+        
+        if elements > 0 then
+            return ("%s\n%s"):format(head:sub(1, -3), ('\t'):rep(indents - 1) .. '}')
+        else
+            return "{}"
+        end
+    end
+
+    return tostring(data)
+end
+
 for name, method in pairs(Methods) do
     if method then
         getgenv()[name] = method
@@ -236,16 +362,49 @@ function Remote.new(instance)
 end
 
 function Remote.ignore(remote)
-    remote.ignored = not remote.ignored
+    remote.Ignored = not remote.Ignored
 
 end
 
 function Remote.block(remote)
-    remote.blocked = not remote.blocked
+    remote.Blocked = not remote.Blocked
 
 end
 
+-- Upvalue
+local Upvalue = {}
 
+function Upvalue.new(closure, index)
+    local object = {}
+
+    object.Closure = closure
+    object.Index = index
+    object.Value = getUpvalue(closure, index)
+    object.Update = Upvalue.update
+
+    return object
+end
+
+function Upvalue.update(upvalue)
+    local value = getUpvalue(upvalue.Closure, upvalue.Index)
+
+    if value ~= upvalue.Value then
+        upvalue.Value = value
+    end
+end
+
+-- Constant
+local Constant = {}
+
+function Constant.new(closure, index)
+    local object = {}
+
+    object.Closure = closure
+    object.Index = index
+    object.Value = getConstant(closure, index)
+
+    return Object
+end
 
 -- Closure
 local Closure = {}
@@ -263,11 +422,12 @@ function Closure.new(data)
 end
 
 -- Explorer
-
-
+local TableCache = {}
+local InstanceCache = {}
 
 -- RemoteSpy
 local RemoteCache = {}
+local RemoteIgnore = {}
 local RemoteAddLog = Instance.new("BindableEvent")
 
 local gameMethods = getMetatable(game)
@@ -278,6 +438,8 @@ local remoteMethods = {
     BindableEvent = Instance.new("BindableEvent").Fire,
     BindableFunction = Instance.new("BindableFunction").Invoke,
 }
+
+RemoteIgnore[RemoteAddLog] = true
 
 setReadOnly(gameMethods, false)
 setmetatable(remoteMethods, {
@@ -293,14 +455,21 @@ function RemoteAddLog.OnInvoke(instance)
 
 end
 
-local remoteHook = function(oldMethod, instance, ...)
+local function remoteHook(oldMethod, instance, ...)
     local results = { oldMethod(instance, ...) }
+
+    local remote = RemoteCache[instance]
+
+    if not remote then
+        remote = Remote.new(instance)
+        remote.log = RemoteAddLog.Invoke(RemoteAddLog)
+    end
 
     return unpack(results)
 end
 
-gameMethods.__namecall = function(instance, ...)
-    if remoteMethods[getNamecallMethod()] then
+function gameMethods.__namecall(instance, ...)
+    if remoteMethods[getNamecallMethod()] and not RemoteIgnore[instance] then
         return remoteHook(namecall, instance, ...)
     end 
 
@@ -310,19 +479,54 @@ end
 for name, method in pairs(remoteMethods) do
     local oldMethod
     oldMethod = hookFunction(method, function(instance, ...)
-        return remoteHook(oldMethod, instance, ...)
+        if not RemoteIgnore[instance] then
+            return remoteHook(oldMethod, instance, ...)
+        end
+        
+        return oldMethod(instance, ...)
     end)
 end
 
 -- ClosureSpy
+local ClosureCache = {}
+
+local function spyFunction(closure)
+    if ClosureCache[closure] then
+        -- already spying closure
+        return 
+    end
+
+    if isXClosure(closure) then
+        -- cannot spy exploit function
+        return
+    end
+
+    ClosureCache[closure] = 
+end
+
+local function unspyFunction(closure)
+    if not ClosureCache[closure] then
+        -- not spying closure
+        return
+    end
 
 
+end
 
 -- UpvalueScanner
-
 local UpvalueCache = {}
 
+local function matchUpvalue()
 
+end
+
+local function scanUpvalues()
+    local upvalues = {}
+
+    
+
+    return upvalues
+end
 
 Hydroixde.Events.UpdateUpvalues = RunService.Heartbeat:Connect(function()
     for func, upvalues in pairs(UpvalueCache) do
@@ -333,12 +537,43 @@ Hydroixde.Events.UpdateUpvalues = RunService.Heartbeat:Connect(function()
 end)
 
 -- ScriptScanner
+local function scanScripts()
+    local scripts = {}
 
+    for i,v in pairs(getgc()) do
+        if type(v) == "function" and not isXClosure(v) then
+            local environment = getfenv(v)
+            local script = rawget(environment, "script")
+            local isExploit = rawget(environment, "getgenv")
+
+            if script and script:IsA("LocalScript") and not isExploit then
+                table.insert(scripts, script)
+            end
+        end
+    end
+
+    return scripts
+end
 
 -- ModuleScanner
+local function scanModules()
+    local modules = {}
+
+    for i,v in pairs(getgc()) do
+        if type(v) == "function" and not isXClosure(v) then
+            local script = rawget(getfenv(v), "script")
+
+            if script and script:IsA("ModuleScript") then
+                table.insert(modules, script)
+            end
+        end
+    end
+
+    return modules
+end
 
 -- Initialization
-Hydroxide.exit = function()
+function Hydroxide.exit()
     for i, event in pairs(Hydroxide.Events) do
         event:Disconnect()
     end
