@@ -173,7 +173,6 @@ local Client = Players.LocalPlayer
 local Mouse = Client:GetMouse()
 
 -- Modules
-getgenv().Hydroxide = {}
 local Explorer = {}
 local RemoteSpy = {}
 local ClosureSpy = {}
@@ -181,7 +180,16 @@ local UpvalueScanner = {}
 local ScriptScanner = {}
 local ModuleScanner = {}
 
-Hydroxide.Events = {}
+getgenv().Hydroxide = {
+    Events = {},
+
+    Explorer = Explorer,
+    RemoteSpy = RemoteSpy,
+    ClosureSpy = ClosureSpy,
+    UpvalueScanner = UpvalueScanner,
+    ScriptScanner = ScriptScanner,
+    ModuleScanner = ModuleScanner
+}
 
 -- UI
 local Assets = game:GetObjects("rbxassetid://5042114982")[1]
