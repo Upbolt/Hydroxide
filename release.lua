@@ -533,7 +533,7 @@ local function compareUpvalue(query, upvalue)
     local numberCheck = upvalueType == "number" and (tonumber(query) == upvalue or ("%.2f"):format(upvalue) == query)
     local userDataCheck = upvalueType == "userdata" and toString(upvalue) == query
 
-    if upvalueType == "table" then
+    if upvalueDeepSearch and upvalueType == "table" then
         for i,v in pairs(upvalue) do
             if (i ~= upvalue and v ~= upvalue) and (compareUpvalue(query, v) or compareUpvalue(query, i)) then
                 return true
