@@ -4,6 +4,17 @@ if Hydroxide and Hydroxide.exit then
     Hydroxide.exit()
 end
 
+-- Services
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local UserInput = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local TextService = game:GetService("TextService")
+local RunService = game:GetService("RunService")
+
+local Client = Players.LocalPlayer
+local Mouse = Client:GetMouse()
+
 -- Global Methods
 local Methods = {
     checkCaller = checkcaller or false,
@@ -160,17 +171,6 @@ for name, method in pairs(Methods) do
         getgenv()[name] = method
     end
 end
-
--- Services
-local Players = game:GetService("Players")
-local CoreGui = game:GetService("CoreGui")
-local UserInput = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
-local TextService = game:GetService("TextService")
-local RunService = game:GetService("RunService")
-
-local Client = Players.LocalPlayer
-local Mouse = Client:GetMouse()
 
 -- Modules
 local Explorer = {}
