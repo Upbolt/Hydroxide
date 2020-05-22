@@ -588,8 +588,8 @@ local function scanScripts()
             local script = rawget(environment, "script")
             local isExploit = rawget(environment, "getgenv")
 
-            if script and script:IsA("LocalScript") and not isExploit then
-                table.insert(scripts, script)
+            if script and script:IsA("LocalScript") and not isExploit and not scripts[script]then
+                scripts[script] = true
             end
         end
     end
@@ -607,8 +607,8 @@ local function scanModules()
         if type(v) == "function" and not isXClosure(v) then
             local script = rawget(getfenv(v), "script")
 
-            if script and script:IsA("ModuleScript") then
-                table.insert(modules, script)
+            if script and script:IsA("ModuleScript") and not modules[script] then
+                modules[script] = true
             end
         end
     end
