@@ -516,14 +516,44 @@ end
 -- UpvalueScanner
 local UpvalueCache = {}
 
-local function matchUpvalue()
+local function compareUpvalue(query, upvalue)
+    local upvalueType = type(upvalue)
 
+    local stringCheck = upvalueType == "string" and (query == upvalue or upvalue:find(query))
+    local numberCheck = upvalueType == "number" and (tonumber(query) == upvalue or ("%.2f"):format(upvalue) == query)
+    local userDataCheck = upvalueType == "userdata" and toString(upvalue) == query
+
+    if upvalueType == "table" then
+        for i,v in pairs(upvalue) do
+            if (i ~= upvalue and v ~= upvalue) and (compareUpvalue(query, v) or compareUpvalue(query, i)) then
+                return true
+            end
+        end
+
+        return false
+    end
+
+    return stringCheck or numberCheck or userDataCheck
 end
 
-local function scanUpvalues()
+local function scanUpvalues(query)
     local upvalues = {}
 
-    
+    for i,v in pairs(getGc()) do
+        if type(v) == "function" and not isXClosure(v) then
+            for k, upvalue in pairs(getUpvalues(v)) do
+                if compareUpvalue(query, upvalue) then
+                    local closure = upvalues[v]
+
+                    if not closure then
+                        upvalues[v] = { [k] = upvalue }
+                    else
+                        closure[k] = upvalue
+                    end
+                end
+            end
+        end
+    end
 
     return upvalues
 end
@@ -535,6 +565,8 @@ Hydroixde.Events.UpdateUpvalues = RunService.Heartbeat:Connect(function()
         end
     end
 end)
+
+UpvalueScanner.scan = scanUpvalues
 
 -- ScriptScanner
 local function scanScripts()
