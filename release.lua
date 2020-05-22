@@ -43,7 +43,9 @@ local Methods = {
 function Methods.userdataValue(data)
     local dataType = typeof(data)
 
-    if dataType == "Instance" then
+    if dataType == "userdata" then
+        return toString(data)
+    elseif dataType == "Instance" then
         return getPath(data)
     elseif 
         dataType == "Vector3" or
@@ -64,7 +66,7 @@ function Methods.userdataValue(data)
         return "ColorSequenceKeypoint.new(" .. data.Time .. ", Color3.new(" .. tostring(data.Value) .. "))"
     end
 
-    return toString(data)
+    return tostring(data)
 end
 
 function Methods.getPath(instance)
