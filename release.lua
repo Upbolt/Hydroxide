@@ -73,7 +73,7 @@ function Methods.getPath(instance)
         
         if result then
             head = ':GetService("' .. instance.ClassName .. '")'
-        elseif instance == players.LocalPlayer then
+        elseif instance == Players.LocalPlayer then
             head = '.LocalPlayer' 
         else
             local nonAlphaNum = name:gsub('[%w_]', '')
