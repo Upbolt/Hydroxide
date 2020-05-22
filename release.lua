@@ -501,7 +501,7 @@ local function spyFunction(closure)
         return
     end
 
-    ClosureCache[closure] = 
+    ClosureCache[closure] = Closure.new(closure)
 end
 
 local function unspyFunction(closure)
@@ -587,6 +587,8 @@ local function scanScripts()
     return scripts
 end
 
+ScriptScanner.scan = scanScripts
+
 -- ModuleScanner
 local function scanModules()
     local modules = {}
@@ -603,6 +605,8 @@ local function scanModules()
 
     return modules
 end
+
+ModuleScanner.scan = scanModules
 
 -- Initialization
 function Hydroxide.exit()

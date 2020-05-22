@@ -1,2 +1,2 @@
-*.out
+/luac.out
 /debug.lua
