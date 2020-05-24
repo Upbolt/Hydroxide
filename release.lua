@@ -608,7 +608,7 @@ local function scanScripts()
                script:IsA("LocalScript") and 
                not scripts[script] and 
                not isExploit and 
-               (not getScriptClosure or (getScriptClosure and getScriptClosure(script))) 
+               (script.Parent or (not getScriptClosure or (getScriptClosure and getScriptClosure(script))))
             then
                 scripts[script] = true -- replace with script object
             end
