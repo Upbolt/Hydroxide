@@ -604,7 +604,12 @@ local function scanScripts()
             local script = rawget(environment, "script")
             local isExploit = rawget(environment, "getgenv")
 
-            if script and script:IsA("LocalScript") and not isExploit and not scripts[script] then
+            if script and 
+               script:IsA("LocalScript") and 
+               not scripts[script] and 
+               not isExploit and 
+               (not getScriptClosure or (getScriptClosure and getScriptClosure(script))) 
+            then
                 scripts[script] = true -- replace with script object
             end
         end
@@ -622,7 +627,7 @@ local function addScript(instance, object)
     if getScriptClosure then
         local closure = getScriptClosure(instance)
         print(instance.Name, closure)
-        
+
         local protos = #getProtos(closure)
         local constants = #getConstants(closure)
         
