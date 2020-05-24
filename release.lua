@@ -24,11 +24,14 @@ local Methods = {
     getContext = getthreadcontext or syn_context_get or false,
     getScriptClosure = get_script_function or getscriptclosure or false,
     getNamecallMethod = getnamecallmethod or false,
+    getLoadedModules = getloadedmodules or get_loaded_modules or false,
     getConstants = debug.getconstants or getconstants or getconsts or false,
     getUpvalues = debug.getupvalues or getupvalues or getupvals or false,
+    getProtos = debug.getprotos or getprotos or false,
     getStack = debug.getstack or getstack or false,
     getConstant = debug.getconstant or getconstant or getconst or false,
     getUpvalue = debug.getupvalue or getupvalue or getupval or false,
+    getProto = debug.getproto or getproto or false,
     getMetatable = getrawmetatable or debug.getmetatable or false,
     setConstant = debug.setconstant or setconstant or setconst or false,
     setUpvalue = debug.setupvalue or setupvalue or setupval or false,
@@ -261,6 +264,10 @@ for i, tab in pairs(Tabs:GetChildren()) do
         }
 
         tab.MouseButton1Click:Connect(function()
+            if SelectedTab == tab then
+                return
+            end
+
             local page = Pages:FindFirstChild(tab.Name)
 
             if page then
@@ -477,7 +484,7 @@ local function remoteHook(oldMethod, instance, ...)
 
     return unpack(results)
 end
-
+--[[
 function gameMethods.__namecall(instance, ...)
     if remoteMethods[getNamecallMethod()] and not RemoteIgnore[instance] then
         return remoteHook(namecall, instance, ...)
@@ -496,7 +503,7 @@ for name, method in pairs(remoteMethods) do
         return oldMethod(instance, ...)
     end)
 end
-
+]]
 -- ClosureSpy
 local ClosureCache = {}
 
@@ -579,6 +586,15 @@ end)
 UpvalueScanner.scan = scanUpvalues
 
 -- ScriptScanner
+local CurrentScripts = {}
+local ScriptScannerPage = Pages.ScriptScanner
+
+local ScriptScannerQuery = ScriptScannerPage.Query
+local ScriptLogs = ScriptScannerPage.Results.Clip.Content
+
+local ScriptsRefresh = ScriptScannerQuery.Refresh
+local ScriptsSearch = ScriptScannerQuery.Search
+
 local function scanScripts()
     local scripts = {}
 
@@ -588,8 +604,8 @@ local function scanScripts()
             local script = rawget(environment, "script")
             local isExploit = rawget(environment, "getgenv")
 
-            if script and script:IsA("LocalScript") and not isExploit and not scripts[script]then
-                scripts[script] = true
+            if script and script:IsA("LocalScript") and not isExploit and not scripts[script] then
+                scripts[script] = true -- replace with script object
             end
         end
     end
@@ -597,24 +613,83 @@ local function scanScripts()
     return scripts
 end
 
-ScriptScanner.scan = scanScripts
+local function addScript(instance, object)
+    local log = Assets.ScriptScanner.ScriptLog:Clone()
+    local name = log:FindFirstChild("Name")
 
--- ModuleScanner
-local function scanModules()
-    local modules = {}
+    -- init, will change later
 
-    for i,v in pairs(getgc()) do
-        if type(v) == "function" and not isXClosure(v) then
-            local script = rawget(getfenv(v), "script")
+    if getScriptClosure then
+        local closure = getScriptClosure(instance)
+        local protos = #getProtos(closure)
+        local constants = #getConstants(closure)
+        
+        log.Protos.Text = tostring(protos)
+        log.Constants.Text = tostring(constants)
+    end
 
-            if script and script:IsA("ModuleScript") and not modules[script] then
-                modules[script] = true
-            end
+    -- end init
+
+    log.Name = instance.Name
+    name.Text = instance.Name
+
+    instance:GetPropertyChangedSignal("Name"):Connect(function()
+        name.Text = instance.Name
+    end)
+
+    ScriptLogs.CanvasSize = ScriptLogs.CanvasSize + UDim2.new(0, 0, 0, log.AbsoluteSize.Y + 5)
+    log.Parent = ScriptLogs
+end
+
+local function addScripts()
+    ScriptLogs.CanvasSize = UDim2.new(0, 0, 0, 15)
+    
+    for i, instance in pairs(ScriptLogs:GetChildren()) do
+        if instance:IsA("ImageLabel") then
+            instance:Destroy()
         end
     end
 
-    return modules
+    for instance, object in pairs(scanScripts()) do
+        addScript(instance)
+    end
+
+    --ScriptLogs.CanvasSize = ScriptLogs.CanvasSize + UDim2.new(0, 0, 0, 5)
 end
+
+local function searchScript(query)
+    local height = 15
+
+    for i, log in pairs(ScriptLogs:GetChildren()) do
+        if log:IsA("ImageLabel") then
+            local match = log.Name:lower():sub(1, #query) == query:lower()
+
+            if match or query:gsub(' ', '') == "" then
+                height = height + log.AbsoluteSize.Y + 5
+            end
+            
+            log.Visible = match
+        end
+    end
+
+    ScriptLogs.CanvasSize = UDim2.new(0, 0, 0, height)
+end
+
+ScriptsSearch.FocusLost:Connect(function(returned)
+    if returned then
+        searchScript(ScriptsSearch.Text)
+        ScriptsSearch.Text = ""
+    end
+end)
+
+addScripts()
+ScriptsRefresh.MouseButton1Click:Connect(addScripts)
+
+ScriptScanner.scan = scanScripts
+ScriptScanner.filter = filterScripts
+
+-- ModuleScanner
+local scanModules = getLoadedModules
 
 ModuleScanner.scan = scanModules
 
