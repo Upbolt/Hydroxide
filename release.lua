@@ -621,6 +621,8 @@ local function addScript(instance, object)
 
     if getScriptClosure then
         local closure = getScriptClosure(instance)
+        print(instance.Name, closure)
+        
         local protos = #getProtos(closure)
         local constants = #getConstants(closure)
         
