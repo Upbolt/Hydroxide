@@ -21,6 +21,7 @@ local Methods = {
     newCClosure = newcclosure or false,
     hookFunction = hookfunction or false,
     getGc = getgc or false,
+    getInfo = debug.getinfo or getinfo or false,
     getContext = getthreadcontext or syn_context_get or false,
     getScriptClosure = get_script_function or getscriptclosure or false,
     getNamecallMethod = getnamecallmethod or false,
@@ -49,7 +50,7 @@ function Methods.userdataValue(data)
     if dataType == "userdata" then
         return toString(data)
     elseif dataType == "Instance" then
-        return getPath(data)
+        return data.Name
     elseif 
         dataType == "Vector3" or
         dataType == "Vector2" or
@@ -126,6 +127,9 @@ function Methods.toString(value)
         return value 
     elseif type(value) == "userdata" then
         return userdataValue(value)
+    elseif type(value) == "function" then
+        local closureName = getInfo(value).name
+        return (closureName == '' and "Unnamed function") or closureName
     else
         return tostring(value) 
     end
@@ -176,6 +180,27 @@ for name, method in pairs(Methods) do
         getgenv()[name] = method
     end
 end
+
+-- Constants
+local syntaxColor = {
+    ["nil"] = Color3.fromRGB(244, 135, 113),
+    table = Color3.fromRGB(200, 200, 200),
+    string = Color3.fromRGB(225, 150, 85),
+    number = Color3.fromRGB(170, 225, 127),
+    boolean = Color3.fromRGB(127, 200, 255),
+    userdata = Color3.fromRGB(200, 200, 200),
+    ["function"] = Color3.fromRGB(200, 200, 200)
+}
+
+local typeIcon = {
+    ["nil"] = "rbxassetid://4800232219",
+    table = "rbxassetid://4666594276",
+    string = "rbxassetid://4666593882",
+    number = "rbxassetid://4666593882",
+    boolean = "rbxassetid://4666593882",
+    userdata = "rbxassetid://4666594723",
+    ["function"] = "rbxassetid://4666593447"
+}
 
 -- Modules
 local Explorer = {}
@@ -533,16 +558,32 @@ end
 -- UpvalueScanner
 local UpvalueCache = {}
 
+local UpvalueScannerPage = Pages.UpvalueScanner
+
+local UpvalueScannerQuery = UpvalueScannerPage.Query
+local UpvalueScannerQueryText = UpvalueScannerQuery.Query
+local UpvalueScannerQuerySearch = UpvalueScannerQuery.Search
+
+local UpvalueScannerFilters = UpvalueScannerPage.Filters
+local UpvalueScannerSearchInTables = UpvalueScannerFilters.SearchInTables
+
+local UpvalueScannerResultsClip = UpvalueScannerPage.Results.Clip
+local UpvalueScannerResults = UpvalueScannerResultsClip.Content
+local UpvalueScannerStatus = UpvalueScannerResultsClip.ResultStatus
+
 local function compareUpvalue(query, upvalue)
     local upvalueType = type(upvalue)
 
-    local stringCheck = upvalueType == "string" and (query == upvalue or upvalue:find(query))
+    local stringCheck = upvalueType == "string" and (query == upvalue or upvalue:lower():find(query:lower()))
     local numberCheck = upvalueType == "number" and (tonumber(query) == upvalue or ("%.2f"):format(upvalue) == query)
     local userDataCheck = upvalueType == "userdata" and toString(upvalue) == query
 
-    if upvalueDeepSearch and upvalueType == "table" then
+    if upvalueType == "function" then
+        local closureName = getInfo(upvalue).name
+        return query == closureName or closureName:lower():find(query:lower())
+    elseif upvalueDeepSearch and upvalueType == "table" then
         for i,v in pairs(upvalue) do
-            if (i ~= upvalue and v ~= upvalue) and (compareUpvalue(query, v) or compareUpvalue(query, i)) then
+            if (type(v) ~= "table" and compareUpvalue(query, v)) or ((type(i) ~= "table" and type(i) ~= "number") and compareUpvalue(query, i)) then
                 return true
             end
         end
@@ -574,6 +615,66 @@ local function scanUpvalues(query)
 
     return upvalues
 end
+
+local function addUpvalues()
+    local query = UpvalueScannerQueryText.Text
+    local height = 15
+    local count = 0
+
+    if query:gsub(' ', '') == '' or (not tonumber(query) and #query < 2) then
+        return
+    end
+
+    for i, instance in pairs(UpvalueScannerResults:GetChildren()) do
+        if instance:IsA("ImageLabel") then
+            instance:Destroy()
+        end
+    end
+
+    local scannedUpvalues = scanUpvalues(query)
+
+    for closure, upvalues in pairs(scannedUpvalues) do
+        local log = Assets.UpvalueScanner.ClosureLog:Clone()
+        local logName = log:FindFirstChild("Name")
+        local logHeight = 0
+
+        local closureName = toString(closure)
+
+        if closureName == "Unnamed function" then
+            logName.TextColor3 = Color3.fromRGB(127, 127, 127)
+        end
+        
+        logName.Text = closureName
+
+        for index, value in pairs(upvalues) do
+            local upvalue = Assets.UpvalueScanner.Upvalue:Clone()
+            local valueType = type(value)
+
+            upvalue.Index.Text = index
+            upvalue.Value.Text = (typeof(value) == "Instance" and value.Name) or toString(value)
+            upvalue.Value.TextColor3 = syntaxColor[valueType]
+            upvalue.Icon.Image = typeIcon[valueType]
+
+            logHeight = logHeight + upvalue.AbsoluteSize.Y + 5
+            upvalue.Parent = log.Upvalues 
+        end
+
+        log.Upvalues.Size = UDim2.new(1, -10, 0, logHeight)
+        log.Size = UDim2.new(1, 0, 0, logHeight + 30)
+        log.Parent = UpvalueScannerResults
+
+        height = height + log.AbsoluteSize.Y + 5
+        count = count + 1
+    end
+
+    UpvalueScannerStatus.Visible = count == 0
+
+    UpvalueScannerResults.CanvasSize = UDim2.new(0, 0, 0, height)
+    UpvalueScannerQueryText.Text = ""
+end
+
+UpvalueScannerQueryText.FocusLost:Connect(addUpvalues)
+UpvalueScannerQuerySearch.MouseButton1Click:Connect(addUpvalues)
 
 Hydroxide.Events.UpdateUpvalues = RunService.Heartbeat:Connect(function()
     for func, upvalues in pairs(UpvalueCache) do
@@ -660,8 +761,6 @@ local function addScripts()
     for instance, object in pairs(scanScripts()) do
         addScript(instance)
     end
-
-    --ScriptLogs.CanvasSize = ScriptLogs.CanvasSize + UDim2.new(0, 0, 0, 5)
 end
 
 local function searchScript(query)
