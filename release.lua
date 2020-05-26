@@ -175,6 +175,16 @@ function Methods.dataToString(data, root, indents)
     return tostring(data)
 end
 
+function Methods.compareTables(x, y)
+    for i in pairs(x) do
+        if x[i] ~= y[i] then
+            return false
+        end
+    end
+
+    return true
+end
+
 for name, method in pairs(Methods) do
     if method then
         getgenv()[name] = method
@@ -466,6 +476,16 @@ end
 -- Explorer
 local TableCache = {}
 local InstanceCache = {}
+
+local function addNode(table, parentNode)
+    local node = Assets.Explorer.Node:Clone()
+
+    if not parentNode then
+        
+    end
+
+    
+end
 
 -- RemoteSpy
 local RemoteCache = {}
@@ -768,7 +788,7 @@ local function searchScript(query)
 
     for i, log in pairs(ScriptLogs:GetChildren()) do
         if log:IsA("ImageLabel") then
-            local match = log.Name:lower():sub(1, #query) == query:lower()
+            local match = log.Name:lower():find(query:lower()) ~= nil
 
             if match or query:gsub(' ', '') == "" then
                 height = height + log.AbsoluteSize.Y + 5
