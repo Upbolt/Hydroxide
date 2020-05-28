@@ -212,6 +212,11 @@ local typeIcon = {
     ["function"] = "rbxassetid://4666593447"
 }
 
+local collapseIcons = {
+    collapsed = "rbxassetid://5091624281",
+    unCollapsed = "rbxassetid://5091624049"
+}
+
 -- Modules
 local Explorer = {}
 local RemoteSpy = {}
@@ -477,15 +482,102 @@ end
 local TableCache = {}
 local InstanceCache = {}
 
-local function addNode(table, parentNode)
-    local node = Assets.Explorer.Node:Clone()
+local ExplorerWindow = Body.Explorer
+local ExplorerQuery = ExplorerWindow.Query.Search
+local ExplorerContents = ExplorerWindow.Clip.Contents
 
-    if not parentNode then
-        
+local function getNodeAncestry(node, callback)
+    if node == ExplorerContents then
+        return
     end
 
-    
+    callback(node.Parent)
+    return getNodeAncestry(node.Parent, callback)
 end
+
+local function addNode(table, index, value, parentNode)
+    local node = Assets.Explorer.Node:Clone()
+    local cached = TableCache[table]
+
+    node.Value.Text = toString(index)
+    node.Icon.Image = typeIcon[type(value)]
+    node.Parent = parentNode 
+
+    if cached and cached.Collapse.Image == collapseIcons.unCollapsed then
+        cached.Size = cached.Size + UDim2.new(0, 0, 0, 25)
+    end
+end
+
+local function addTable(table, parentNode)
+    parentNode = parentNode or ExplorerContents
+
+    local node = Assets.Explorer.Table:Clone()
+    local collapsed = true
+    local childCount = 0
+
+    node.Parent = parentNode
+    node.Value.Text = toString(table):gsub('table: 0x', '')
+    node.Collapse.MouseButton1Click:Connect(function()
+        local cached = TableCache[table]
+
+        if cached then
+            if cached ~= node then
+                return
+            end
+            
+            if collapsed then
+                local nodeHeight = 0 
+
+                for i, v in pairs(cached.Children:GetChildren()) do
+                    if v:IsA("Frame") then
+                        nodeHeight = nodeHeight + v.AbsoluteSize.Y
+                    end
+                end
+                
+                getNodeAncestry(node, function(parentNode)
+                    parentNode.Size = parentNode.Size + UDim2.new(0, 0, 0, nodeHeight)
+                end)
+
+                node.Size = node.Size + UDim2.new(0, 0, 0, nodeHeight)
+            else
+                ExplorerContents.CanvasSize = ExplorerContents.CanvasSize - UDim2.new(0, 0, 0, node.AbsoluteSize.Y - 25)
+                node.Size = UDim2.new(1, 0, 0, 25)
+            end
+
+            collapsed = not collapsed
+            node.Collapse.Image = (collapsed and collapseIcons.unCollapsed) or collapseIcons.collapsed
+        else
+            for i, v in pairs(table) do
+                if type(v) == "table" then
+                    addTable(v, node.Children)
+                else
+                    addNode(table, i, v, node.Children)
+                end
+            end
+            
+            collapsed = false
+            node.Collapse.Image = collapseIcons.collapsed
+            TableCache[table] = node
+        end
+    end)
+
+    if parentNode ~= ExplorerContents then
+        getNodeAncestry(node, function(parentNode)
+            parentNode.Size = parentNode.Size + UDim2.new(0, 0, 0, 25)
+        end)
+    end
+
+    for i,v in pairs(table) do
+        childCount = childCount + 1
+    end
+
+    node.Collapse.Visible = childCount ~= 0
+    ExplorerContents.CanvasSize = ExplorerContents.CanvasSize + UDim2.new(0, 0, 0, node.AbsoluteSize.Y)
+
+    print(node.Parent)
+end
+
+Explorer.addTable = addTable
 
 -- RemoteSpy
 local RemoteCache = {}
@@ -747,8 +839,6 @@ local function addScript(instance, object)
 
     if getScriptClosure then
         local closure = getScriptClosure(instance)
-        print(instance.Name, closure)
-
         local protos = #getProtos(closure)
         local constants = #getConstants(closure)
         
@@ -825,6 +915,10 @@ function Hydroxide.exit()
         event:Disconnect()
     end
 
+    if isReadOnly(gameMethods) then
+        setReadOnly(gameMethods, false)
+    end
+    
     gameMethods.__namecall = namecall
 
     Interface:Destroy()
