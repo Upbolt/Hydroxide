@@ -35,7 +35,7 @@ local globalMethods = {
     isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure or false
 }
 
-local web = false
+local web = true
 local function import(asset)
     if importCache[asset] then
         return unpack(importCache[asset])
