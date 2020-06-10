@@ -14,6 +14,7 @@ local globalMethods = {
     getContext = getthreadcontext or syn_context_get or false,
     getScriptClosure = get_script_function or getscriptclosure or false,
     getNamecallMethod = getnamecallmethod or false,
+    getCallingScript = getcallingscript or false,
     getLoadedModules = getloadedmodules or get_loaded_modules or false,
     getConstants = debug.getconstants or getconstants or getconsts or false,
     getUpvalues = debug.getupvalues or getupvalues or getupvals or false,
@@ -23,6 +24,7 @@ local globalMethods = {
     getUpvalue = debug.getupvalue or getupvalue or getupval or false,
     getProto = debug.getproto or getproto or false,
     getMetatable = getrawmetatable or debug.getmetatable or false,
+    setClipboard = setclipboard or writeclipboard or false,
     setConstant = debug.setconstant or setconstant or setconst or false,
     setUpvalue = debug.setupvalue or setupvalue or setupval or false,
     setStack = debug.setstack or setstack or false,
@@ -33,7 +35,7 @@ local globalMethods = {
     isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure or false
 }
 
-local web = true
+local web = false
 local function import(asset)
     if importCache[asset] then
         return unpack(importCache[asset])

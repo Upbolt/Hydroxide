@@ -98,6 +98,8 @@ function ContextMenu.show(contextMenu)
 
     instance.Visible = true
     instance.Position = UDim2.new(0, mouse.X, 0, mouse.Y)
+    
+    currentContextMenu = contextMenu
 end
 
 function ContextMenu.hide(contextMenu)
