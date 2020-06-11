@@ -5,6 +5,7 @@ function Remote.new(instance)
 
     object.Instance = instance
     object.Logs = {}
+    object.Calls = 0
     object.Blocked = false
     object.Ignored = false
     object.Block = Remote.block

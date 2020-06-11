@@ -7,9 +7,10 @@ local Assets = import("rbxassetid://5042114982")
 
 local Flags = Page.Flags
 
-local currentRemotes = {}
-local gmt = getMetatable(game)
-local nmc = gmt.__namecall
+local remotesViewing = Methods.RemotesViewing
+local currentRemotes = Methods.CurrentRemotes
+
+local remoteLogs = {}
 
 for i,flag in pairs(Flags:GetChildren()) do
     if flag:IsA("Frame") then
@@ -21,42 +22,14 @@ for i,flag in pairs(Flags:GetChildren()) do
     end
 end
 
-gmt.__namecall = function(instance, ...)
-    local instanceClass = instance.ClassName
-    local results 
+Methods.ConnectEvent(function(remote, vargs, results, callingScript)
+    local instance = remote.instance
+    local log = remoteLogs[instance]
 
-    if not checkCaller() and remoteMethods[instanceClass] and remoteMethods[getNamecallMethod()] then
-        if string.find(instanceClass, "Function") then
-            results = { nmc(instance, ...) }
-        end
+    if not log then
+        
+    else
 
-        local remote = currentRemotes[instance]
-
-        if not remote then
-            
-        end
-    end
-
-    if results then
-        return unpack(results)
-    end
-
-    return nmc(instance, ...)
-end
-
-spawn(function()
-    while true do
-        for remote in pairs(currentRemotes) do
-            local ran, result = pcall(function()
-                remote.Parent = remote
-            end)
-
-            if result:find(": NULL") then
-                currentRemotes[remote] = nil
-            end
-        end
-
-        wait(2)
     end
 end)
 
