@@ -3,22 +3,22 @@ local Upvalue = import("objects/Upvalue")
 local Constant = import("objects/Constant")
 
 function Closure.new(data, isProto)
-    local object = {}
+    local closure = {}
     
-    object.Data = data
-    object.Protos = {}
-    object.Constants = {}
-    object.Environment = getfenv(data)
+    closure.Data = data
+    closure.Protos = {}
+    closure.Constants = {}
+    closure.Environment = getfenv(data)
 
     if not isProto then
-        object.Upvalues = {}
-        object.AssignUpvalues = Closure.assignUpvalues
+        closure.Upvalues = {}
+        closure.AssignUpvalues = Closure.assignUpvalues
     end
     
-    object.AssignProtos = Closure.assignProtos
-    object.AssignConstants = Closure.assignConstants
+    closure.AssignProtos = Closure.assignProtos
+    closure.AssignConstants = Closure.assignConstants
 
-    return object
+    return closure
 end
 
 function Closure.assignProtos(closure)

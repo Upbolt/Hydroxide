@@ -1,14 +1,14 @@
 local Constant = {}
 
 function Constant.new(closure, index, value)
-    local object = {}
+    local constant = {}
 
-    object.Closure = closure
-    object.Index = index
-    object.Value = value
-    object.Update = Constant.update
+    constant.Closure = closure
+    constant.Index = index
+    constant.Value = value
+    constant.Update = Constant.update
 
-    return object
+    return constant
 end
 
 function Constant.update(constant)

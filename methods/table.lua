@@ -41,8 +41,8 @@ local function tableToString(data, root, indents)
 end
 
 local function compareTables(x, y)
-    for i in pairs(x) do
-        if x[i] ~= y[i] then
+    for i, v in pairs(x) do
+        if v ~= y[i] then
             return false
         end
     end

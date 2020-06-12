@@ -1,14 +1,14 @@
 local Upvalue = {}
 
 function Upvalue.new(closure, index, value)
-    local object = {}
+    local upvalue = {}
 
-    object.Closure = closure
-    object.Index = index
-    object.Value = value
-    object.Update = Upvalue.update
+    upvalue.Closure = closure
+    upvalue.Index = index
+    upvalue.Value = value
+    upvalue.Update = Upvalue.update
 
-    return object
+    return upvalue
 end
 
 function Upvalue.update(upvalue)

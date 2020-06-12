@@ -1,25 +1,25 @@
 local CheckBox = {}
 
 function CheckBox.new(instance)
-    local object = {}
+    local checkBox = {}
     local toggle = instance.Toggle
     local label = toggle.Label
 
     toggle.MouseButton1Click:Connect(function()
-        object.Enabled = not object.Enabled
+        checkBox.Enabled = not checkBox.Enabled
 
-        if object.Callback then
-            object.Callback(object.Enabled)
+        if checkBox.Callback then
+            checkBox.Callback(checkBox.Enabled)
         end
 
-        label.Text = (object.Enabled and '✓') or ''
+        label.Text = (checkBox.Enabled and '✓') or ''
     end)
 
-    object.Enabled = label.Text == '✓'
-    object.Instance = instance
-    object.SetCallback = CheckBox.setCallback
+    checkBox.Enabled = label.Text == '✓'
+    checkBox.Instance = instance
+    checkBox.SetCallback = CheckBox.setCallback
 
-    return object
+    return checkBox
 end
 
 function CheckBox.setCallback(checkBox, callback)

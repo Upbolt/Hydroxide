@@ -66,19 +66,20 @@ gmt.__namecall = function(instance, ...)
             currentRemotes[instance] = remote
         end
 
-        if remote.Blocked then
+        local remoteIgnored = remote.Ignored
+        local argsIgnored = remote.AreArgsIgnored(remote, vargs)
+
+        if remote.Blocked or remote.AreArgsBlocked(remote, vargs) then
             return
         end
 
-        if string.find(className, "Function") and not remote.Ignored then
+        if string.find(className, "Function") and not remoteIgnored or not argsIgnored then
             results = { nmc(instance, ...) }
         end
 
-        if eventSet and not remote.Ignored then
-            remote.Calls = remote.Calls + 1
-            table.insert(remote.Logs, vargs)
-
-            remoteDataEvent.Fire(remoteDataEvent, remote, vargs, results, getCallingScript((is_protosmasher_closure and 2) or nil))
+        if eventSet and not remoteIgnored or not argsIgnored then
+            remote.IncrementCalls(remote, vargs)
+            remoteDataEvent.Fire(remoteDataEvent, instance, vargs, results, getCallingScript((is_protosmasher_closure and 2) or nil))
         end
     end
 
@@ -101,21 +102,23 @@ for name, hook in pairs(methodHooks) do
 
             if not remote then
                 remote = Remote.new(instance)
+                currentRemotes[instance] = remote
             end
+
+            local remoteIgnored = remote.Ignored
+            local argsIgnored = remote:AreArgsIgnored(vargs)
 
             if remote.Blocked or remote:AreArgsBlocked(vargs) then
                 return
             end
 
-            if string.find(className, "Function") and not remote.Ignored then
+            if string.find(className, "Function") and not remoteIgnored or not argsIgnored then
                 results = { originalMethod(instance, ...) }
             end
 
-            if eventSet and not remote.Ignored then
-                remote.Calls = remote.Calls + 1
-                table.insert(remote.Logs, vargs)
-
-                remoteDataEvent:Fire(remote, vargs, results, getCallingScript())
+            if eventSet and not remoteIgnored or not argsIgnored then
+                remote:IncrementCalls(vargs)
+                remoteDataEvent:Fire(instance, vargs, results, getCallingScript())
             end
         end
 

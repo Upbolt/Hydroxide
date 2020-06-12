@@ -80,7 +80,6 @@ environment.oh = {
         end
 
         unpack(importCache["rbxassetid://5042109928"]):Destroy()
-        unpack(importCache["rbxassetid://5042114982"]):Destroy()
     end
 }
 

@@ -3,6 +3,7 @@ local Storage = import("rbxassetid://5042109928").ContextMenus
 
 local Players = game:GetService("Players")
 local UserInput = game:GetService("UserInputService")
+local TextService = game:GetService("TextService")
 local TweenService = game:GetService("TweenService")
 
 local client = Players.LocalPlayer
@@ -13,7 +14,8 @@ local ContextMenu = {}
 
 local currentContextMenu
 local constants = {
-    fadeLength = TweenInfo.new(0.15)
+    fadeLength = TweenInfo.new(0.15),
+    textWidth = Vector2.new(1337420, 20)
 }
 
 function ContextMenuButton.new(icon, text)
@@ -28,7 +30,9 @@ function ContextMenuButton.new(icon, text)
     instance.Icon.Image = icon
 
     instance.MouseButton1Click:Connect(function()
-        
+        if contextMenuButton.Callback then
+            contextMenuButton.Callback()
+        end
     end)
 
     instance.MouseEnter:Connect(function()
@@ -42,6 +46,7 @@ function ContextMenuButton.new(icon, text)
     contextMenuButton.Instance = instance
     contextMenuButton.SetIcon = ContextMenuButton.setIcon
     contextMenuButton.SetText = ContextMenuButton.setText
+    contextMenuButton.SetCallback = ContextMenuButton.setCallback
     return contextMenuButton
 end
 
@@ -56,9 +61,6 @@ end
 function ContextMenuButton.setCallback(contextMenuButton, callback)
     if not contextMenuButton.Callback then
         contextMenuButton.Callback = callback
-        return contextMenuButton.MouseButton1Click:Connect(function()
-            
-        end)
     end
 end
 
@@ -71,16 +73,20 @@ function ContextMenu.new(contextMenuButtons)
     
     for i, contextMenuButton in pairs(contextMenuButtons) do
         local buttonInstance = contextMenuButton.Instance
+        local textWidth = TextService:GetTextSize(buttonInstance.Label.Text, 18, "SourceSans", constants.textWidth).X
+
         buttonInstance.Parent = instance.List
-        
-        local buttonWidth = buttonInstance.Icon.AbsoluteSize.X + buttonInstance.Label.TextBounds.X + 18
+        buttonInstance.TextWrapped = false
+
+        local buttonWidth = buttonInstance.Icon.AbsoluteSize.X + textWidth + 16
         
         if not instanceWidth or buttonWidth > instanceWidth then
             instanceWidth = buttonWidth
         end
     end
-
+    
     instance.Size = UDim2.new(0, instanceWidth, 0, instance.AbsoluteSize.Y)
+    instance.Visible = false
     
     contextMenu.Instance = instance
     contextMenu.Buttons = {}
