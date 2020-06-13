@@ -51,11 +51,11 @@ function ContextMenuButton.new(icon, text)
 end
 
 function ContextMenuButton.setIcon(contextMenuButton, newIcon)
-    contextMenuButton.Icon.Image = newIcon
+    contextMenuButton.Instance.Icon.Image = newIcon
 end
 
 function ContextMenuButton.setText(contextMenuButton, newText)
-    contextMenuButton.Label.Text = newText
+    contextMenuButton.Instance.Label.Text = newText
 end
 
 function ContextMenuButton.setCallback(contextMenuButton, callback)
@@ -67,7 +67,8 @@ end
 function ContextMenu.new(contextMenuButtons)
     local contextMenu = {}
     local instance = Assets.ContextMenu:Clone()
-    local instanceWidth 
+    local instanceWidth = 0
+    local instanceHeight = 0
 
     instance.Parent = Storage
     
@@ -80,12 +81,14 @@ function ContextMenu.new(contextMenuButtons)
 
         local buttonWidth = buttonInstance.Icon.AbsoluteSize.X + textWidth + 16
         
-        if not instanceWidth or buttonWidth > instanceWidth then
+        if buttonWidth > instanceWidth then
             instanceWidth = buttonWidth
         end
+
+        instanceHeight = instanceHeight + buttonInstance.AbsoluteSize.Y
     end
     
-    instance.Size = UDim2.new(0, instanceWidth, 0, instance.AbsoluteSize.Y)
+    instance.Size = UDim2.new(0, instanceWidth, 0, instanceHeight)
     instance.Visible = false
     
     contextMenu.Instance = instance

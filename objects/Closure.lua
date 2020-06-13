@@ -4,7 +4,9 @@ local Constant = import("objects/Constant")
 
 function Closure.new(data, isProto)
     local closure = {}
+    local name = getInfo(data).name
     
+    closure.Name = (name ~= "" and name) or "Unnamed function"
     closure.Data = data
     closure.Protos = {}
     closure.Constants = {}

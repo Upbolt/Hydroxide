@@ -8,6 +8,7 @@ local MessageBox, MessageType = import("ui/controls/MessageBox")
 
 local RemoteSpy = import("ui/modules/RemoteSpy")
 local UpvalueScanner = import("ui/modules/UpvalueScanner")
+local ScriptScanner = import("ui/modules/ScriptScanner")
 
 local constants = {
     opened = UDim2.new(0.5, -325, 0.5, -175),

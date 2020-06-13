@@ -1,4 +1,6 @@
 local UpvalueScanner = {}
+local Upvalue = import("objects/Upvalue")
+
 local requiredMethods = {
     getGc = true,
     getInfo = true,
@@ -18,7 +20,7 @@ local function compareUpvalue(query, upvalue)
     if upvalueType == "function" then
         local closureName = getInfo(upvalue).name
         return query == closureName or closureName:lower():find(query:lower())
-    elseif UpvalueScsanner.upvalueDeepSearch and upvalueType == "table" then
+    elseif UpvalueScanner.upvalueDeepSearch and upvalueType == "table" then
         for i,v in pairs(upvalue) do
             local indexType = type(i)
 
@@ -36,16 +38,16 @@ end
 local function scan(query)
     local upvalues = {}
 
-    for i,v in pairs(getGc()) do
-        if type(v) == "function" and not isXClosure(v) then
-            for k, upvalue in pairs(getUpvalues(v)) do
-                if compareUpvalue(query, upvalue) then
-                    local closure = upvalues[v]
+    for i,closure in pairs(getGc()) do
+        if type(closure) == "function" and not isXClosure(closure) and not upvalues[closure] then
+            for index, value in pairs(getUpvalues(closure)) do
+                if compareUpvalue(query, value) then
+                    local storage = upvalues[closure]
 
-                    if not closure then
-                        upvalues[v] = { [k] = upvalue }
+                    if not storage then
+                        upvalues[closure] = { [index] = Upvalue.new(closure, index, value) }
                     else
-                        closure[k] = upvalue
+                        storage[index] = Upvalue.new(closure, index, value)
                     end
                 end
             end

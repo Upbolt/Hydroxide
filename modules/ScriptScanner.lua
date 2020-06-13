@@ -1,4 +1,6 @@
 local ScriptScanner = {}
+local LocalScript = import("objects/LocalScript")
+
 local requiredMethods = {
     getGc = true,
     isXClosure = true,
@@ -7,22 +9,23 @@ local requiredMethods = {
     getScriptClosure = true
 }
 
-local function scan()
+local function scan(query)
     local scripts = {}
+    query = query or ""
 
     for i,v in pairs(getgc()) do
         if type(v) == "function" and not isXClosure(v) then
-            local environment = getfenv(v)
-            local script = rawget(environment, "script")
-            local isExploit = rawget(environment, "getgenv")
+            local script = rawget(getfenv(v), "script")
 
             if script and 
-               script:IsA("LocalScript") and 
-               not scripts[script] and 
-               not isExploit and 
-               (script.Parent or getScriptClosure(script))
+                not scripts[script] and 
+                script:IsA("LocalScript") and 
+                script.Name:lower():find(query) and
+                getScriptClosure(script)
             then
-                scripts[script] = true 
+                if pcall(function() getsenv(script) end) then
+                    scripts[script] = LocalScript.new(script)
+                end
             end
         end
     end

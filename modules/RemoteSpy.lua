@@ -7,6 +7,7 @@ local requiredMethods = {
     isReadOnly = true,
     setReadOnly = true,
     setContext = true,
+    getInfo = true,
     getContext = true,
     getMetatable = true,
     setClipboard = true,
@@ -40,6 +41,8 @@ local currentRemotes = {}
 local gmt = getMetatable(game)
 local nmc = gmt.__namecall
 
+oh.Namecall = nmc
+
 local remoteDataEvent = Instance.new("BindableEvent")
 local eventSet = false
 
@@ -69,17 +72,17 @@ gmt.__namecall = function(instance, ...)
         local remoteIgnored = remote.Ignored
         local argsIgnored = remote.AreArgsIgnored(remote, vargs)
 
-        if remote.Blocked or remote.AreArgsBlocked(remote, vargs) then
-            return
-        end
-
-        if string.find(className, "Function") and not remoteIgnored or not argsIgnored then
+        if string.find(className, "Function") and (not remoteIgnored and not argsIgnored) then
             results = { nmc(instance, ...) }
         end
-
-        if eventSet and not remoteIgnored or not argsIgnored then
+        
+        if eventSet and (not remoteIgnored and not argsIgnored) then
             remote.IncrementCalls(remote, vargs)
-            remoteDataEvent.Fire(remoteDataEvent, instance, vargs, results, getCallingScript((is_protosmasher_closure and 2) or nil))
+            remoteDataEvent.Fire(remoteDataEvent, instance, vargs, results, getInfo(2).func, getCallingScript((is_protosmasher_closure and 2) or nil))
+        end
+
+        if remote.Blocked or remote.AreArgsBlocked(remote, vargs) then
+            return
         end
     end
 
@@ -105,23 +108,23 @@ for name, hook in pairs(methodHooks) do
                 currentRemotes[instance] = remote
             end
 
-            local remoteIgnored = remote.Ignored
+            local remoteIgnored = remote.Ignored 
             local argsIgnored = remote:AreArgsIgnored(vargs)
+            
+            if string.find(className, "Function") and (not remoteIgnored and not argsIgnored) then
+                results = { originalMethod(instance, ...) }
+            end
+            
+            if eventSet and (not remoteIgnored and not argsIgnored) then
+                remote:IncrementCalls(vargs)
+                remoteDataEvent:Fire(instance, vargs, results, getInfo(2).func, getCallingScript((is_protosmasher_closure and 2) or nil))
+            end
 
             if remote.Blocked or remote:AreArgsBlocked(vargs) then
                 return
             end
-
-            if string.find(className, "Function") and not remoteIgnored or not argsIgnored then
-                results = { originalMethod(instance, ...) }
-            end
-
-            if eventSet and not remoteIgnored or not argsIgnored then
-                remote:IncrementCalls(vargs)
-                remoteDataEvent:Fire(instance, vargs, results, getCallingScript())
-            end
         end
-
+        
         if results then
             return unpack(results)
         end

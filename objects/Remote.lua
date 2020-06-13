@@ -8,6 +8,7 @@ function Remote.new(instance)
     remote.Calls = 0
     remote.Blocked = false
     remote.Ignored = false
+    remote.Clear = Remote.clear
     remote.Block = Remote.block
     remote.Ignore = Remote.ignore
     remote.BlockedArgs = {}
@@ -18,6 +19,11 @@ function Remote.new(instance)
     remote.DecrementCalls = Remote.decrementCalls
 
     return remote
+end
+
+function Remote.clear(remote)
+    remote.Calls = 0
+    remote.Logs = {}
 end
 
 function Remote.block(remote)
@@ -34,7 +40,7 @@ function Remote.areArgsBlocked(remote, args)
     for index, value in pairs(args) do
         local indexBlock = blockedArgs[index]
         
-        if indexBlock and ( indexBlock.types[type(v)] or indexBlock.values[v] ~= nil )then
+        if indexBlock and ( indexBlock.types[type(v)] or indexBlock.values[v] ~= nil ) then
             return true
         end
     end
@@ -46,7 +52,7 @@ function Remote.areArgsIgnored(remote, args)
     for index, value in pairs(args) do
         local indexIgnore = ignoredArgs[index]
         
-        if indexIgnore and ( indexIgnore.types[type(v)] or indexIgnore.values[v] ~= nil )then
+        if indexIgnore and ( indexIgnore.types[type(v)] or indexIgnore.values[v] ~= nil ) then
             return true
         end
     end
