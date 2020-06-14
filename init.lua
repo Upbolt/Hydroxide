@@ -37,7 +37,10 @@ local globalMethods = {
     isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure
 }
 
-local web = true
+local settings = (...) or {}
+settings.web = settings.web or true
+settings.branch = settings.branch or "Upbolt/Hydroxide/revision"
+
 local function import(asset)
     if importCache[asset] then
         return unpack(importCache[asset])
@@ -47,8 +50,8 @@ local function import(asset)
 
     if asset:find("rbxassetid://") then
         assets = { game:GetObjects(asset)[1] }
-    elseif web then
-        assets = { loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Upbolt/Hydroxide/revision/" .. asset .. ".lua"))() }
+    elseif settings.web then
+        assets = { loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/" .. settings.branch .. "/" .. asset .. ".lua"), "Hydroxide/" .. asset ..".lua")() }
     else
         assets = { loadfile("hydroxide/" .. asset .. ".lua")() }
     end
@@ -78,6 +81,7 @@ end
 environment.import = import
 environment.hasMethods = hasMethods
 environment.oh = {
+    Settings = {},
     Events = {},
     Hooks = {},
     Methods = globalMethods,
