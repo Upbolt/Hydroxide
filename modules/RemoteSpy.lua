@@ -3,6 +3,7 @@ local Remote = import("objects/Remote")
 
 local requiredMethods = {
     checkCaller = true,
+    newCClosure = true,
     hookFunction = true,
     isReadOnly = true,
     setReadOnly = true,
@@ -12,7 +13,7 @@ local requiredMethods = {
     getMetatable = true,
     setClipboard = true,
     getNamecallMethod = true,
-    getCallingScript = true
+    getCallingScript = true,
 }
 
 local remoteMethods = {
@@ -56,11 +57,11 @@ end
 
 setReadOnly(gmt, false)
 
-gmt.__namecall = function(instance, ...)
+gmt.__namecall = newCClosure(function(instance, ...)
     local results
     local className = instance.ClassName
 
-    if remotesViewing[className] and instance ~= remoteDataEvent and (method ~= nmc or remoteMethods[getNamecallMethod()]) then
+    if remotesViewing[className] and instance ~= remoteDataEvent and remoteMethods[getNamecallMethod()] then
         local remote = currentRemotes[instance]
         local vargs = {...}
 
@@ -70,10 +71,15 @@ gmt.__namecall = function(instance, ...)
         end
 
         local remoteIgnored = remote.Ignored
+        local remoteBlocked = remote.Blocked
         local argsIgnored = remote.AreArgsIgnored(remote, vargs)
+        local argsBlocked = remote.AreArgsBlocked(remote, vargs)
 
-        if string.find(className, "Function") and (not remoteIgnored and not argsIgnored) then
+        if string.find(className, "Function") and ((not remoteIgnored and not argsIgnored) and (not remoteBlocked and not argsBlocked)) then
             results = { nmc(instance, ...) }
+            if instance.Name == "Containers" then
+                print(unpack(results))
+            end
         end
         
         if eventSet and (not remoteIgnored and not argsIgnored) then
@@ -81,7 +87,7 @@ gmt.__namecall = function(instance, ...)
             remoteDataEvent.Fire(remoteDataEvent, instance, vargs, results, getInfo(2).func, getCallingScript((is_protosmasher_closure and 2) or nil))
         end
 
-        if remote.Blocked or remote.AreArgsBlocked(remote, vargs) then
+        if remoteBlocked or argsBlocked then
             return
         end
     end
@@ -91,11 +97,11 @@ gmt.__namecall = function(instance, ...)
     end
 
     return nmc(instance, ...)
-end
+end)
 
 for name, hook in pairs(methodHooks) do
     local originalMethod
-    originalMethod = hookFunction(hook, function(instance, ...)
+    originalMethod = hookFunction(hook, newCClosure(function(instance, ...)
         local results
         local className = instance.ClassName
 
@@ -130,7 +136,7 @@ for name, hook in pairs(methodHooks) do
         end
 
         return originalMethod(instance, ...)
-    end)
+    end))
 
     oh.Hooks[originalMethod] = hook
 end

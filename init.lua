@@ -4,40 +4,9 @@ if oh then
     oh.Exit()
 end
 
+local web = false
 local importCache = {}
-local globalMethods = {
-    checkCaller = checkcaller,
-    newCClosure = newcclosure,
-    hookFunction = hookfunction,
-    getGc = getgc,
-    getInfo = debug.getinfo or getinfo,
-    getSenv = getsenv,
-    getMenv = getmenv,
-    getContext = getthreadcontext or syn_context_get,
-    getScriptClosure = get_script_function or getscriptclosure,
-    getNamecallMethod = getnamecallmethod,
-    getCallingScript = getcallingscript,
-    getLoadedModules = getloadedmodules or get_loaded_modules,
-    getConstants = debug.getconstants or getconstants or getconsts,
-    getUpvalues = debug.getupvalues or getupvalues or getupvals,
-    getProtos = debug.getprotos or getprotos,
-    getStack = debug.getstack or getstack,
-    getConstant = debug.getconstant or getconstant or getconst,
-    getUpvalue = debug.getupvalue or getupvalue or getupval,
-    getProto = debug.getproto or getproto,
-    getMetatable = getrawmetatable or debug.getmetatable,
-    setClipboard = setclipboard or writeclipboard,
-    setConstant = debug.setconstant or setconstant or setconst,
-    setUpvalue = debug.setupvalue or setupvalue or setupval,
-    setStack = debug.setstack or setstack,
-    setContext = setthreadcontext or syn_context_set,
-    setReadOnly = setreadonly,
-    isLClosure = islclosure or (iscclosure and function(closure) return not iscclosure(closure) end),
-    isReadOnly = isreadonly,
-    isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure
-}
 
-local web = true
 local function import(asset)
     if importCache[asset] then
         return unpack(importCache[asset])
@@ -74,6 +43,38 @@ local function useMethods(module)
         end
     end
 end
+
+local globalMethods = {
+    checkCaller = checkcaller,
+    newCClosure = newcclosure,
+    hookFunction = hookfunction,
+    getGc = getgc,
+    getInfo = debug.getinfo or getinfo,
+    getSenv = getsenv,
+    getMenv = getmenv,
+    getContext = getthreadcontext or syn_context_get,
+    getScriptClosure = get_script_function or getscriptclosure,
+    getNamecallMethod = getnamecallmethod,
+    getCallingScript = getcallingscript,
+    getLoadedModules = getloadedmodules or get_loaded_modules,
+    getConstants = debug.getconstants or getconstants or getconsts,
+    getUpvalues = debug.getupvalues or getupvalues or getupvals,
+    getProtos = debug.getprotos or getprotos,
+    getStack = debug.getstack or getstack,
+    getConstant = debug.getconstant or getconstant or getconst,
+    getUpvalue = debug.getupvalue or getupvalue or getupval,
+    getProto = debug.getproto or getproto,
+    getMetatable = getrawmetatable or debug.getmetatable,
+    setClipboard = setclipboard or writeclipboard,
+    setConstant = debug.setconstant or setconstant or setconst,
+    setUpvalue = debug.setupvalue or setupvalue or setupval,
+    setStack = debug.setstack or setstack,
+    setContext = setthreadcontext or syn_context_set,
+    setReadOnly = setreadonly,
+    isLClosure = islclosure or (iscclosure and function(closure) return not iscclosure(closure) end),
+    isReadOnly = isreadonly,
+    isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure
+}
 
 environment.import = import
 environment.hasMethods = hasMethods
@@ -112,7 +113,15 @@ environment.oh = {
             end)
         end
 
-        getrawmetatable(game).__namecall = oh.Namecall
+        local gmt = getrawmetatable(game)
+        
+        if isReadOnly(gmt) then
+            setReadOnly(gmt, false) 
+        end
+
+        if oh.Namecall then
+            gmt.__namecall = oh.Namecall
+        end
 
         unpack(importCache["rbxassetid://5042109928"]):Destroy()
         unpack(importCache["rbxassetid://5042114982"]):Destroy()
@@ -123,3 +132,4 @@ useMethods(globalMethods)
 useMethods(import("methods/string"))
 useMethods(import("methods/table"))
 useMethods(import("methods/userdata"))
+useMethods(import("methods/environment"))
