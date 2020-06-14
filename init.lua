@@ -12,6 +12,7 @@ local globalMethods = {
     getGc = getgc,
     getInfo = debug.getinfo or getinfo,
     getSenv = getsenv,
+    getMenv = getmenv,
     getContext = getthreadcontext or syn_context_get,
     getScriptClosure = get_script_function or getscriptclosure,
     getNamecallMethod = getnamecallmethod,
@@ -56,6 +57,16 @@ local function import(asset)
     return unpack(assets)
 end
 
+local function hasMethods(methods)
+    for name in pairs(methods) do
+        if not environment[name] then
+            return false
+        end
+    end
+
+    return true
+end
+
 local function useMethods(module)
     for name, method in pairs(module) do
         if method then
@@ -65,6 +76,7 @@ local function useMethods(module)
 end
 
 environment.import = import
+environment.hasMethods = hasMethods
 environment.oh = {
     Events = {},
     Hooks = {},

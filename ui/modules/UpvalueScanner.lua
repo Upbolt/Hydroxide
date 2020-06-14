@@ -2,8 +2,13 @@ local RunService = game:GetService("RunService")
 local TextService = game:GetService("TextService")
 
 local UpvalueScanner = {}
-local Closure = import("objects/Closure")
 local Methods = import("modules/UpvalueScanner")
+
+if not hasMethods(Methods.RequiredMethods) then
+    return UpvalueScanner
+end
+
+local Closure = import("objects/Closure")
 
 local CheckBox = import("ui/controls/CheckBox")
 local List, ListButton = import("ui/controls/List")
@@ -25,13 +30,12 @@ local upvalueList = List.new(ResultsClip.Content)
 local upvalueLogs = {}
 local selectedLog
 
-local spyArgs = ContextMenuButton.new("rbxassetid://112902314", "Spy Function")
-local viewUpvalues = ContextMenuButton.new("rbxassetid://112902314", "View All Upvalues")
+local spyArgs = ContextMenuButton.new("rbxassetid://4666593447", "Spy Function")
+local viewUpvalues = ContextMenuButton.new("rbxassetid://5179169654", "View All Upvalues")
 
 upvalueList:BindContextMenu(ContextMenu.new({ spyArgs, viewUpvalues }))
 
 spyArgs:SetCallback(function()end)
-
 deepSearch:SetCallback(function(enabled)
     if enabled then
         MessageBox.Show("Notice", "Deep searching may result in longer scan times!", MessageType.OK)
@@ -65,7 +69,7 @@ function Log.new(closureData, upvalues)
         upvalueLog.Name = upvalue.Index
         upvalueLog.Icon.Image = oh.Constants.Types[valueType]
         upvalueLog.Index.Text = upvalue.Index
-        upvalueLog.Value.Text = value
+        upvalueLog.Value.Text = toString(value)
         upvalueLog.Value.TextColor3 = valueColor
         upvalueLog.Parent = button.Upvalues
 
@@ -79,7 +83,10 @@ function Log.new(closureData, upvalues)
     button:FindFirstChild("Name").Text = closure.Name
     button.Size = UDim2.new(1, 0, 0, logHeight)
 
-    upvalueList:Recalculate()
+    listButton:SetRightCallback(function()
+        selectedLog = log
+    end)
+
     upvalueLogs[closureData] = log
 
     log.Closure = closure
@@ -101,35 +108,41 @@ function Log.update(log)
 
         if valueType == "function" then
             local name = getInfo(newValue).name
-            value = (name ~= "" and name) or "Unnamed function"
+            newValue = (name ~= "" and name) or "Unnamed function"
             valueColor = Color3.fromRGB(170, 170, 170)
         end
 
         upvalueLog.Icon.Image = oh.Constants.Types[valueType]
-        upvalueLog.Value.Text = newValue
+        upvalueLog.Value.Text = toString(newValue)
         upvalueLog.Value.TextColor3 = valueColor
     end
 end
 
 -- UI Functionality
 
-local function addUpvalues(query)
-    upvalueList:Clear()
+local function addUpvalues()
+    local query = SearchBox.Text
 
-    for closureData, upvalues in pairs(Methods.Scan(query)) do
-        Log.new(closureData, upvalues)
+    if query:gsub(' ', '') ~= '' and query:len() >= 2 then
+        upvalueList:Clear()
+        upvalueLogs = {}
+
+        for closureData, upvalues in pairs(Methods.Scan(query)) do
+            Log.new(closureData, upvalues)
+        end
+
+        upvalueList:Recalculate()
+    else
+        MessageBox.Show("Invalid query", "Your query is too short", MessageType.OK)
     end
+
+    SearchBox.Text = ''
 end
 
-Search.MouseButton1Click:Connect(function()
-    addUpvalues(SearchBox.Text)
-    SearchBox.Text = ""
-end)
-
+Search.MouseButton1Click:Connect(addUpvalues)
 SearchBox.FocusLost:Connect(function(returned)
     if returned then
-        addUpvalues(SearchBox.Text)
-        SearchBox.Text = ""
+        addUpvalues()
     end
 end)
 

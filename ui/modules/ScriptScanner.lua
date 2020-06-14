@@ -1,5 +1,10 @@
 local ScriptScanner = {}
 local Methods = import("modules/ScriptScanner")
+
+if not hasMethods(Methods.RequiredMethods) then
+    return ScriptScanner
+end
+
 local List, ListButton = import("ui/controls/List")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 local ContextMenu, ContextMenuButton = import("ui/controls/ContextMenu")
@@ -55,16 +60,14 @@ end
 -- UI Functionality
 
 local function addScripts(query)
-    query = query or ""
-
     scriptList:Clear()
     scriptLogs = {}
 
-    for instance, localScript in pairs(Methods.Scan()) do
-        if instance.Name:lower():find(query) then
-            Log.new(localScript)
-        end
+    for instance, localScript in pairs(Methods.Scan(query)) do
+        Log.new(localScript)
     end
+
+    scriptList:Recalculate()
 end
 
 Search.FocusLost:Connect(function(returned)

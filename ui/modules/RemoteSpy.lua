@@ -3,6 +3,11 @@ local TweenService = game:GetService("TweenService")
 
 local RemoteSpy = {}
 local Methods = import("modules/RemoteSpy")
+
+if not hasMethods(Methods.RequiredMethods) then
+    return RemoteSpy
+end
+
 local CheckBox = import("ui/controls/CheckBox")
 local List, ListButton = import("ui/controls/List")
 local MessageBox, MessageType = import("ui/controls/MessageBox")

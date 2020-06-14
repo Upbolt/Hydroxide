@@ -57,7 +57,7 @@ local function scan(query)
     return upvalues
 end
 
+UpvalueScanner.Scan = scan
 UpvalueScanner.upvalueDeepSearch = false
 UpvalueScanner.RequiredMethods = requiredMethods
-UpvalueScanner.Scan = scan
 return UpvalueScanner

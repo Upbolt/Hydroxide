@@ -53,6 +53,7 @@ function List.clear(list)
     end
 
     instance.CanvasSize = UDim2.new(0, 0, 0, 15)
+    list.Buttons = {}
 end
 
 function List.recalculate(list)

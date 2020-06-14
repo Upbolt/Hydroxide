@@ -3,10 +3,11 @@ local LocalScript = import("objects/LocalScript")
 
 local requiredMethods = {
     getGc = true,
-    isXClosure = true,
+    getSenv = true,
     getProtos = true,
     getConstants = true,
-    getScriptClosure = true
+    getScriptClosure = true,
+    isXClosure = true
 }
 
 local function scan(query)

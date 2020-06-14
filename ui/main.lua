@@ -7,8 +7,10 @@ local TabSelector = import("ui/controls/TabSelector")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 
 local RemoteSpy = import("ui/modules/RemoteSpy")
-local UpvalueScanner = import("ui/modules/UpvalueScanner")
 local ScriptScanner = import("ui/modules/ScriptScanner")
+local ModuleScanner = import("ui/modules/ModuleScanner")
+local UpvalueScanner = import("ui/modules/UpvalueScanner")
+local ConstantScanner = import("ui/modules/ConstantScanner")
 
 local constants = {
     opened = UDim2.new(0.5, -325, 0.5, -175),
