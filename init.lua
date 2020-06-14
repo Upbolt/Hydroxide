@@ -4,7 +4,7 @@ if oh then
     oh.Exit()
 end
 
-local web = false
+local web = true
 local importCache = {}
 
 local function import(asset)
@@ -114,7 +114,7 @@ environment.oh = {
         end
 
         local gmt = getrawmetatable(game)
-        
+
         if isReadOnly(gmt) then
             setReadOnly(gmt, false) 
         end
