@@ -38,7 +38,7 @@ local globalMethods = {
 }
 
 local settings = (...) or {}
-settings.web = settings.web or true
+settings.web = (settings.web == nil and true) or settings.web
 settings.branch = settings.branch or "Upbolt/Hydroxide/revision"
 
 local function import(asset)
