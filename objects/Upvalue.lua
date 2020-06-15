@@ -1,4 +1,5 @@
 local Upvalue = {}
+local TableUpvalue = {}
 
 function Upvalue.new(closure, index, value)
     local upvalue = {}
@@ -11,8 +12,26 @@ function Upvalue.new(closure, index, value)
     return upvalue
 end
 
+function TableUpvalue.new(closure, index, value)
+    local tableUpvalue = {}
+
+    tableUpvalue.Scanned = {} 
+    tableUpvalue.Closure = closure
+    tableUpvalue.Index = index
+    tableUpvalue.Value = value
+    tableUpvalue.Update = TableUpvalue.update
+
+    return tableUpvalue
+end
+
 function Upvalue.update(upvalue)
     upvalue.Value = getUpvalue(upvalue.Closure, upvalue.Index)
 end
 
-return Upvalue
+function TableUpvalue.update(tableUpvalue)
+    for index, value in pairs(tableUpvalue.Value) do
+        tableUpvalue.Scanned[index] = value
+    end
+end
+
+return Upvalue, TableUpvalue

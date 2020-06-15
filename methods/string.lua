@@ -13,18 +13,18 @@ local function toString(value)
 
         rawset(mt, "__tostring", nil)
         
-        value = tostring(value)
+        value = tostring(value):gsub((dataType == "userdarta" and "userdata: ") or "table: ", '')
         
         rawset(mt, "__tostring", __tostring)
 
         return value 
     elseif type(value) == "userdata" then
         return userdataValue(value)
-    elseif type(value) == "function" then
+    elseif dataType == "function" then
         local closureName = getInfo(value).name
         return (closureName == '' and "Unnamed function") or closureName
     else
-        return tostring(value) 
+        return tostring(value)
     end
 end
 

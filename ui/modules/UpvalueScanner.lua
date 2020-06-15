@@ -38,6 +38,7 @@ upvalueList:BindContextMenu(ContextMenu.new({ spyArgs, viewUpvalues }))
 spyArgs:SetCallback(function()end)
 deepSearch:SetCallback(function(enabled)
     if enabled then
+        Methods.UpvalueDeepSearch = enabled
         MessageBox.Show("Notice", "Deep searching may result in longer scan times!", MessageType.OK)
     end
 end)
@@ -55,15 +56,41 @@ function Log.new(closureData, upvalues)
     local logHeight = 30
 
     for i, upvalue in pairs(upvalues) do
-        local upvalueLog = Assets.Upvalue:Clone()
         local value = upvalue.Value
         local valueType = type(value)
         local valueColor = oh.Constants.Syntax[valueType]
+        local upvalueLog = (valueType == "table" and Assets.Table:Clone()) or Assets.Upvalue:Clone()
 
         if valueType == "function" then
             local name = getInfo(value).name
             value = (name ~= "" and name) or "Unnamed function"
             valueColor = Color3.fromRGB(127, 127, 127)
+        elseif valueType == "table" then
+            local tableHeight = 30
+            log.Scanned = {}
+
+            for index, value in pairs(upvalue.Scanned) do
+                local indexType = type(index)
+                local valueType = type(value)
+                local element = Assets.Element:Clone()
+                local indexFrame = element.Index
+                local valueFrame = element.Value
+
+                indexFrame.Label.Text = toString(index)
+                indexFrame.Label.TextColor3 = oh.Constants.Syntax[indexType]
+                indexFrame.Icon.Image = oh.Constants.Types[indexType]
+
+                valueFrame.Label.Text = toString(value)
+                valueFrame.Label.TextColor3 = oh.Constants.Syntax[valueType]
+                valueFrame.Icon.Image = oh.Constants.Types[valueType]
+
+                element.Parent = upvalueLog.Elements
+
+                tableHeight = tableHeight + element.AbsoluteSize.Y + 5
+                log.Scanned[index] = element
+            end
+
+            upvalueLog.Size = UDim2.new(1, 0, 0, tableHeight)
         end
 
         upvalueLog.Name = upvalue.Index
@@ -110,6 +137,23 @@ function Log.update(log)
             local name = getInfo(newValue).name
             newValue = (name ~= "" and name) or "Unnamed function"
             valueColor = Color3.fromRGB(170, 170, 170)
+        elseif valueType == "table" then
+            for i, element in pairs(log.Scanned) do
+                local v = upvalue.Scanned[i]
+
+                local indexType = type(i)
+                local valueType = type(v)
+                local indexFrame = element.Index
+                local valueFrame = element.Value
+
+                indexFrame.Label.Text = toString(i)
+                indexFrame.Label.TextColor3 = oh.Constants.Syntax[indexType]
+                indexFrame.Icon.Image = oh.Constants.Types[indexType]
+
+                valueFrame.Label.Text = toString(v)
+                valueFrame.Label.TextColor3 = oh.Constants.Syntax[valueType]
+                valueFrame.Icon.Image = oh.Constants.Types[valueType]
+            end
         end
 
         upvalueLog.Icon.Image = oh.Constants.Types[valueType]
@@ -123,11 +167,25 @@ end
 local function addUpvalues()
     local query = SearchBox.Text
 
-    if query:gsub(' ', '') ~= '' and query:len() >= 2 then
+    if query:gsub(' ', '') ~= '' then
+        if not tonumber(query) and query:len() <= 1 then
+            return
+        end
+
+        local unnamedFunctions = {}
+
         upvalueList:Clear()
         upvalueLogs = {}
 
         for closureData, upvalues in pairs(Methods.Scan(query)) do
+            if getInfo(closureData).name == "" then
+                unnamedFunctions[closureData] = upvalues
+            else
+                Log.new(closureData, upvalues)
+            end
+        end
+
+        for closureData, upvalues in pairs(unnamedFunctions) do
             Log.new(closureData, upvalues)
         end
 

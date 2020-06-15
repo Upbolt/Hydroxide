@@ -17,9 +17,9 @@ local function import(asset)
     if asset:find("rbxassetid://") then
         assets = { game:GetObjects(asset)[1] }
     elseif web then
-        assets = { loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Upbolt/Hydroxide/revision/" .. asset .. ".lua"))() }
+        assets = { loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Upbolt/Hydroxide/revision/" .. asset .. ".lua", asset .. '.lua'))() }
     else
-        assets = { loadfile("hydroxide/" .. asset .. ".lua")() }
+        assets = { loadstring(readfile("hydroxide/" .. asset .. ".lua"), asset .. '.lua')() }
     end
     
     importCache[asset] = assets
@@ -123,8 +123,16 @@ environment.oh = {
             gmt.__namecall = oh.Namecall
         end
 
-        unpack(importCache["rbxassetid://5042109928"]):Destroy()
-        unpack(importCache["rbxassetid://5042114982"]):Destroy()
+        local ui = importCache["rbxassetid://5042109928"]
+        local assets = importCache["rbxassetid://5042114982"]
+
+        if ui then
+            unpack(ui):Destroy()
+        end
+
+        if assets then
+            unpack(assets):Destroy()
+        end
     end
 }
 

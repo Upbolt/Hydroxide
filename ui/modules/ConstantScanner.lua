@@ -85,7 +85,11 @@ end
 local function addConstants()
     local query = SearchBox.Text
 
-    if query:gsub(' ', '') ~= '' and query:len() > 2 then
+    if query:gsub(' ', '') ~= '' then
+        if not tonumber(query) and query:len() <= 1 then
+            return
+        end
+
         constantList:Clear()
         constantLogs = {}
 
