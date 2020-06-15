@@ -94,12 +94,12 @@ environment.oh = {
         },
         Syntax = {
             ["nil"] = Color3.fromRGB(244, 135, 113),
-            table = Color3.fromRGB(200, 200, 200),
+            table = Color3.fromRGB(225, 225, 225),
             string = Color3.fromRGB(225, 150, 85),
             number = Color3.fromRGB(170, 225, 127),
             boolean = Color3.fromRGB(127, 200, 255),
-            userdata = Color3.fromRGB(200, 200, 200),
-            ["function"] = Color3.fromRGB(200, 200, 200)
+            userdata = Color3.fromRGB(225, 225, 225),
+            ["function"] = Color3.fromRGB(225, 225, 225)
         }
     },
     Exit = function()
