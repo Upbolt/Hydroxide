@@ -34,6 +34,13 @@ function Upvalue.update(upvalue)
     upvalue.Value = getUpvalue(upvalue.Closure, upvalue.Index)
 end
 
+function TableUpvalue.set(tableUpvalue, index, value)
+    if tableUpvalue.Scanned[index] then
+        tableUpvalue.Value[index] = value
+        tableUpvalue.Scanned[index] = value
+    end
+end
+
 function TableUpvalue.update(tableUpvalue)
     for index, value in pairs(tableUpvalue.Value) do
         tableUpvalue.Scanned[index] = value
