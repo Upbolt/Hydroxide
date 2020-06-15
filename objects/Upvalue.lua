@@ -7,6 +7,7 @@ function Upvalue.new(closure, index, value)
     upvalue.Closure = closure
     upvalue.Index = index
     upvalue.Value = value
+    upvalue.Set = Upvalue.set
     upvalue.Update = Upvalue.update
 
     return upvalue
@@ -22,6 +23,11 @@ function TableUpvalue.new(closure, index, value)
     tableUpvalue.Update = TableUpvalue.update
 
     return tableUpvalue
+end
+
+function Upvalue.set(upvalue, index, value)
+    setUpvalue(upvalue.Closure, upvalue.Index, value)
+    upvalue.Value = value
 end
 
 function Upvalue.update(upvalue)
