@@ -77,9 +77,6 @@ gmt.__namecall = newCClosure(function(instance, ...)
 
         if string.find(className, "Function") and ((not remoteIgnored and not argsIgnored) and (not remoteBlocked and not argsBlocked)) then
             results = { nmc(instance, ...) }
-            if instance.Name == "Containers" then
-                print(unpack(results))
-            end
         end
         
         if eventSet and (not remoteIgnored and not argsIgnored) then

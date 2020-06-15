@@ -54,7 +54,7 @@ local function scan(query)
                     local table
 
                     for i,v in pairs(value) do
-                        if (i ~= value and v ~= value) and (compareUpvalue(query, i) or compareUpvalue(query, v)) then
+                        if (i ~= value and v ~= value) and (compareUpvalue(query, i, true) or compareUpvalue(query, v)) then
                             if not storage then
                                 upvalues[closure] = {}
                                 storage = upvalues[closure]

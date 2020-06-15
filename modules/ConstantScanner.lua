@@ -39,8 +39,6 @@ local function scan(query)
                     else
                         storage[index] = Constant.new(closure, index, constant)
                     end
-
-                    print(index, constant)
                 end
             end
         end
