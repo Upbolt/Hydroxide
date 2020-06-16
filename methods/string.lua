@@ -13,7 +13,7 @@ local function toString(value)
 
         rawset(mt, "__tostring", nil)
         
-        value = tostring(value):gsub((dataType == "userdarta" and "userdata: ") or "table: ", '')
+        value = tostring(value):gsub((dataType == "userdata" and "userdata: ") or "table: ", '')
         
         rawset(mt, "__tostring", __tostring)
 

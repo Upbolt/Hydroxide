@@ -2,6 +2,7 @@ local RunService = game:GetService("RunService")
 local TextService = game:GetService("TextService")
 
 local UpvalueScanner = {}
+local ClosureSpy = import("modules/ClosureSpy")
 local Methods = import("modules/UpvalueScanner")
 
 if not hasMethods(Methods.RequiredMethods) then
@@ -14,6 +15,7 @@ local CheckBox = import("ui/controls/CheckBox")
 local List, ListButton = import("ui/controls/List")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 local ContextMenu, ContextMenuButton = import("ui/controls/ContextMenu")
+local TabSelector = import("ui/controls/TabSelector")
 
 local Page = import("rbxassetid://5042109928").Base.Body.Pages.UpvalueScanner
 local Assets = import("rbxassetid://5042114982").UpvalueScanner
@@ -30,12 +32,25 @@ local upvalueList = List.new(ResultsClip.Content)
 local upvalueLogs = {}
 local selectedLog
 
-local spyArgs = ContextMenuButton.new("rbxassetid://4666593447", "Spy Function")
-local viewUpvalues = ContextMenuButton.new("rbxassetid://5179169654", "View All Upvalues")
+local spyClosureContext = ContextMenuButton.new("rbxassetid://4666593447", "Spy Closure")
+local viewUpvaluesContext = ContextMenuButton.new("rbxassetid://5179169654", "View All Upvalues")
 
-upvalueList:BindContextMenu(ContextMenu.new({ spyArgs, viewUpvalues }))
+upvalueList:BindContextMenu(ContextMenu.new({ spyClosureContext, viewUpvaluesContext }))
 
-spyArgs:SetCallback(function()end)
+spyClosureContext:SetCallback(function()
+    local selectedClosure = selectedLog.Closure
+
+    if TabSelector.SelectTab("ClosureSpy") then
+        local result = ClosureSpy.SpyClosure(selectedClosure)
+
+        if result == false then
+            MessageBox.Show("Already hooked", "You are already spying " .. selectedClosure.Name)
+        elseif result == nil then
+            MessageBox.Show("Cannot hook", ('Cannot hook "%s" because there are no upvalues'):format(selectedClosure.Name))
+        end
+    end
+end)
+
 deepSearch:SetCallback(function(enabled)
     if enabled then
         Methods.UpvalueDeepSearch = enabled
@@ -47,12 +62,11 @@ end)
 
 local Log = {}
 
-function Log.new(closureData, upvalues)
+function Log.new(closureData, closure)
     local log = {}
     local button = Assets.ClosureLog:Clone()
     local listButton = ListButton.new(button, upvalueList)
-    local closure = Closure.new(closureData)
-
+    local upvalues = closure.Upvalues
     local logHeight = 30
 
     for i, upvalue in pairs(upvalues) do
@@ -178,18 +192,18 @@ local function addUpvalues()
         upvalueList:Clear()
         upvalueLogs = {}
 
-        for closureData, upvalues in pairs(Methods.Scan(query)) do
+        for closureData, closure in pairs(Methods.Scan(query)) do
             if getInfo(closureData).name == "" then
-                unnamedFunctions[closureData] = upvalues
+                unnamedFunctions[closureData] = closure
             else
-                Log.new(closureData, upvalues)
+                Log.new(closureData, closure)
             end
 
             results = results + 1
         end
 
-        for closureData, upvalues in pairs(unnamedFunctions) do
-            Log.new(closureData, upvalues)
+        for closureData, closure in pairs(unnamedFunctions) do
+            Log.new(closureData, closure)
         end
 
         ResultStatus.Visible = results ~= 0

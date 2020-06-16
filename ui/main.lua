@@ -7,6 +7,7 @@ local TabSelector = import("ui/controls/TabSelector")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 
 local RemoteSpy = import("ui/modules/RemoteSpy")
+local ClosureSpy = import("ui/modules/RemoteSpy")
 local ScriptScanner = import("ui/modules/ScriptScanner")
 local ModuleScanner = import("ui/modules/ModuleScanner")
 local UpvalueScanner = import("ui/modules/UpvalueScanner")

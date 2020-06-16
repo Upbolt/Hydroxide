@@ -26,12 +26,12 @@ function TableUpvalue.new(closure, index, value)
 end
 
 function Upvalue.set(upvalue, index, value)
-    setUpvalue(upvalue.Closure, upvalue.Index, value)
+    setUpvalue(upvalue.Closure.Data, upvalue.Index, value)
     upvalue.Value = value
 end
 
 function Upvalue.update(upvalue)
-    upvalue.Value = getUpvalue(upvalue.Closure, upvalue.Index)
+    upvalue.Value = getUpvalue(upvalue.Closure.Data, upvalue.Index)
 end
 
 function TableUpvalue.set(tableUpvalue, index, value)

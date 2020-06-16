@@ -4,7 +4,7 @@ if oh then
     oh.Exit()
 end
 
-local web = false
+local web = true
 local importCache = {}
 
 local function import(asset)
@@ -106,9 +106,16 @@ environment.oh = {
         end
 
         for original, hook in pairs(oh.Hooks) do
-            hookFunction(hook, function(...)
-                return original(...)
-            end)
+            local hookType = type(hook)
+            if hookType == "function" then
+                hookFunction(hook, function(...)
+                    return original(...)
+                end)
+            elseif hookType == "table" then
+                hookFunction(hook.Closure.Data, function(...)
+                    return hook.OriginalFunction(...)
+                end)
+            end
         end
 
         local gmt = getrawmetatable(game)

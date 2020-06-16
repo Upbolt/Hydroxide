@@ -100,7 +100,7 @@ for name, hook in pairs(methodHooks) do
         local results
         local className = instance.ClassName
 
-        if remotesViewing[className] and instance ~= remoteDataEvent and (method ~= nmc or remoteMethods[getNamecallMethod()]) then
+        if remotesViewing[className] and instance ~= remoteDataEvent then
             local remote = currentRemotes[instance]
             local vargs = {...}
 

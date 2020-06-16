@@ -70,6 +70,7 @@ local function selectTab(tabName)
 
     selectedTab = tab
     selectedPage = page
+    return true
 end
 
 for i, tab in pairs(Tabs:GetChildren()) do

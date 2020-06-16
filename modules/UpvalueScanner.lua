@@ -1,4 +1,5 @@
 local UpvalueScanner = {}
+local Closure = import("objects/Closure")
 local Upvalue, TableUpvalue = import("objects/Upvalue")
 
 local requiredMethods = {
@@ -41,13 +42,15 @@ local function scan(query)
 
                 if valueType ~= "table" and compareUpvalue(query, value) then
                     local upvalueType = type(value)
-                    local upvalue = Upvalue.new(closure, index, value)
                     local storage = upvalues[closure]
 
                     if not storage then
-                        upvalues[closure] = { [index] = upvalue }
+                        local newClosure = Closure.new(closure)
+                        newClosure.Upvalues = {}
+                        newClosure.Upvalues[index] = Upvalue.new(newClosure, index, value)
+                        upvalues[closure] = newClosure
                     else
-                        storage[index] = upvalue
+                        storage.Upvalues[index] = Upvalue.new(newClosure, index, value)
                     end
                 elseif UpvalueScanner.UpvalueDeepSearch and valueType == "table" then
                     local storage = upvalues[closure]
@@ -56,13 +59,15 @@ local function scan(query)
                     for i,v in pairs(value) do
                         if (i ~= value and v ~= value) and (compareUpvalue(query, i, true) or compareUpvalue(query, v)) then
                             if not storage then
-                                upvalues[closure] = {}
-                                storage = upvalues[closure]
+                                local newClosure = Closure.new(closure)
+                                newClosure.Upvalues = {}
+                                storage = newClosure
+                                upvalues[closure] = newClosure
                             end
 
                             if not table then
-                                table = TableUpvalue.new(closure, index, value)
-                                storage[index] = table
+                                table = TableUpvalue.new(storage, index, value)
+                                storage.Upvalues[index] = table
                             end
 
                             table.Scanned[i] = v

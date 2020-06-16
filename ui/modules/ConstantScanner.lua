@@ -1,6 +1,7 @@
 local TextService = game:GetService("TextService")
 
 local ConstantScanner = {}
+local ClosureSpy = import("modules/ClosureSpy")
 local Methods = import("modules/ConstantScanner")
 local Closure = import("objects/Closure")
 
@@ -11,6 +12,7 @@ end
 local List, ListButton = import("ui/controls/List")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 local ContextMenu, ContextMenuButton = import("ui/controls/ContextMenu")
+local TabSelector = import("ui/controls/TabSelector")
 
 local Page = import("rbxassetid://5042109928").Base.Body.Pages.ConstantScanner
 local Assets = import("rbxassetid://5042114982").ConstantScanner
@@ -23,20 +25,34 @@ local constantList = List.new(Page.Results.Clip.Content)
 local constantLogs = {}
 local selectedLog 
 
-local spyArgs = ContextMenuButton.new("rbxassetid://4666593447", "Spy Function")
-local viewConstants = ContextMenuButton.new("rbxassetid://5179169654", "View All Constants")
+local spyClosureContext = ContextMenuButton.new("rbxassetid://4666593447", "Spy Closure")
+local viewConstantsContext = ContextMenuButton.new("rbxassetid://5179169654", "View All Constants")
 
-constantList:BindContextMenu(ContextMenu.new({ spyArgs, viewConstants }))
+constantList:BindContextMenu(ContextMenu.new({ spyClosureContext, viewConstantsContext }))
+
+spyClosureContext:SetCallback(function()
+    local selectedClosure = selectedLog.Closure
+
+    if TabSelector.SelectTab("ClosureSpy") then
+        local result = ClosureSpy.SpyClosure(selectedClosure)
+
+        if result == false then
+            MessageBox.Show("Already hooked", "You are already spying " .. selectedClosure.Name)
+        elseif result == nil then
+            MessageBox.Show("Cannot hook", ('Cannot hook "%s" because there are no upvalues'):format(selectedClosure.Name))
+        end
+    end
+end)
 
 -- Log Object
 
 local Log = {}
 
-function Log.new(closureData, constants)
+function Log.new(closureData, closure)
     local log = {}
     local button = Assets.ClosureLog:Clone()
     local listButton = ListButton.new(button, constantList) 
-    local closure = Closure.new(closureData)
+    local constants = closure.Constants
     local logHeight = 30
 
     for i, constant in pairs(constants) do
@@ -93,8 +109,8 @@ local function addConstants()
         constantList:Clear()
         constantLogs = {}
 
-        for closureData, constants in pairs(Methods.Scan(query)) do
-            Log.new(closureData, constants)
+        for closureData, closure in pairs(Methods.Scan(query)) do
+            Log.new(closureData, closure)
         end
 
         constantList:Recalculate()

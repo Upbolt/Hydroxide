@@ -16,8 +16,6 @@ local ContextMenu, ContextMenuButton = import("ui/controls/ContextMenu")
 local Page = import("rbxassetid://5042109928").Base.Body.Pages.RemoteSpy
 local Assets = import("rbxassetid://5042114982").RemoteSpy
 
-local RemoteLog = Assets:FindFirstChild("RemoteLog")
-
 local Flags = Page.Flags
 local Query = Page.Query
 local Search = Query.Search
@@ -112,7 +110,7 @@ local Log = {}
 
 function Log.new(remote)
     local log = {}
-    local button = RemoteLog:Clone()
+    local button = Assets.RemoteLog:Clone()
     local remoteInstance = remote.Instance
     local remoteClass = remoteInstance.ClassName
     local listButton = ListButton.new(button, remoteList)

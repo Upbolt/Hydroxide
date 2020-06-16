@@ -1,4 +1,5 @@
 local ConstantScanner = {}
+local Closure = import("objects/Closure")
 local Constant = import("objects/Constant")
 
 local requiredMethods = {
@@ -35,9 +36,12 @@ local function scan(query)
                     local storage = constants[closure]
 
                     if not storage then
-                        constants[closure] = { [index] = Constant.new(closure, index, constant) }
+                        local newClosure = Closure.new(closure)
+                        newClosure.Constants = {}
+                        newClosure.Constants[index] = Constant.new(newClosure, index, constant)
+                        constants[closure] = newClosure
                     else
-                        storage[index] = Constant.new(closure, index, constant)
+                        storage.Constants[index] = Constant.new(storage, index, constant)
                     end
                 end
             end
