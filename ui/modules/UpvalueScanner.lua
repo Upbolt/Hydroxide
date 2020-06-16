@@ -173,6 +173,7 @@ local function addUpvalues()
         end
 
         local unnamedFunctions = {}
+        local results = 0
 
         upvalueList:Clear()
         upvalueLogs = {}
@@ -183,11 +184,15 @@ local function addUpvalues()
             else
                 Log.new(closureData, upvalues)
             end
+
+            results = results + 1
         end
 
         for closureData, upvalues in pairs(unnamedFunctions) do
             Log.new(closureData, upvalues)
         end
+
+        ResultStatus.Visible = results ~= 0
 
         upvalueList:Recalculate()
     else
