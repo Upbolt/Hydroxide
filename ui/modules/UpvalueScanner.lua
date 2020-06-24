@@ -52,8 +52,9 @@ spyClosureContext:SetCallback(function()
 end)
 
 deepSearch:SetCallback(function(enabled)
+    Methods.UpvalueDeepSearch = enabled
+    
     if enabled then
-        Methods.UpvalueDeepSearch = enabled
         MessageBox.Show("Notice", "Deep searching may result in longer scan times!", MessageType.OK)
     end
 end)

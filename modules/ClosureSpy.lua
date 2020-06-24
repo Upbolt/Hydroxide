@@ -27,7 +27,6 @@ local function connectEvent(callback)
     end
 end
 
--- Set as environment variable to reduce upvalue count
 function sendCallEvent(data, ...)
     local closure, originalClosure = unpack(data)
 
