@@ -11,14 +11,20 @@ end
 
 local Closure = import("objects/Closure")
 
+local Prompt = import("ui/controls/Prompt")
 local CheckBox = import("ui/controls/CheckBox")
+local Dropdown = import("ui/controls/Dropdown")
 local List, ListButton = import("ui/controls/List")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 local ContextMenu, ContextMenuButton = import("ui/controls/ContextMenu")
 local TabSelector = import("ui/controls/TabSelector")
 
-local Page = import("rbxassetid://5042109928").Base.Body.Pages.UpvalueScanner
+local Base = import("rbxassetid://5042109928").Base
+local Prompts = Base.Prompts
+local Page = Base.Body.Pages.UpvalueScanner
 local Assets = import("rbxassetid://5042114982").UpvalueScanner
+
+local SpyHook = ClosureSpy.Hook
 
 local Query = Page.Query
 local Search = Query.Search
@@ -27,37 +33,35 @@ local Filters = Page.Filters
 local ResultsClip = Page.Results.Clip
 local ResultStatus = ResultsClip.ResultStatus
 
+local modifyUpvalue = Prompt.new(Prompts.ModifyUpvalue)
 local deepSearch = CheckBox.new(Filters.SearchInTables)
 local upvalueList = List.new(ResultsClip.Content)
 local upvalueLogs = {}
+
 local selectedLog
+local selectedUpvalue
 
 local spyClosureContext = ContextMenuButton.new("rbxassetid://4666593447", "Spy Closure")
 local viewUpvaluesContext = ContextMenuButton.new("rbxassetid://5179169654", "View All Upvalues")
 
-upvalueList:BindContextMenu(ContextMenu.new({ spyClosureContext, viewUpvaluesContext }))
+local changeUpvalueContext = ContextMenuButton.new("rbxassetid://5432062776", "Change Upvalue")
 
-spyClosureContext:SetCallback(function()
-    local selectedClosure = selectedLog.Closure
+local closureContextMenu = ContextMenu.new({ spyClosureContext, viewUpvaluesContext })
+local upvalueContextMenu = ContextMenu.new({ changeUpvalueContext })
 
-    if TabSelector.SelectTab("ClosureSpy") then
-        local result = ClosureSpy.SpyClosure(selectedClosure)
+local modifyUpvalueInner = modifyUpvalue.Instance.Inner
+local modifyUpvalueContent = modifyUpvalueInner.Content
+local modifyUpvalueButtons = modifyUpvalueInner.Buttons.SetCancel
+local modifyUpvalueType = modifyUpvalueContent.Type
+local modifyUpvalueValue = modifyUpvalueContent.Value.Input
 
-        if result == false then
-            MessageBox.Show("Already hooked", "You are already spying " .. selectedClosure.Name)
-        elseif result == nil then
-            MessageBox.Show("Cannot hook", ('Cannot hook "%s" because there are no upvalues'):format(selectedClosure.Name))
-        end
-    end
-end)
+local upvalueTypeDropdown = Dropdown.new(modifyUpvalueType)
 
-deepSearch:SetCallback(function(enabled)
-    Methods.UpvalueDeepSearch = enabled
-    
-    if enabled then
-        MessageBox.Show("Notice", "Deep searching may result in longer scan times!", MessageType.OK)
-    end
-end)
+local function typeMismatchMessage()
+    MessageBox.Show("Error", 
+        "Value does not match selected type",
+        MessageType.OK)
+end
 
 -- Log Object
 
@@ -114,6 +118,12 @@ function Log.new(closureData, closure)
         upvalueLog.Value.Text = toString(value)
         upvalueLog.Value.TextColor3 = valueColor
         upvalueLog.Parent = button.Upvalues
+
+        upvalueLog.MouseButton2Click:Connect(function()
+            selectedUpvalue = upvalue
+            upvalueTypeDropdown:SetSelected(type(upvalue.Value))
+            upvalueContextMenu:Show()
+        end)
 
         logHeight = logHeight + upvalueLog.AbsoluteSize.Y + 5
     end
@@ -216,6 +226,104 @@ local function addUpvalues()
 
     SearchBox.Text = ''
 end
+
+upvalueList:BindContextMenu(ContextMenu.new({ spyClosureContext, viewUpvaluesContext }))
+
+spyClosureContext:SetCallback(function()
+    local selectedClosure = selectedLog.Closure
+
+    if TabSelector.SelectTab("ClosureSpy") then
+        local result = SpyHook.new(selectedClosure)
+
+        if result == false then
+            MessageBox.Show("Already hooked", "You are already spying " .. selectedClosure.Name)
+        elseif result == nil then
+            MessageBox.Show("Cannot hook", ('Cannot hook "%s" because there are no upvalues'):format(selectedClosure.Name))
+        end
+    end
+end)
+
+changeUpvalueContext:SetCallback(function()
+    if selectedUpvalue then
+        local index = selectedUpvalue.Index
+        local indexFrame = modifyUpvalueContent.Index
+        local indexNumber = indexFrame.Number
+        local indexWidth = TextService:GetTextSize(tostring(index), 18, "SourceSans", indexFrame.AbsoluteSize).X
+        
+        indexNumber.Text = index
+        indexNumber.Size = UDim2.new(0, indexWidth, 0, 25)
+        
+        modifyUpvalue:Show()
+    end
+end)
+
+upvalueTypeDropdown:SetCallback(function(dropdown, button)
+    local instance = dropdown.Instance
+    local icon = oh.Constants.Types[button.Name] or oh.Constants.Types["userdata"]
+
+    instance.Icon.Image = icon
+    modifyUpvalueValue.Text = ""
+end)
+
+deepSearch:SetCallback(function(enabled)
+    Methods.UpvalueDeepSearch = enabled
+    
+    if enabled then
+        MessageBox.Show("Notice", "Deep searching may result in longer scan times!", MessageType.OK)
+    end
+end)
+
+modifyUpvalueButtons.Cancel.MouseButton1Click:Connect(function()
+    modifyUpvalue:Hide()
+end)
+
+modifyUpvalueButtons.Set.MouseButton1Click:Connect(function()
+    local newType = modifyUpvalueType.Label.Text
+    local newValue = modifyUpvalueValue.Text
+
+    if upvalueType ~= "Select Type" then
+        local value 
+
+        if newType == "string" then
+            value = newValue    
+        elseif newType == "number" then
+            local numberVal = tonumber(newValue)
+
+            if not numberVal then
+                typeMismatchMessage()
+            else
+                value = numberVal
+            end
+        elseif newType == "boolean" then
+            if newValue == "true" then 
+                value = true
+            elseif newValue == "false" then
+                value = false
+            else
+                typeMismatchMessage()
+            end
+        else
+            local success, result = pcall(loadstring("return " .. newValue))
+
+            if success then
+                if typeof(result) ~= newType then
+                    typeMismatchMessage()
+                else
+                    value = result
+                end
+            else
+                MessageBox.Show("Error",
+                    "There was an error with your value input",
+                    MessageType.OK)
+            end
+        end
+
+        if value then
+            selectedUpvalue:Set(value)
+            modifyUpvalue:Hide()
+        end
+    end
+end)
 
 Search.MouseButton1Click:Connect(addUpvalues)
 SearchBox.FocusLost:Connect(function(returned)

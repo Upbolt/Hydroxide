@@ -19,15 +19,7 @@ function Closure.new(data)
     closure.Upvalues = {}
     closure.Constants = {}
 
-    closure.AssignHook = Closure.assignHook
     return closure
-end
-
-function Closure.assignHook(closure, hook)
-    if not closure.Hook then
-        closure.Data = hook.OriginalFunction
-        closure.Hook = hook
-    end
 end
 
 return Closure

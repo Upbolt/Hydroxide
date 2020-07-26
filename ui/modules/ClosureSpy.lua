@@ -1,3 +1,6 @@
+local TextService = game:GetService("TextService")
+local TweenService = game:GetService("TweenService")
+
 local ClosureSpy = {}
 local Methods = import("modules/ClosureSpy")
 
@@ -46,7 +49,7 @@ local clearContext = ContextMenuButton.new("rbxassetid://4892169181", "Clear Cal
 local ignoreContext = ContextMenuButton.new("rbxassetid://4842578510", "Ignore Calls")
 local blockContext = ContextMenuButton.new("rbxassetid://4891641806", "Block Calls")
 
-closureList:BindContextMenu({ conditionContext, clearCOntext, ignoreContext, blockContext })
+closureList:BindContextMenu(ContextMenu.new({ conditionContext, clearContext, ignoreContext, blockContext }))
 
 -- Log Object
 local Log = {}
@@ -55,27 +58,37 @@ function Log.new(hook)
     local log = {}
     local button = Assets.ClosureLog:Clone()
     local buttonName = button:FindFirstChild("Name")
+    local buttonInfo = button.Information
     local listButton = ListButton.new(button, closureList)
-    local Closure = hook.Closure
+    local closure = hook.Closure
+    local original = hook.Original
 
     local normalAnimation = TweenService:Create(buttonName, constants.fadeLength, { TextColor3 = constants.normalColor })
     local blockAnimation = TweenService:Create(buttonName, constants.fadeLength, { TextColor3 = constants.blockedColor })
     local ignoreAnimation = TweenService:Create(buttonName, constants.fadeLength, { TextColor3 = constants.ignoredColor })
 
-    button.Name = Closure.Name
-    buttonName.Text = Closure.Name
+    buttonInfo.Protos.Text = #getProtos(original)
+    buttonInfo.Upvalues.Text = #getUpvalues(original)
+    buttonInfo.Constants.Text = #getConstants(original)
+
+    button.Name = closure.Name
+    buttonName.Text = closure.Name
 
     listButton:SetCallback(function()
         
     end)
 
     listButton:SetRightCallback(function()
+        local oldContext = getContext()
+        setContext(7)
+
         ignoreContext:SetIcon((hook.Ignored and icons.unignore) or icons.ignore)
         ignoreContext:SetText((hook.Ignored and "Unignore Calls") or "Ignore Calls")
         blockContext:SetIcon((hook.Blocked and icons.unblock) or icons.block)
         blockContext:SetText((hook.Blocked and "Unblock Calls") or "Block Calls")
 
         selectedLog = log
+        setContext(oldContext)
     end)
 
     closureLogs[hook] = log
@@ -93,6 +106,7 @@ function Log.new(hook)
     log.Adjust = Log.adjust
     log.IncrementCalls = Log.incrementCalls
     log.Decrementcalls = Log.decrementCalls
+
     return log
 end
 
@@ -111,14 +125,15 @@ end
 function Log.adjust(log)
     local logInstance = log.Button.Instance
     local logIcon = logInstance.Icon
+    local logName = logInstance:FindFirstChild("Name")
 
     local callWidth = TextService:GetTextSize(logInstance.Calls.Text, 18, "SourceSans", constants.callWidth).X + 10
     local labelWidth = callWidth + 21
 
-    logInstance.Calls.Size = UDim2.new(0, callWidth, 1, 0)
+    logInstance.Calls.Size = UDim2.new(0, callWidth, 0, 20)
     logIcon.Position = UDim2.new(0, callWidth, 0.5, -7)
-    logInstance.Label.Position = UDim2.new(0, labelWidth, 0, 0)
-    logInstance.Label.Size = UDim2.new(1, -labelWidth, 1, 0)
+    logName.Position = UDim2.new(0, labelWidth, 0, 0)
+    logName.Size = UDim2.new(1, -labelWidth, 1, 0)
 end
 
 function Log.clear(log)
@@ -132,6 +147,9 @@ end
 function Log.incrementCalls(log, args, results)
     local buttonInstance = log.Button.Instance
     local hook = log.Hook
+
+    hook.Calls = hook.Calls + 1
+
     local calls = hook.Calls
 
     buttonInstance.Calls.Text = (calls < 10000 and calls) or "..."
@@ -142,9 +160,12 @@ end
 function Log.decrementCalls(log, args)
     local buttonInstance = log.Button.Instance
     local hook = log.Remote
+
+    hook.Calls = Hook.calls - 1
+
     local calls = hook.Calls
 
-    hook:DecrementCalls(args)
+    -- hook:DecrementCalls(args)
     buttonInstance.Calls.Text = (calls < 10000 and calls) or "..."
     log:Adjust()
 end
@@ -166,10 +187,15 @@ Refresh.MouseButton1Click:Connect(function()
     closureList:Recalculate()
 end)
 
-Methods.ConnectEvent(function(hook, vargs, results, callingScript)
-    local log = closureLogs[hook] or Log.new(hook)
+Methods.SetEvent(function(hook, callingScript, ...)
+    local oldContext = getContext()
+    setContext(7)
 
-    log:IncrementCalls(vargs, results)
+    local log = closureLogs[hook] or Log.new(hook)
+    
+    log:IncrementCalls()
+
+    setContext(oldContext)
 end)
 
 return ClosureSpy

@@ -52,6 +52,7 @@ local globalMethods = {
     getInfo = debug.getinfo or getinfo,
     getSenv = getsenv,
     getMenv = getmenv or getsenv,
+    getContext = getthreadcontext or (syn and syn.get_thread_identity),
     getScriptClosure = get_script_function or getscriptclosure,
     getNamecallMethod = getnamecallmethod,
     getCallingScript = getcallingscript,
@@ -66,6 +67,7 @@ local globalMethods = {
     getMetatable = getrawmetatable or debug.getmetatable,
     setClipboard = setclipboard or writeclipboard,
     setConstant = debug.setconstant or setconstant or setconst,
+    setContext = setthreadcontext or (syn and syn.set_thread_identity),
     setUpvalue = debug.setupvalue or setupvalue or setupval,
     setStack = debug.setstack or setstack,
     setReadOnly = setreadonly,
@@ -108,13 +110,9 @@ environment.oh = {
         for original, hook in pairs(oh.Hooks) do
             local hookType = type(hook)
             if hookType == "function" then
-                hookFunction(hook, function(...)
-                    return original(...)
-                end)
+                hookFunction(hook, original)
             elseif hookType == "table" then
-                hookFunction(hook.Closure.Data, function(...)
-                    return hook.OriginalFunction(...)
-                end)
+                hookFunction(hook.Closure.Data, hook.Original)
             end
         end
 

@@ -46,7 +46,6 @@ local function scan(query)
 
                     if not storage then
                         local newClosure = Closure.new(closure)
-                        newClosure.Upvalues = {}
                         newClosure.Upvalues[index] = Upvalue.new(newClosure, index, value)
                         upvalues[closure] = newClosure
                     else
@@ -60,7 +59,6 @@ local function scan(query)
                         if (i ~= value and v ~= value) and (compareUpvalue(query, i, true) or compareUpvalue(query, v)) then
                             if not storage then
                                 local newClosure = Closure.new(closure)
-                                newClosure.Upvalues = {}
                                 storage = newClosure
                                 upvalues[closure] = newClosure
                             end

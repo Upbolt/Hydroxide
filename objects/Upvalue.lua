@@ -25,7 +25,7 @@ function TableUpvalue.new(closure, index, value)
     return tableUpvalue
 end
 
-function Upvalue.set(upvalue, index, value)
+function Upvalue.set(upvalue, value)
     setUpvalue(upvalue.Closure.Data, upvalue.Index, value)
     upvalue.Value = value
 end

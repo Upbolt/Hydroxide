@@ -103,6 +103,10 @@ function ContextMenu.add(contextMenu, contextMenuButton)
 end
 
 function ContextMenu.show(contextMenu)
+    if currentContextMenu then
+        currentContextMenu:Hide()
+    end
+
     local instance = contextMenu.Instance
 
     instance.Visible = true

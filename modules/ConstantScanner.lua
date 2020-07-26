@@ -37,7 +37,6 @@ local function scan(query)
 
                     if not storage then
                         local newClosure = Closure.new(closure)
-                        newClosure.Constants = {}
                         newClosure.Constants[index] = Constant.new(newClosure, index, constant)
                         constants[closure] = newClosure
                     else
