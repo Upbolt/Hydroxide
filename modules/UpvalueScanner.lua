@@ -49,7 +49,7 @@ local function scan(query, deepSearch)
                         newClosure.Upvalues[index] = Upvalue.new(newClosure, index, value)
                         upvalues[closure] = newClosure
                     else
-                        storage.Upvalues[index] = Upvalue.new(newClosure, index, value)
+                        storage.Upvalues[index] = Upvalue.new(storage, index, value)
                     end
                 elseif deepSearch and valueType == "table" then
                     local storage = upvalues[closure]

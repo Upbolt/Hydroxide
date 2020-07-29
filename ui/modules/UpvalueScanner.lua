@@ -72,6 +72,10 @@ local function typeMismatchMessage()
 end
 
 local function addUpvalue(upvalue, temporary)
+    if not upvalue.Closure then
+        print('what ')
+    end
+
     local upvalueLog 
     local index = upvalue.Index
     local value = upvalue.Value
@@ -141,20 +145,12 @@ local function updateUpvalue(closureLog, upvalue)
     local upvalueLog = closureLog.Instance.Upvalues[tostring(upvalue.Index)]
     local closure = upvalue.Closure
     local index = upvalue.Index
-    local oldValue = upvalue.Value
     local newValue = getUpvalue(closure.Data, index)
     local valueType = type(newValue)
 
-    if newValue ~= oldValue then
-        if valueType == "function" then
-            local closureName = getInfo(newValue).name
-            upvalueLog.Value.Text = (closureName == '' and "Unnamed function") or closureName
-        else
-            upvalueLog.Value.Text = toString(newValue)
-        end
-
-        upvalueLog.Value.TextColor3 = oh.Constants.Syntax[valueType]
-        upvalueLog.Icon.Image = oh.Constants.Types[valueType]
+    if valueType == "function" then
+        local closureName = getInfo(newValue).name
+        upvalueLog.Value.Text = (closureName == '' and "Unnamed function") or closureName
     elseif valueType == "table" and upvalue.Scanned then
         for i, v in pairs(upvalue.Scanned) do
             local indexText = toString(i)
@@ -170,7 +166,12 @@ local function updateUpvalue(closureLog, upvalue)
             elementLog.Value.Icon.Image = oh.Constants.Types[elementValueType]
             elementLog.Parent = upvalueLog.Elements
         end
+    else
+        upvalueLog.Value.Text = toString(newValue)
     end
+
+    upvalueLog.Value.TextColor3 = oh.Constants.Syntax[valueType]
+    upvalueLog.Icon.Image = oh.Constants.Types[valueType]
 
     upvalue:Update(newValue)
 end
@@ -214,7 +215,7 @@ function Log.update(log)
     for i, upvalue in pairs(log.Closure.Upvalues) do
         updateUpvalue(log, upvalue)
     end
-
+    
     for i, upvalue in pairs(log.Closure.TemporaryUpvalues) do
         updateUpvalue(log, upvalue)
     end
