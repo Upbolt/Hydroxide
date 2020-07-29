@@ -13,37 +13,25 @@ function Upvalue.new(closure, index, value)
     return upvalue
 end
 
-function TableUpvalue.new(closure, index, value)
-    local tableUpvalue = {}
-
-    tableUpvalue.Scanned = {} 
-    tableUpvalue.Closure = closure
-    tableUpvalue.Index = index
-    tableUpvalue.Value = value
-    tableUpvalue.Update = TableUpvalue.update
-
-    return tableUpvalue
-end
-
 function Upvalue.set(upvalue, value)
     setUpvalue(upvalue.Closure.Data, upvalue.Index, value)
     upvalue.Value = value
 end
 
-function Upvalue.update(upvalue)
-    upvalue.Value = getUpvalue(upvalue.Closure.Data, upvalue.Index)
-end
+function Upvalue.update(upvalue, newValue)
+    local value = newValue or getUpvalue(upvalue.Closure.Data, upvalue.Index)
+    local scanned = upvalue.Scanned
 
-function TableUpvalue.set(tableUpvalue, index, value)
-    if tableUpvalue.Scanned[index] then
-        tableUpvalue.Value[index] = value
-        tableUpvalue.Scanned[index] = value
-    end
-end
+    upvalue.Value = value
 
-function TableUpvalue.update(tableUpvalue)
-    for index, value in pairs(tableUpvalue.Value) do
-        tableUpvalue.Scanned[index] = value
+    if type(value) ~= "table" and scanned then
+        upvalue.Scanned = nil
+    elseif scanned then
+        for i,v in pairs(value) do
+            if scanned[i] then
+                scanned[i] = v
+            end
+        end
     end
 end
 

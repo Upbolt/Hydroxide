@@ -15,7 +15,7 @@ local function compareUpvalue(query, upvalue, ignore)
     local upvalueType = type(upvalue)
 
     local stringCheck = upvalueType == "string" and (query == upvalue or upvalue:lower():find(query:lower()))
-    local numberCheck = upvalueType == "number" and not isTableIndex and (tonumber(query) == upvalue or ("%.2f"):format(upvalue) == query)
+    local numberCheck = not ignore and upvalueType == "number" and not isTableIndex and (tonumber(query) == upvalue or ("%.2f"):format(upvalue) == query)
     
     if upvalueType == "userdata" then
         if typeof(upvalueType) == "Instance" then
@@ -32,7 +32,7 @@ local function compareUpvalue(query, upvalue, ignore)
     return stringCheck or numberCheck or userDataCheck
 end
 
-local function scan(query)
+local function scan(query, deepSearch)
     local upvalues = {}
 
     for i,closure in pairs(getGc()) do
@@ -51,7 +51,7 @@ local function scan(query)
                     else
                         storage.Upvalues[index] = Upvalue.new(newClosure, index, value)
                     end
-                elseif UpvalueScanner.UpvalueDeepSearch and valueType == "table" then
+                elseif deepSearch and valueType == "table" then
                     local storage = upvalues[closure]
                     local table
 
@@ -64,7 +64,8 @@ local function scan(query)
                             end
 
                             if not table then
-                                table = TableUpvalue.new(storage, index, value)
+                                table = Upvalue.new(storage, index, value)
+                                table.Scanned = {}
                                 storage.Upvalues[index] = table
                             end
 
@@ -80,6 +81,5 @@ local function scan(query)
 end
 
 UpvalueScanner.Scan = scan
-UpvalueScanner.UpvalueDeepSearch = false
 UpvalueScanner.RequiredMethods = requiredMethods
 return UpvalueScanner

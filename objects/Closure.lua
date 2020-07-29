@@ -19,6 +19,9 @@ function Closure.new(data)
     closure.Upvalues = {}
     closure.Constants = {}
 
+    closure.TemporaryUpvalues = {}
+    closure.TemporaryConstants = {}
+
     return closure
 end
 
