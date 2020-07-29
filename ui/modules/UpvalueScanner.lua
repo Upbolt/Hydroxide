@@ -88,8 +88,8 @@ local function addUpvalue(upvalue, temporary)
 
         for i, v in pairs(upvalue.Scanned) do
             local elementLog = Assets.Element:Clone()
-            local indexType = type(i)
-            local valueType = type(v)
+            local elementIndexType = type(i)
+            local elementValueType = type(v)
             local indexText = toString(i)
 
             height = height + elementLog.AbsoluteSize.Y + 5
@@ -98,10 +98,10 @@ local function addUpvalue(upvalue, temporary)
 
             elementLog.Index.Label.Text = indexText
             elementLog.Value.Label.Text = toString(v)
-            elementLog.Index.Label.TextColor3 = oh.Constants.Syntax[indexType]
-            elementLog.Value.Label.TextColor3 = oh.Constants.Syntax[valueType]
-            elementLog.Index.Icon.Image = oh.Constants.Types[indexType]
-            elementLog.Value.Icon.Image = oh.Constants.Types[valueType]
+            elementLog.Index.Label.TextColor3 = oh.Constants.Syntax[elementIndexType]
+            elementLog.Value.Label.TextColor3 = oh.Constants.Syntax[elementValueType]
+            elementLog.Index.Icon.Image = oh.Constants.Types[elementIndexType]
+            elementLog.Value.Icon.Image = oh.Constants.Types[elementValueType]
             elementLog.Parent = upvalueLog.Elements
         end
 
@@ -157,17 +157,17 @@ local function updateUpvalue(closureLog, upvalue)
         upvalueLog.Icon.Image = oh.Constants.Types[valueType]
     elseif valueType == "table" and upvalue.Scanned then
         for i, v in pairs(upvalue.Scanned) do
-            local indexType = type(i)
             local indexText = toString(i)
-            local valuetype = type(v)
+            local elementIndexType = type(i)
+            local elementValueType = type(v)
             local elementLog = upvalueLog.Elements[indexText]
 
             elementLog.Index.Label.Text = indexText
             elementLog.Value.Label.Text = toString(v)
-            elementLog.Index.Label.TextColor3 = oh.Constants.Syntax[indexType]
-            elementLog.Value.Label.TextColor3 = oh.Constants.Syntax[valueType]
-            elementLog.Value.Icon.Image = oh.Constants.Types[indexType]
-            elementLog.Value.Icon.Image = oh.Constants.Types[valueType]
+            elementLog.Index.Label.TextColor3 = oh.Constants.Syntax[elementIndexType]
+            elementLog.Value.Label.TextColor3 = oh.Constants.Syntax[elementValueType]
+            elementLog.Value.Icon.Image = oh.Constants.Types[elementIndexType]
+            elementLog.Value.Icon.Image = oh.Constants.Types[elementValueType]
             elementLog.Parent = upvalueLog.Elements
         end
     end
