@@ -4,7 +4,7 @@ if oh then
     oh.Exit()
 end
 
-local web = false
+local web = true
 local importCache = {}
 
 local function import(asset)
