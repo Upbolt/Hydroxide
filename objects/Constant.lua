@@ -18,7 +18,12 @@ function Constant.set(constant, index, value)
 end
 
 function Constant.update(constant)
-    constant.Value = getConstant(constant.Closure, constant.Index)
+    if is_protosmasher_caller() then
+        local PS_ThreadConstants = debug.getconstants(constant.Closure)
+        constant.Value = PS_ThreadConstants[constant.Index]
+    else
+        constant.Value = getConstant(constant.Closure, constant.Index)
+    end
 end
 
 return Constant
