@@ -1,8 +1,22 @@
+## Script
+```lua
+local owner = "Upbolt"
+local branch = "revision"
+
+local function webImport(file)
+    return loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/%s/Hydroxide/%s/%s.lua"):format(owner, branch, file)), file .. '.lua')()
+end
+
+webImport("init")
+webImport("ui/main")
+```
+
 # Hydroxide
 <i>General purpose pen-testing tool for games on the Roblox engine</i>
 
 <p align="center">
     <img src="https://cdn.discordapp.com/attachments/633472429917995038/722143730500501534/Hydroxide_Logo.png"/>
+    <img src="https://i.gyazo.com/63afdd764cdca533af5ebca843217a7e.gif" width="600px"/>
 </p>
 
 ## Features
@@ -10,7 +24,6 @@
     * View/Modify Upvalues
     * View first-level values in table upvalues
     * View information of closure
-<img src="https://i.gyazo.com/63afdd764cdca533af5ebca843217a7e.gif" width="600px"/>
 * Constant Scanner
     * View/Modify Constants
     * View information of closure
@@ -29,16 +42,3 @@
     * View general information of closures (location, protos, constants, etc.)
 
 More to come, soon.
-
-## Script
-```lua
-local owner = "Upbolt"
-local branch = "revision"
-
-local function webImport(file)
-    return loadstring(game:HttpGetAsync(("https://raw.githubusercontent.com/%s/Hydroxide/%s/%s.lua"):format(owner, branch, file)), file .. '.lua')()
-end
-
-webImport("init")
-webImport("ui/main")
-```
