@@ -1,7 +1,8 @@
 local aux = {}
 
-local getGc = getgc
-local getInfo = debug.getinfo or getinfo
+local methods = oh.Methods
+local getGc = methods.getGc
+local getInfo = methods.getInfo
 
 assert(getGc and getInfo, "Your exploit is not supported")
 
