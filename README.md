@@ -16,6 +16,7 @@ webImport("ui/main")
 
 <p align="center">
     <img src="https://cdn.discordapp.com/attachments/633472429917995038/722143730500501534/Hydroxide_Logo.png"/>
+    </br>
     <img src="https://i.gyazo.com/63afdd764cdca533af5ebca843217a7e.gif" width="600px"/>
 </p>
 
