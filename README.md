@@ -10,9 +10,9 @@
     * View/Modify Upvalues
     * View first-level values in table upvalues
     * View information of closure
-<video>
-    <source src="https://i.gyazo.com/63afdd764cdca533af5ebca843217a7e.mp4" type="video/mp4">
-</video>
+<figure class="video_container">
+  <iframe src="https://gyazo.com/63afdd764cdca533af5ebca843217a7e" frameborder="0" allowfullscreen="true"> </iframe>
+</figure>
 * Constant Scanner
     * View/Modify Constants
     * View information of closure
