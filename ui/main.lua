@@ -63,5 +63,5 @@ oh.Events.Drag = UserInput.InputChanged:Connect(function(input)
 	end
 end)
 
-MessageBox.Show("Welcome to Hydroxide", "This is not a finished product.", MessageType.OK)
+MessageBox.Show("Welcome to Hydroxide", "This is not a finished product\n\nAlso: table elements in the Upvalue Scanner causes the scrolling frame to go all fucky wucky, not an issue i can fix :pepehands:\n\nMight make my own list function or something though, we'll see", MessageType.OK)
 Interface.Parent = CoreGui

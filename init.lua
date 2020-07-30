@@ -7,6 +7,15 @@ end
 local web = true
 local importCache = {}
 
+-- local read, result = pcall(readfile, "ohaux.lua")
+-- if web and read and readfile then
+--     local webAux = game:HttpGetAsync('https://raw.githubusercontent.com/Upbolt/Hydroxide/revision/ohaux.lua')
+
+--     if not read or webAux ~= result then
+--         writefile("ohaux.lua", webAux)
+--     end
+-- end
+
 local function import(asset)
     if importCache[asset] then
         return unpack(importCache[asset])
