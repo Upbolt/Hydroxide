@@ -85,6 +85,12 @@ local globalMethods = {
     isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure
 }
 
+if is_protosmasher_closure then
+    globalMethods.getConstant = function(closure, index)
+        return globalMethods.getConstants(closure)[index]
+    end
+end
+
 environment.import = import
 environment.hasMethods = hasMethods
 environment.oh = {
