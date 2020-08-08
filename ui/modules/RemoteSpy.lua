@@ -45,9 +45,12 @@ local constants = {
     ignoredColor = Color3.fromRGB(100, 100, 100)
 }
 
-local remoteList = List.new(Results)
+local remoteList = List.new(Results, true)
 local remoteLogs = {}
-local selectedLog
+
+local selected = {
+    logs = {}
+}
 
 local pathContext = ContextMenuButton.new("rbxassetid://4891705738", "Get Remote Path")
 local conditionContext = ContextMenuButton.new("rbxassetid://4891633802", "Call Conditions")
@@ -60,49 +63,145 @@ local callingScriptContext = ContextMenuButton.new("rbxassetid://4800244808", "G
 local spyClosureContext = ContextMenuButton.new("rbxassetid://4666593447", "Spy Calling Function")
 local repeatCallContext = ContextMenuButton.new("rbxassetid://4907151581", "Repeat Call")
 
+local pathContextSelected = ContextMenuButton.new("rbxassetid://4891705738", "Get Paths")
+local clearContextSelected = ContextMenuButton.new("rbxassetid://4892169181", "Clear Calls")
+local ignoreContextSelected = ContextMenuButton.new("rbxassetid://4842578510", "Ignore Calls")
+local blockContextSelected = ContextMenuButton.new("rbxassetid://4891641806", "Block Calls")
+local unignoreContextSelected = ContextMenuButton.new("rbxassetid://4842578818", "Unignore Calls")
+local unblockContextSelected = ContextMenuButton.new("rbxassetid://4891642508", "Unblock Calls")
+
 local remoteListMenu = ContextMenu.new({ pathContext, conditionContext, clearContext, ignoreContext, blockContext })
+local remoteListMenuSelected = ContextMenu.new({ pathContextSelected, clearContextSelected, ignoreContextSelected, unignoreContextSelected, blockContextSelected, unblockContextSelected })
 local remoteLogsMenu = ContextMenu.new({ scriptContext, callingScriptContext, spyClosureContext, repeatCallContext })
 
 remoteList:BindContextMenu(remoteListMenu)
+remoteList:BindContextMenuSelected(remoteListMenuSelected)
 
 pathContext:SetCallback(function()
-    local selectedInstance = selectedLog.Remote.Instance
+    local selectedInstance = selected.log.Remote.Instance
 
     setClipboard(getInstancePath(selectedInstance))
     MessageBox.Show("Success", ("%s's path was copied to your clipboard."):format(selectedInstance.Name), MessageType.OK)
 end)
 
 clearContext:SetCallback(function()
-    selectedLog:Clear()
+    selected.log:Clear()
 end)
 
 ignoreContext:SetCallback(function()
-    local selectedRemote = selectedLog.Remote
+    local selectedRemote = selected.log.Remote
 
-    selectedLog.Remote:Ignore()
+    selected.log.Remote:Ignore()
 
     if selectedRemote.Blocked then
-        selectedLog:PlayBlock()
+        selected.log:PlayBlock()
     elseif selectedRemote.Ignored then
-        selectedLog:PlayIgnore()
+        selected.log:PlayIgnore()
     else
-        selectedLog:PlayNormal()
+        selected.log:PlayNormal()
     end
 end)
 
 blockContext:SetCallback(function()
-    local label = selectedLog.Button.Instance.Label
-    local selectedRemote = selectedLog.Remote
+    local label = selected.log.Button.Instance.Label
+    local selectedRemote = selected.log.Remote
 
-    selectedLog.Remote:Block()
+    selected.log.Remote:Block()
 
     if selectedRemote.Blocked then
-        selectedLog:PlayBlock()
+        selected.log:PlayBlock()
     elseif selectedRemote.Ignored then
-        selectedLog:PlayIgnore()
+        selected.log:PlayIgnore()
     else
-        selectedLog:PlayNormal()
+        selected.log:PlayNormal()
     end
+end)
+
+pathContextSelected:SetCallback(function()
+    local paths = ""
+
+    for i, log in pairs(selected.logs) do
+        paths = paths .. getInstancePath(log.Remote.Instance) .. '\n'
+    end
+
+    setClipboard(paths)
+    selected.logs = {}
+end)
+
+ignoreContextSelected:SetCallback(function()
+    for i, log in pairs(selected.logs) do
+        local remote = log.Remote
+
+        remote:Ignore()
+
+        if remote.Blocked then
+            log:PlayBlock()
+        elseif remote.Ignored then
+            log:PlayIgnore()
+        end
+    end
+
+    selected.logs = {}
+end)
+
+unignoreContextSelected:SetCallback(function()
+    for i, log in pairs(selected.logs) do
+        local remote = log.Remote
+
+        if remote.Ignored then
+            remote:Ignore()
+        end
+
+        if remote.Blocked then
+            log:PlayBlock()
+        else
+            log:PlayNormal()
+        end
+    end
+
+    selected.logs = {}
+end)
+
+blockContextSelected:SetCallback(function()
+    for i, log in pairs(selected.logs) do
+        local remote = log.Remote
+
+        if remote.Blocked then
+            remote:Block()
+        end
+
+        if remote.Blocked then
+            log:PlayBlock()
+        elseif remote.Ignored then
+            log:PlayIgnore()
+        end
+    end
+
+    selected.logs = {}
+end)
+
+unblockContextSelected:SetCallback(function()
+    for i, log in pairs(selected.logs) do
+        local remote = log.Remote
+
+        remote:Unblock()
+
+        if remote.Ignored then
+            log:PlayIgnore()
+        else
+            log:PlayNormal()
+        end
+    end
+
+    selected.logs = {}
+end)
+
+clearContextSelected:SetCallback(function()
+    for i, log in pairs(selected.logs) do
+        log:Clear()
+    end
+
+    selected.logs = {}
 end)
 
 -- Log Object
@@ -133,7 +232,11 @@ function Log.new(remote)
         blockContext:SetIcon((remote.Blocked and icons.unblock) or icons.block)
         blockContext:SetText((remote.Blocked and "Unblock Calls") or "Block Calls")
 
-        selectedLog = log
+        selected.log = log
+    end)
+
+    listButton:SetSelectedCallback(function()
+        table.insert(selected.logs, log)
     end)
 
     remoteLogs[remoteInstance] = log

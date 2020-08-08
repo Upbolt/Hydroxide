@@ -23,7 +23,12 @@ local constants = {
 local Open = Interface.Open
 local Base = Interface.Base
 local Drag = Base.Drag
+local Status = Base.Status
 local Collapse = Drag.Collapse
+
+function oh.setStatus(text)
+    Status.Text = '• Status: ' .. text
+end
 
 local dragging
 local dragStart

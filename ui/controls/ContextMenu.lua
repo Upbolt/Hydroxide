@@ -92,6 +92,7 @@ function ContextMenu.new(contextMenuButtons)
     instance.Visible = false
     
     contextMenu.Instance = instance
+    contextMenu.Visible = false
     contextMenu.Buttons = {}
     contextMenu.Show = ContextMenu.show
     contextMenu.Hide = ContextMenu.hide
@@ -112,10 +113,12 @@ function ContextMenu.show(contextMenu)
     instance.Visible = true
     instance.Position = UDim2.new(0, mouse.X, 0, mouse.Y)
     
+    contextMenu.Visible = true
     currentContextMenu = contextMenu
 end
 
 function ContextMenu.hide(contextMenu)
+    contextMenu.Visible = false
     contextMenu.Instance.Visible = false
 end
 
