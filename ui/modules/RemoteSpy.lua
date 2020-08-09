@@ -16,12 +16,19 @@ local ContextMenu, ContextMenuButton = import("ui/controls/ContextMenu")
 local Page = import("rbxassetid://5042109928").Base.Body.Pages.RemoteSpy
 local Assets = import("rbxassetid://5042114982").RemoteSpy
 
-local Flags = Page.Flags
-local Query = Page.Query
-local Search = Query.Search
-local Refresh = Query.Refresh
-local Filters = Page.Filters
-local Results = Page.Results.Clip.Content
+local RemoteList = Page.List
+local ListFlags = RemoteList.Flags
+local ListQuery = RemoteList.Query
+local ListSearch = ListQuery.Search
+local ListRefresh = ListQuery.Refresh
+local ListFilters = RemoteList.Filters
+local ListResults = RemoteList.Results.Clip.Content
+
+local RemoteLogs = Page.Logs
+local LogsButtons = RemoteLogs.Buttons
+local LogsRemote = RemoteLogs.RemoteObject
+local LogsBack = RemoteLogs.Back
+local LogsResults = RemoteLogs.Results.Clip.Content
 
 local remotesViewing = Methods.RemotesViewing
 local currentRemotes = Methods.CurrentRemotes
@@ -39,14 +46,16 @@ local icons = {
 
 local constants = {
     fadeLength = TweenInfo.new(0.15),
-    callWidth = Vector2.new(1337420, 20),
+    textWidth = Vector2.new(1337420, 20),
     normalColor = Color3.new(1, 1, 1),
     blockedColor = Color3.fromRGB(170, 0, 0),
     ignoredColor = Color3.fromRGB(100, 100, 100)
 }
 
-local remoteList = List.new(Results, true)
-local remoteLogs = {}
+local remoteList = List.new(ListResults, true)
+local remoteLogs = List.new(LogsResults, true)
+local currentLogs = {}
+local removed = {}
 
 local selected = {
     logs = {}
@@ -57,6 +66,7 @@ local conditionContext = ContextMenuButton.new("rbxassetid://4891633802", "Call 
 local clearContext = ContextMenuButton.new("rbxassetid://4892169181", "Clear Calls")
 local ignoreContext = ContextMenuButton.new("rbxassetid://4842578510", "Ignore Calls")
 local blockContext = ContextMenuButton.new("rbxassetid://4891641806", "Block Calls")
+local removeContext = ContextMenuButton.new("rbxassetid://4702831188", "Remove Log")
 
 local scriptContext = ContextMenuButton.new("rbxassetid://4800244808", "Generate Script")
 local callingScriptContext = ContextMenuButton.new("rbxassetid://4800244808", "Get Calling Script")
@@ -69,52 +79,58 @@ local ignoreContextSelected = ContextMenuButton.new("rbxassetid://4842578510", "
 local blockContextSelected = ContextMenuButton.new("rbxassetid://4891641806", "Block Calls")
 local unignoreContextSelected = ContextMenuButton.new("rbxassetid://4842578818", "Unignore Calls")
 local unblockContextSelected = ContextMenuButton.new("rbxassetid://4891642508", "Unblock Calls")
+local removeContextSelected = ContextMenuButton.new("rbxassetid://4702831188", "Remove Logs")
 
-local remoteListMenu = ContextMenu.new({ pathContext, conditionContext, clearContext, ignoreContext, blockContext })
-local remoteListMenuSelected = ContextMenu.new({ pathContextSelected, clearContextSelected, ignoreContextSelected, unignoreContextSelected, blockContextSelected, unblockContextSelected })
+local remoteListMenu = ContextMenu.new({ pathContext, conditionContext, clearContext, ignoreContext, blockContext, removeContext })
+local remoteListMenuSelected = ContextMenu.new({ pathContextSelected, clearContextSelected, ignoreContextSelected, unignoreContextSelected, blockContextSelected, unblockContextSelected, removeContextSelected })
 local remoteLogsMenu = ContextMenu.new({ scriptContext, callingScriptContext, spyClosureContext, repeatCallContext })
 
 remoteList:BindContextMenu(remoteListMenu)
 remoteList:BindContextMenuSelected(remoteListMenuSelected)
+remoteLogs:BindContextMenu(remoteLogsMenu)
 
 pathContext:SetCallback(function()
-    local selectedInstance = selected.log.Remote.Instance
+    local selectedInstance = selected.logContext.Remote.Instance
 
     setClipboard(getInstancePath(selectedInstance))
     MessageBox.Show("Success", ("%s's path was copied to your clipboard."):format(selectedInstance.Name), MessageType.OK)
 end)
 
 clearContext:SetCallback(function()
-    selected.log:Clear()
+    selected.logContext:Clear()
 end)
 
 ignoreContext:SetCallback(function()
-    local selectedRemote = selected.log.Remote
+    local selectedRemote = selected.logContext.Remote
 
-    selected.log.Remote:Ignore()
+    selected.logContext.Remote:Ignore()
 
     if selectedRemote.Blocked then
-        selected.log:PlayBlock()
+        selected.logContext:PlayBlock()
     elseif selectedRemote.Ignored then
-        selected.log:PlayIgnore()
+        selected.logContext:PlayIgnore()
     else
-        selected.log:PlayNormal()
+        selected.logContext:PlayNormal()
     end
 end)
 
 blockContext:SetCallback(function()
-    local label = selected.log.Button.Instance.Label
-    local selectedRemote = selected.log.Remote
+    local label = selected.logContext.Button.Instance.Label
+    local selectedRemote = selected.logContext.Remote
 
-    selected.log.Remote:Block()
+    selected.logContext.Remote:Block()
 
     if selectedRemote.Blocked then
-        selected.log:PlayBlock()
+        selected.logContext:PlayBlock()
     elseif selectedRemote.Ignored then
-        selected.log:PlayIgnore()
+        selected.logContext:PlayIgnore()
     else
-        selected.log:PlayNormal()
+        selected.logContext:PlayNormal()
     end
+end)
+
+removeContext:SetCallback(function()
+    selected.logContext:Remove()
 end)
 
 pathContextSelected:SetCallback(function()
@@ -204,43 +220,81 @@ clearContextSelected:SetCallback(function()
     selected.logs = {}
 end)
 
--- Log Object
+removeContextSelected:SetCallback(function()
+    for i, log in pairs(selected.logs) do
+        log:Remove()
+    end
+
+    remoteList:Recalculate()
+    selected.logs = {}
+end)
+
+-- Log Objects
 local Log = {}
+local ArgsLog = {}
 
 function Log.new(remote)
     local log = {}
     local button = Assets.RemoteLog:Clone()
     local remoteInstance = remote.Instance
-    local remoteClass = remoteInstance.ClassName
+    local remoteInstanceName = remoteInstance.Name
+    local remoteClassName = remoteInstance.ClassName
     local listButton = ListButton.new(button, remoteList)
     
     local normalAnimation = TweenService:Create(button.Label, constants.fadeLength, { TextColor3 = constants.normalColor })
     local blockAnimation = TweenService:Create(button.Label, constants.fadeLength, { TextColor3 = constants.blockedColor })
     local ignoreAnimation = TweenService:Create(button.Label, constants.fadeLength, { TextColor3 = constants.ignoredColor })
 
-    button.Name = remoteInstance.Name
-    button.Label.Text = remoteInstance.Name
-    button.Icon.Image = icons[remoteClass]
+    button.Name = remoteInstanceName
+    button.Label.Text = remoteInstanceName
+    button.Icon.Image = icons[remoteClassName]
 
     listButton:SetCallback(function()
-        
+        if selected.remoteLog ~= log then
+            if selected.remoteLog then
+                for i, argsLog in pairs(selected.remoteLog.Args) do
+                    argsLog.Instance.Visible = false
+                end
+            end
+
+            for i, argsLog in pairs(log.Args) do
+                argsLog.Instance.Visible = true
+            end
+            
+            local nameLength = TextService:GetTextSize(remoteInstanceName, 18, "SourceSans", constants.textWidth).X + 20
+            
+            selected.remoteLog = log 
+
+            LogsRemote.Icon.Image = icons[remoteClassName]
+            LogsRemote.Label.Text = remoteInstanceName
+            LogsRemote.Label.Size = UDim2.new(0, nameLength, 0, 20)
+            LogsRemote.Position = UDim2.new(1, -nameLength, 0, 0)
+
+            remoteLogs:Recalculate()
+        end
+
+        RemoteList.Visible = false
+        RemoteLogs.Visible = true
     end)
 
     listButton:SetRightCallback(function()
         ignoreContext:SetIcon((remote.Ignored and icons.unignore) or icons.ignore)
         ignoreContext:SetText((remote.Ignored and "Unignore Calls") or "Ignore Calls")
         blockContext:SetIcon((remote.Blocked and icons.unblock) or icons.block)
-        blockContext:SetText((remote.Blocked and "Unblock Calls") or "Block Calls")
+        blockContext:SetText((remote.Blocked and "Unblock Calls") or "Block Calls") 
 
-        selected.log = log
+        selected.logContext = log
     end)
 
     listButton:SetSelectedCallback(function()
-        table.insert(selected.logs, log)
+        if not table.find(selected.logs, log) then
+            table.insert(selected.logs, log)
+        end
     end)
 
-    remoteLogs[remoteInstance] = log
+    currentLogs[remoteInstance] = log
 
+    log.Args = {}
     log.Remote = remote
     log.Button = listButton
     log.BlockAnimation = blockAnimation
@@ -254,7 +308,44 @@ function Log.new(remote)
     log.Adjust = Log.adjust
     log.IncrementCalls = Log.incrementCalls
     log.Decrementcalls = Log.decrementCalls
+    log.Remove = Log.remove
     return log
+end
+
+local function createArg(instance, index, value)
+    local arg = Assets.RemoteArg:Clone()
+    local valueType = type(value)
+
+    arg.Icon.Image = oh.Constants.Types[valueType]
+    arg.Index.Text = index
+    arg.Label.Text = toString(value)
+    arg.Label.TextColor3 = oh.Constants.Syntax[valueType]
+    arg.Parent = instance.Contents
+
+    return arg.AbsoluteSize.Y + 5
+end
+
+function ArgsLog.new(log, args, results)
+    local instance = Assets.CallPod:Clone()
+
+    if selected.remoteLog ~= log then
+        instance.Visible = false
+    end
+
+    local button = ListButton.new(instance, remoteLogs)
+    local height = 0
+
+    if #args == 0 then
+        height = height + createArg(instance, 1, nil)
+    else
+        for i,v in pairs(args) do
+            height = height + createArg(instance, i, v)
+        end
+    end
+
+    button.Instance.Size = button.Instance.Size + UDim2.new(0, 0, 0, height)
+
+    return button 
 end
 
 function Log.playIgnore(log)
@@ -274,12 +365,12 @@ function Log.adjust(log)
     local logInstance = log.Button.Instance
     local logIcon = logInstance.Icon
 
-    local callWidth = TextService:GetTextSize(logInstance.Calls.Text, 18, "SourceSans", constants.callWidth).X + 10
+    local callWidth = TextService:GetTextSize(logInstance.Calls.Text, 18, "SourceSans", constants.textWidth).X + 10
     local iconPosition = callWidth - (((remoteClassName == "RemoteEvent" or remoteClassName == "BindableEvent") and 4) or 0)
     local labelWidth = iconPosition + 21
 
     logInstance.Calls.Size = UDim2.new(0, callWidth, 1, 0)
-    logIcon.Position = UDim2.new(0, iconPosition, 0.5, -7)
+    logIcon.Position = UDim2.new(0, iconPosition, 0.5, (remoteClassName == "RemoteEvent" and -9) or -7)
     logInstance.Label.Position = UDim2.new(0, labelWidth, 0, 0)
     logInstance.Label.Size = UDim2.new(1, -labelWidth, 1, 0)
 end
@@ -288,6 +379,11 @@ function Log.clear(log)
     local logInstance = log.Button.Instance
 
     log.Remote:Clear()
+    
+    for i, argsLog in pairs(log.Args) do
+        argsLog:Remove()
+    end
+
     logInstance.Calls.Text = 0
     log:Adjust()
 end
@@ -300,6 +396,11 @@ function Log.incrementCalls(log, args, results)
     buttonInstance.Calls.Text = (calls < 10000 and calls) or "..."
 
     log:Adjust()
+    table.insert(log.Args, ArgsLog.new(log, args, results))
+
+    if selected.remoteLog == log then
+        remoteLogs:Recalculate()
+    end
 end
 
 function Log.decrementCalls(log, args)
@@ -312,17 +413,25 @@ function Log.decrementCalls(log, args)
     log:Adjust()
 end
 
+function Log.remove(log)
+    local remoteInstance = log.Remote.Instance
+
+    log.Button:Remove()
+    currentLogs[remoteInstance] = nil
+    removed[remoteInstance] = true
+end
+
 -- UI Functionality
 
 local function refreshLogs()
-    for remoteInstance, log in pairs(remoteLogs) do
+    for remoteInstance, log in pairs(currentLogs) do
         log.Button.Instance.Visible = remotesViewing[remoteInstance.ClassName]
     end
 
     remoteList:Recalculate()
 end
 
-for i,flag in pairs(Flags:GetChildren()) do
+for i,flag in pairs(ListFlags:GetChildren()) do
     if flag:IsA("Frame") then
         local check = CheckBox.new(flag)
 
@@ -333,29 +442,36 @@ for i,flag in pairs(Flags:GetChildren()) do
     end
 end
 
-Search.FocusLost:Connect(function(returned)
+ListSearch.FocusLost:Connect(function(returned)
     if returned then
-        for remoteInstance, log in pairs(remoteLogs) do
+        for remoteInstance, log in pairs(currentLogs) do
             local instance = log.Button.Instance
-            instance.Visible = not (instance.Visible and not remoteInstance.Name:lower():find(Search.Text))
+            instance.Visible = not (instance.Visible and not remoteInstance.Name:lower():find(ListSearch.Text))
         end
 
         remoteList:Recalculate()
-        Search.Text = ""
+        ListSearch.Text = ""
     end
 end)
 
-Refresh.MouseButton1Click:Connect(function()
+ListRefresh.MouseButton1Click:Connect(function()
     refreshLogs()
 end)
 
-local nilCheck = CheckBox.new(Filters.ViewNil)
+local nilCheck = CheckBox.new(ListFilters.ViewNil)
 
-Methods.ConnectEvent(function(remoteInstance, vargs, results, callingFunction, callingScript)
-    local remote = currentRemotes[remoteInstance]
-    local log = remoteLogs[remoteInstance] or Log.new(remote)
+LogsBack.MouseButton1Click:Connect(function()
+    RemoteLogs.Visible = false
+    RemoteList.Visible = true
+end)
 
-    log:IncrementCalls(vargs, results, callingFunction, callingScript)
+Methods.ConnectEvent(function(remoteInstance, vargs, callingFunction, callingScript)
+    if not removed[remoteInstance] then
+        local remote = currentRemotes[remoteInstance]
+        local log = currentLogs[remoteInstance] or Log.new(remote)
+
+        log:IncrementCalls(vargs, callingFunction, callingScript)
+    end
 end)
 
 return RemoteSpy

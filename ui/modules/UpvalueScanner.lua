@@ -117,11 +117,13 @@ local function addElement(upvalueLog, upvalue, index, value, temporary)
     return elementLog
 end
 
+local did = false
+
 local function updateElement(upvalueLog, index, value)
     local indexText = toString(index)
     local elementIndexType = type(index)
     local elementValueType = type(value)
-    local elementLog = upvalueLog.Elements[indexText]
+    local elementLog = upvalueLog.Elements:FindFirstChild(indexText)
 
     elementLog.Index.Label.Text = indexText
     elementLog.Value.Label.Text = toString(value)
@@ -200,6 +202,10 @@ local function updateUpvalue(closureLog, upvalue)
     local index = upvalue.Index
     local newValue = getUpvalue(closure.Data, index)
     local valueType = type(newValue)
+
+    if typeof(upvalueLog) == "string" then
+        print('what the fuck')
+    end
 
     if valueType == "function" then
         local closureName = getInfo(newValue).name

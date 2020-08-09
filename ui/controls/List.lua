@@ -35,7 +35,10 @@ function ListButton.new(instance, list)
     local listInstance = list.Instance
 
     list.Buttons[instance] = listButton
-    listInstance.CanvasSize = listInstance.CanvasSize + UDim2.new(0, 0, 0, instance.AbsoluteSize.Y + 5)
+
+    if instance.Visible then
+        listInstance.CanvasSize = listInstance.CanvasSize + UDim2.new(0, 0, 0, instance.AbsoluteSize.Y + 5)
+    end
 
     instance.Parent = listInstance
     instance.MouseButton1Click:Connect(function()
@@ -153,7 +156,7 @@ function ListButton.remove(listButton)
     local instance = listButton.Instance
     local listInstance = list.Instance
 
-    listInstance.CanvasSize = listInstance.CanvasSize - UDim2.new(0, 0, 0, instance.AbsoluteSize.Y)
+    listInstance.CanvasSize = listInstance.CanvasSize - UDim2.new(0, 0, 0, instance.AbsoluteSize.Y + 5)
     list.Buttons[instance] = nil 
 
     instance:Destroy()
