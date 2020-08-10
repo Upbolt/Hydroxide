@@ -106,6 +106,13 @@ ignoreContext:SetCallback(function()
 
     selected.logContext.Remote:Ignore()
 
+    LogsButtons.Ignore.Label.Text = (selectedRemote.Ignored and "Unignore") or "Ignore"
+    LogsButtons.Ignore.Icon.Image = (selectedRemote.Ignored and icons.unignore) or icons.ignore
+
+    local newWidth = TextService:GetTextSize((selectedRemote.Ignored and "Unblock") or "Block", 18, "SourceSans", constants.textWidth).X + 35
+
+    LogsButtons.Ignore.Size = UDim2.new(0, newWidth, 0, 20)
+
     if selectedRemote.Blocked then
         selected.logContext:PlayBlock()
     elseif selectedRemote.Ignored then
@@ -121,6 +128,13 @@ blockContext:SetCallback(function()
 
     selected.logContext.Remote:Block()
 
+    LogsButtons.Block.Label.Text = (selectedRemote.Blocked and "Unblock") or "Block"
+    LogsButtons.Block.Icon.Image = (selectedRemote.Blocked and icons.unblock) or icons.block
+
+    local newWidth = TextService:GetTextSize((selectedRemote.Blocked and "Unblock") or "Block", 18, "SourceSans", constants.textWidth).X + 30
+
+    LogsButtons.Block.Size = UDim2.new(0, newWidth, 0, 20)
+    
     if selectedRemote.Blocked then
         selected.logContext:PlayBlock()
     elseif selectedRemote.Ignored then
