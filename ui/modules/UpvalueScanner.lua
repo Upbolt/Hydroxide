@@ -151,7 +151,7 @@ local function addUpvalue(upvalue, temporary)
 
         if not temporary then
             for i, v in pairs(upvalue.Scanned) do
-                local elementLog = addElement(upvalue, upvalueLog, i, v)
+                local elementLog = addElement(upvalueLog, upvalue, i, v)
                 elementLog.Parent = upvalueLog.Elements
                 
                 height = height + elementLog.AbsoluteSize.Y + 5
@@ -202,10 +202,6 @@ local function updateUpvalue(closureLog, upvalue)
     local index = upvalue.Index
     local newValue = getUpvalue(closure.Data, index)
     local valueType = type(newValue)
-
-    if typeof(upvalueLog) == "string" then
-        print('what the fuck')
-    end
 
     if valueType == "function" then
         local closureName = getInfo(newValue).name
@@ -404,6 +400,7 @@ end)
 
 modifyElementButtons.Set.MouseButton1Click:Connect(function()
     local upvalueValue = selectedUpvalue.Value
+    
     local newValue = setValue(
         modifyElementValue.Text, 
         upvalueValue[selectedElement], 

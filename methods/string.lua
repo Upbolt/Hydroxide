@@ -28,5 +28,15 @@ local function toString(value)
     end
 end
 
+local toUnicode = function(string)
+    local codepoints = "utf8.char("
+    
+    for i,v in utf8.codes(string) do
+        codepoints = codepoints .. v .. ', '
+    end
+    
+    return codepoints:sub(1, -3) .. ')'
+end
+
 methods.toString = toString
 return methods

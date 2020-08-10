@@ -30,6 +30,10 @@ function oh.setStatus(text)
     Status.Text = '• Status: ' .. text
 end
 
+function oh.getStatus()
+    return Status.Text:gsub('• Status: ', '')
+end
+
 local dragging
 local dragStart
 local startPos
