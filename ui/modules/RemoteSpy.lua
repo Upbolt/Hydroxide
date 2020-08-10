@@ -561,8 +561,6 @@ LogsBack.MouseButton1Click:Connect(function()
     RemoteList.Visible = true
 end)
 
-LogsButtons.
-
 Methods.ConnectEvent(function(remoteInstance, vargs, callingFunction, callingScript)
     if not removed[remoteInstance] then
         local remote = currentRemotes[remoteInstance]
