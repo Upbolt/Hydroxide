@@ -21,8 +21,6 @@ xpcall(function()
     ModuleScanner = import("ui/modules/ModuleScanner")
     UpvalueScanner = import("ui/modules/UpvalueScanner")
     ConstantScanner = import("ui/modules/ConstantScanner")
-
-    print'yes'
 end, function(err)
     MessageBox.Show("An error has occurred", "A module in Hydroxide has errored. This typically happens when a section's UI is modified, so please rejoin and execute again.\n\nIf that doesn't work, press F9 and send the error message marked with <HYDROXIDE-ERROR> to hush in the Hydroxide Discord server.\n\nhttps://nrv-ous.xyz/hydroxide/discord", MessageType.OK)
     warn('<HYDROXIDE-ERROR>: ' .. err)

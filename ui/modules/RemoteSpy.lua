@@ -8,6 +8,7 @@ if not hasMethods(Methods.RequiredMethods) then
     return RemoteSpy
 end
 
+local CheckBox = import("ui/controls/CheckBox")
 local List, ListButton = import("ui/controls/List")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 local ContextMenu, ContextMenuButton = import("ui/controls/ContextMenu")
@@ -83,6 +84,28 @@ local remoteListMenu = ContextMenu.new({ pathContext, conditionContext, clearCon
 local remoteListMenuSelected = ContextMenu.new({ pathContextSelected, clearContextSelected, ignoreContextSelected, unignoreContextSelected, blockContextSelected, unblockContextSelected, removeContextSelected })
 local remoteLogsMenu = ContextMenu.new({ scriptContext, callingScriptContext, spyClosureContext, repeatCallContext })
 
+local function checkCurrentIgnored()
+    local selectedRemote = selected.remoteLog.Remote
+
+    LogsButtons.Ignore.Label.Text = (selectedRemote.Ignored and "Unignore") or "Ignore"
+    LogsButtons.Ignore.Icon.Image = (selectedRemote.Ignored and icons.unignore) or icons.ignore
+
+    local newWidth = TextService:GetTextSize((selectedRemote.Ignored and "Unignore") or "Ignore", 18, "SourceSans", constants.textWidth).X + 30
+
+    LogsButtons.Ignore.Size = UDim2.new(0, newWidth, 0, 20)
+end
+
+local function checkCurrentBlocked()
+    local selectedRemote = selected.remoteLog.Remote
+
+    LogsButtons.Block.Label.Text = (selectedRemote.Blocked and "Unblock") or "Block"
+    LogsButtons.Block.Icon.Image = (selectedRemote.Blocked and icons.unblock) or icons.block
+
+    local newWidth = TextService:GetTextSize((selectedRemote.Blocked and "Unblock") or "Block", 18, "SourceSans", constants.textWidth).X + 30
+
+    LogsButtons.Block.Size = UDim2.new(0, newWidth, 0, 20)
+end
+
 remoteList:BindContextMenu(remoteListMenu)
 remoteList:BindContextMenuSelected(remoteListMenuSelected)
 remoteLogs:BindContextMenu(remoteLogsMenu)
@@ -106,12 +129,7 @@ ignoreContext:SetCallback(function()
 
     selected.logContext.Remote:Ignore()
 
-    LogsButtons.Ignore.Label.Text = (selectedRemote.Ignored and "Unignore") or "Ignore"
-    LogsButtons.Ignore.Icon.Image = (selectedRemote.Ignored and icons.unignore) or icons.ignore
-
-    local newWidth = TextService:GetTextSize((selectedRemote.Ignored and "Unblock") or "Block", 18, "SourceSans", constants.textWidth).X + 35
-
-    LogsButtons.Ignore.Size = UDim2.new(0, newWidth, 0, 20)
+    checkCurrentIgnored()
 
     if selectedRemote.Blocked then
         selected.logContext:PlayBlock()
@@ -128,12 +146,7 @@ blockContext:SetCallback(function()
 
     selected.logContext.Remote:Block()
 
-    LogsButtons.Block.Label.Text = (selectedRemote.Blocked and "Unblock") or "Block"
-    LogsButtons.Block.Icon.Image = (selectedRemote.Blocked and icons.unblock) or icons.block
-
-    local newWidth = TextService:GetTextSize((selectedRemote.Blocked and "Unblock") or "Block", 18, "SourceSans", constants.textWidth).X + 30
-
-    LogsButtons.Block.Size = UDim2.new(0, newWidth, 0, 20)
+    checkCurrentBlocked()
     
     if selectedRemote.Blocked then
         selected.logContext:PlayBlock()
@@ -367,6 +380,9 @@ function Log.new(remote)
             
             selected.remoteLog = log 
 
+            checkCurrentBlocked()
+            checkCurrentIgnored()
+
             LogsRemote.Icon.Image = icons[remoteClassName]
             LogsRemote.Label.Text = remoteInstanceName
             LogsRemote.Label.Size = UDim2.new(0, nameLength, 0, 20)
@@ -577,12 +593,7 @@ LogsButtons.Ignore.MouseButton1Click:Connect(function()
 
     selectedRemote:Ignore()
 
-    LogsButtons.Ignore.Label.Text = (selectedRemote.Ignored and "Unignore") or "Ignore"
-    LogsButtons.Ignore.Icon.Image = (selectedRemote.Ignored and icons.unignore) or icons.ignore
-
-    local newWidth = TextService:GetTextSize((selectedRemote.Ignored and "Unblock") or "Block", 18, "SourceSans", constants.textWidth).X + 35
-
-    LogsButtons.Ignore.Size = UDim2.new(0, newWidth, 0, 20)
+    checkCurrentIgnored()
 
     if selectedRemote.Blocked then
         selected.remoteLog:PlayBlock()
@@ -599,12 +610,7 @@ LogsButtons.Block.MouseButton1Click:Connect(function()
 
     selectedRemote:Block()
 
-    LogsButtons.Block.Label.Text = (selectedRemote.Blocked and "Unblock") or "Block"
-    LogsButtons.Block.Icon.Image = (selectedRemote.Blocked and icons.unblock) or icons.block
-
-    local newWidth = TextService:GetTextSize((selectedRemote.Blocked and "Unblock") or "Block", 18, "SourceSans", constants.textWidth).X + 30
-
-    LogsButtons.Block.Size = UDim2.new(0, newWidth, 0, 20)
+    checkCurrentBlocked()
 
     if selectedRemote.Blocked then
         selected.remoteLog:PlayBlock()
