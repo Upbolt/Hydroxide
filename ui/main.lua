@@ -6,12 +6,33 @@ local Interface = import("rbxassetid://5042109928")
 local TabSelector = import("ui/controls/TabSelector")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 
-local RemoteSpy = import("ui/modules/RemoteSpy")
-local ClosureSpy = import("ui/modules/ClosureSpy")
-local ScriptScanner = import("ui/modules/ScriptScanner")
-local ModuleScanner = import("ui/modules/ModuleScanner")
-local UpvalueScanner = import("ui/modules/UpvalueScanner")
-local ConstantScanner = import("ui/modules/ConstantScanner")
+local modulesLoaded = true
+local RemoteSpy
+local ClosureSpy
+local ScriptScanner
+local ModuleScanner
+local UpvalueScanner
+local ConstantScanner
+
+xpcall(function()
+    RemoteSpy = import("ui/modules/RemoteSpy")
+    ClosureSpy = import("ui/modules/ClosureSpy")
+    ScriptScanner = import("ui/modules/ScriptScanner")
+    ModuleScanner = import("ui/modules/ModuleScanner")
+    UpvalueScanner = import("ui/modules/UpvalueScanner")
+    ConstantScanner = import("ui/modules/ConstantScanner")
+
+    print'yes'
+end, function(err)
+    MessageBox.Show("An error has occurred", "A module in Hydroxide has errored. This typically happens when a section's UI is modified, so please rejoin and execute again.\n\nIf that doesn't work, press F9 and send the error message marked with <HYDROXIDE-ERROR> to hush in the Hydroxide Discord server.\n\nhttps://nrv-ous.xyz/hydroxide/discord", MessageType.OK)
+    warn('<HYDROXIDE-ERROR>: ' .. err)
+    modulesLoaded = false
+end)
+
+if not modulesLoaded then
+    Interface.Parent = CoreGui
+    return
+end
 
 local constants = {
     opened = UDim2.new(0.5, -325, 0.5, -175),
