@@ -50,5 +50,5 @@ More to come, soon.
 
 * Remote Spy
 <p align="center">
-    <img src="https://i.gyazo.com/d5955eb40c82b38697835063ab8118fa.gif" width="600px">
+    <img src="https://i.gyazo.com/d5955eb40c82b38697835063ab8118fa.gif" width="600px"/>
 </p>
