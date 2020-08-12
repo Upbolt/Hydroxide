@@ -2,19 +2,19 @@ local ScriptScanner = {}
 local LocalScript = import("objects/LocalScript")
 
 local requiredMethods = {
-    getGc = true,
-    getSenv = true,
-    getProtos = true,
-    getConstants = true,
-    getScriptClosure = true,
-    isXClosure = true
+    ["getGc"] = true,
+    ["getSenv"] = true,
+    ["getProtos"] = true,
+    ["getConstants"] = true,
+    ["getScriptClosure"] = true,
+    ["isXClosure"] = true
 }
 
 local function scan(query)
     local scripts = {}
     query = query or ""
 
-    for _i, v in pairs(getgc()) do
+    for _i, v in pairs(getGc()) do
         if type(v) == "function" and not isXClosure(v) then
             local script = rawget(getfenv(v), "script")
 
@@ -22,11 +22,10 @@ local function scan(query)
                 not scripts[script] and 
                 script:IsA("LocalScript") and 
                 script.Name:lower():find(query) and
-                getScriptClosure(script)
+                getScriptClosure(script) and
+                pcall(function() getsenv(script) end)
             then
-                if pcall(function() getsenv(script) end) then
-                    scripts[script] = LocalScript.new(script)
-                end
+                scripts[script] = LocalScript.new(script)
             end
         end
     end

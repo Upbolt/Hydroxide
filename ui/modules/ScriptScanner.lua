@@ -12,18 +12,18 @@ local ContextMenu, ContextMenuButton = import("ui/controls/ContextMenu")
 local Page = import("rbxassetid://5042109928").Base.Body.Pages.ScriptScanner
 local Assets = import("rbxassetid://5042114982").ScriptScanner
 
-local List = Page.List
-local Info = Page.Info
+local ScriptList = Page.List
+local ScriptInfo = Page.Info
 
-local ListQuery = List.Query
+local ListQuery = ScriptList.Query
 local ListSearch = ListQuery.Search
 local ListRefresh = ListQuery.Refresh
-local ListResults = List.Results.Clip.Content
+local ListResults = ScriptList.Results.Clip.Content
 
-local InfoScript = Info.ScriptObject
-local InfoBack = Info.Back
-local InfoOptions = Info.Options
-local InfoSections = Info.Sections
+local InfoScript = ScriptInfo.ScriptObject
+local InfoBack = ScriptInfo.Back
+local InfoOptions = ScriptInfo.Options
+local InfoSections = ScriptInfo.Sections
 
 local InfoSource = InfoSections.Source
 local InfoEnvironment = InfoSections.Environment
@@ -45,7 +45,7 @@ local ProtosResultsClip = InfoProtos.Results.Clip
 local ProtosResultsStatus = ProtosResultsClip.ResultStatus
 local ProtosResults = ProtosResultsClip.Content
 
-local scriptList = List.new(Results)
+local scriptList = List.new(ListResults)
 local protosList = List.new(ProtosResults)
 
 local scriptLogs = {}
@@ -114,28 +114,28 @@ function Log.new(localScript)
     button.Protos.Text = #localScript.Protos
     button.Constants.Text = #localScript.Constants
 
-    listButton:SetCallback(function()
-        if selected.scriptLog ~= log then
-            protosList:Clear()
-            constantsList:Clear()
+    -- listButton:SetCallback(function()
+    --     if selected.scriptLog ~= log then
+    --         protosList:Clear()
+    --         constantsList:Clear()
             
-            for i,v in pairs(localScript.Protos) do
-                createProto(i, v)
-            end 
+    --         for i,v in pairs(localScript.Protos) do
+    --             createProto(i, v)
+    --         end 
 
-            for i,v in pairs(localScript.Constants) do
-                createConstant(i, v)
-            end
+    --         for i,v in pairs(localScript.Constants) do
+    --             createConstant(i, v)
+    --         end
 
-            for i,v in pairs(localScript.Environment) do
-                createEnvironment(i, v)
-            end
+    --         for i,v in pairs(localScript.Environment) do
+    --             createEnvironment(i, v)
+    --         end
 
-            -- script decompilation here
+    --         -- script decompilation here
 
-            selected.scriptLog = log
-        end
-    end)
+    --         selected.scriptLog = log
+    --     end
+    -- end)
 
     listButton:SetRightCallback(function()
         selected.logContext = log
