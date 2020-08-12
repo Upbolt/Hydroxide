@@ -4,7 +4,7 @@ if oh then
     oh.Exit()
 end
 
-local web = false
+local web = true
 local importCache = {}
 
 -- local read, result = pcall(readfile, "ohaux.lua")
@@ -119,7 +119,7 @@ environment.oh = {
         }
     },
     Exit = function()
-        for i, event in pairs(oh.Events) do
+        for _i, event in pairs(oh.Events) do
             event:Disconnect()
         end
 
