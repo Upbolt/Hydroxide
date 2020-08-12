@@ -31,7 +31,7 @@ end
 local toUnicode = function(string)
     local codepoints = "utf8.char("
     
-    for i,v in utf8.codes(string) do
+    for _i, v in utf8.codes(string) do
         codepoints = codepoints .. v .. ', '
     end
     
@@ -39,4 +39,5 @@ local toUnicode = function(string)
 end
 
 methods.toString = toString
+methods.toUnicode = toUnicode
 return methods

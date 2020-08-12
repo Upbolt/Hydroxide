@@ -1,4 +1,3 @@
-local Assets = import("rbxassetid://5042114982").Controls
 local Prompts = import("rbxassetid://5042109928").Base.Prompts
 
 local Prompt = {}

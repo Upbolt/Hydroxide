@@ -85,7 +85,7 @@ end
 function List.clear(list)
     local instance = list.Instance
 
-    for i, listButton in pairs(instance:GetChildren()) do
+    for _i, listButton in pairs(instance:GetChildren()) do
         if listButton:IsA("ImageButton") then
             listButton:Destroy()
         end
@@ -166,9 +166,9 @@ oh.Events.ListInputBegan = UserInput.InputBegan:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.LeftControl then
         ctrlHeld = true
     elseif not ctrlHeld and input.UserInputType == Enum.UserInputType.MouseButton1 then
-        for i, list in pairs(lists) do
+        for _i, list in pairs(lists) do
             if list.Selected then
-                for k, listButton in pairs(list.Selected) do
+                for _k, listButton in pairs(list.Selected) do
                     listButton.DeselectAnimation:Play()
                 end
 

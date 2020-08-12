@@ -13,7 +13,7 @@ local function scan(query)
     local modules = {}
     query = query or ""
     
-    for i, module in pairs(getLoadedModules()) do
+    for _i, module in pairs(getLoadedModules()) do
         if module.Name:lower():find(query) then
             modules[module] = ModuleScript.new(module)
         end

@@ -12,7 +12,7 @@ function Constant.new(closure, index, value)
     return constant
 end
 
-function Constant.set(constant, index, value)
+function Constant.set(constant, value)
     setConstant(constant.Closure, constant.Index, value)
     constant.Value = value
 end

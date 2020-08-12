@@ -29,7 +29,7 @@ end
 local function scan(query)
     local constants = {}
 
-    for i, closure in pairs(getGc()) do
+    for _i, closure in pairs(getGc()) do
         if type(closure) == "function" and not isXClosure(closure) and isLClosure(closure) and not constants[closure] then
             for index, constant in pairs(getConstants(closure)) do
                 if compareConstant(query, constant) then

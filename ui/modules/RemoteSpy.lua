@@ -10,7 +10,6 @@ end
 
 local CheckBox = import("ui/controls/CheckBox")
 local List, ListButton = import("ui/controls/List")
-local MessageBox, MessageType = import("ui/controls/MessageBox")
 local ContextMenu, ContextMenuButton = import("ui/controls/ContextMenu")
 
 local Page = import("rbxassetid://5042109928").Base.Body.Pages.RemoteSpy
@@ -141,7 +140,6 @@ ignoreContext:SetCallback(function()
 end)
 
 blockContext:SetCallback(function()
-    local label = selected.logContext.Button.Instance.Label
     local selectedRemote = selected.logContext.Remote
 
     selected.logContext.Remote:Block()
@@ -164,7 +162,7 @@ end)
 pathContextSelected:SetCallback(function()
     local paths = ""
 
-    for i, log in pairs(selected.logs) do
+    for _i, log in pairs(selected.logs) do
         paths = paths .. getInstancePath(log.Remote.Instance) .. '\n'
     end
 
@@ -173,7 +171,7 @@ pathContextSelected:SetCallback(function()
 end)
 
 ignoreContextSelected:SetCallback(function()
-    for i, log in pairs(selected.logs) do
+    for _i, log in pairs(selected.logs) do
         local remote = log.Remote
 
         remote:Ignore()
@@ -189,7 +187,7 @@ ignoreContextSelected:SetCallback(function()
 end)
 
 unignoreContextSelected:SetCallback(function()
-    for i, log in pairs(selected.logs) do
+    for _i, log in pairs(selected.logs) do
         local remote = log.Remote
 
         if remote.Ignored then
@@ -207,7 +205,7 @@ unignoreContextSelected:SetCallback(function()
 end)
 
 blockContextSelected:SetCallback(function()
-    for i, log in pairs(selected.logs) do
+    for _i, log in pairs(selected.logs) do
         local remote = log.Remote
 
         if remote.Blocked then
@@ -225,7 +223,7 @@ blockContextSelected:SetCallback(function()
 end)
 
 unblockContextSelected:SetCallback(function()
-    for i, log in pairs(selected.logs) do
+    for _i, log in pairs(selected.logs) do
         local remote = log.Remote
 
         remote:Unblock()
@@ -241,7 +239,7 @@ unblockContextSelected:SetCallback(function()
 end)
 
 clearContextSelected:SetCallback(function()
-    for i, log in pairs(selected.logs) do
+    for _i, log in pairs(selected.logs) do
         log:Clear()
     end
 
@@ -249,7 +247,7 @@ clearContextSelected:SetCallback(function()
 end)
 
 removeContextSelected:SetCallback(function()
-    for i, log in pairs(selected.logs) do
+    for _i, log in pairs(selected.logs) do
         log:Remove()
     end
 
@@ -299,7 +297,7 @@ scriptContext:SetCallback(function()
                 v = tostring(v)
             end
 
-            script = script .. ("local oh%s%d = %s\n"):format(variableName, i, v) 
+            script = script .. ("local oh%s%d = %s\n"):format(variableName, _i, v) 
             args = args .. ("oh%s%d, "):format(variableName, i)
         end
 
@@ -367,12 +365,12 @@ function Log.new(remote)
     listButton:SetCallback(function()
         if selected.remoteLog ~= log then
             if selected.remoteLog then
-                for i, argsLog in pairs(selected.remoteLog.Args) do
+                for _i, argsLog in pairs(selected.remoteLog.Args) do
                     argsLog.Instance.Visible = false
                 end
             end
 
-            for i, argsLog in pairs(log.Args) do
+            for _i, argsLog in pairs(log.Args) do
                 argsLog.Instance.Visible = true
             end
             
@@ -458,7 +456,7 @@ function ArgsLog.new(log, args, callingScript)
     else
         for i = 1, #args do
             local v = args[i]
-            height = height + createArg(instance, i, v)
+            height = height + createArg(instance, _i, v)
         end
     end
 
@@ -504,7 +502,7 @@ function Log.clear(log)
 
     log.Remote:Clear()
     
-    for i, argsLog in pairs(log.Args) do
+    for _i, argsLog in pairs(log.Args) do
         argsLog:Remove()
     end
 
@@ -555,7 +553,7 @@ local function refreshLogs()
     remoteList:Recalculate()
 end
 
-for i,flag in pairs(ListFlags:GetChildren()) do
+for _i,flag in pairs(ListFlags:GetChildren()) do
     if flag:IsA("Frame") then
         local check = CheckBox.new(flag)
 
@@ -588,7 +586,6 @@ LogsBack.MouseButton1Click:Connect(function()
 end)
 
 LogsButtons.Ignore.MouseButton1Click:Connect(function()
-    local label = selected.remoteLog.Button.Instance.Label
     local selectedRemote = selected.remoteLog.Remote
 
     selectedRemote:Ignore()
@@ -605,7 +602,6 @@ LogsButtons.Ignore.MouseButton1Click:Connect(function()
 end)
 
 LogsButtons.Block.MouseButton1Click:Connect(function()
-    local label = selected.remoteLog.Button.Instance.Label
     local selectedRemote = selected.remoteLog.Remote
 
     selectedRemote:Block()

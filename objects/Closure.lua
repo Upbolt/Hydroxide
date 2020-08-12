@@ -1,7 +1,4 @@
 local Closure = {}
-local Upvalue = import("objects/Upvalue")
-local Constant = import("objects/Constant")
-
 local closureCache = {}
 
 function Closure.new(data)

@@ -3,7 +3,7 @@ local UserInput = game:GetService("UserInputService")
 
 local Interface = import("rbxassetid://5042109928")
 
-local TabSelector = import("ui/controls/TabSelector")
+import("ui/controls/TabSelector")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 
 local modulesLoaded = true

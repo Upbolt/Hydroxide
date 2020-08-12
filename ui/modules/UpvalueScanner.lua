@@ -9,7 +9,6 @@ if not hasMethods(Methods.RequiredMethods) then
     return UpvalueScanner
 end
 
-local Closure = import("objects/Closure")
 local Upvalue = import("objects/Upvalue")
 
 local Prompt = import("ui/controls/Prompt")
@@ -117,8 +116,6 @@ local function addElement(upvalueLog, upvalue, index, value, temporary)
     return elementLog
 end
 
-local did = false
-
 local function updateElement(upvalueLog, index, value)
     local indexText = toString(index)
     local elementIndexType = type(index)
@@ -214,7 +211,7 @@ local function updateUpvalue(closureLog, upvalue)
         if upvalue.TemporaryElements then
             local table = upvalue.Value
 
-            for index, v in pairs(upvalue.TemporaryElements) do
+            for index, _v in pairs(upvalue.TemporaryElements) do
                 updateElement(upvalueLog, index, table[index])
             end
         end
@@ -264,11 +261,11 @@ function Log.new(closure)
 end
 
 function Log.update(log)
-    for i, upvalue in pairs(log.Closure.Upvalues) do
+    for _i, upvalue in pairs(log.Closure.Upvalues) do
         updateUpvalue(log, upvalue)
     end
     
-    for i, upvalue in pairs(log.Closure.TemporaryUpvalues) do
+    for _i, upvalue in pairs(log.Closure.TemporaryUpvalues) do
         updateUpvalue(log, upvalue)
     end
 end
@@ -287,7 +284,7 @@ local function addUpvalues()
         upvalueList:Clear()
         currentUpvalues = {}
 
-        for i, closure in pairs(Methods.Scan(query, deepSearchFlag)) do
+        for _i, closure in pairs(Methods.Scan(query, deepSearchFlag)) do
             local closureData = closure.Data
 
             if getInfo(closureData).name == "" then
@@ -299,7 +296,7 @@ local function addUpvalues()
             results = results + 1
         end
 
-        for i, closure in pairs(unnamedFunctions) do
+        for _i, closure in pairs(unnamedFunctions) do
             Log.new(closure)
         end
 
@@ -444,7 +441,7 @@ viewUpvaluesContext:SetCallback(function()
 
         if temporaryUpvalues then
 
-            for i, upvalueLog in pairs(temporaryUpvalues) do
+            for _i, upvalueLog in pairs(temporaryUpvalues) do
                 newHeight = newHeight - (upvalueLog.AbsoluteSize.Y + 5)
                 upvalueLog:Destroy()
             end
@@ -490,8 +487,8 @@ viewElementsContext:SetCallback(function()
     local newHeight = 0
 
     if temporaryElements then
-        for i,v in pairs(temporaryElements) do
-            local elementLog = selectedUpvalueLog.Elements[toString(i)]
+        for index, _v in pairs(temporaryElements) do
+            local elementLog = selectedUpvalueLog.Elements[toString(index)]
             newHeight = newHeight - (elementLog.AbsoluteSize.Y + 5)
 
             elementLog:Destroy()
@@ -543,7 +540,6 @@ changeElementContext:SetCallback(function()
     if selectedUpvalue and selectedElement then
         local index = selectedElement
         local indexType = type(index)
-        local indexText = toString(index)
         local indexFrame = modifyElementContent.Index
         local indexLabel = indexFrame.Data
         local indexWidth = TextService:GetTextSize(index, 18, "SourceSans", indexFrame.AbsoluteSize).X
@@ -557,7 +553,7 @@ changeElementContext:SetCallback(function()
 end)
 
 oh.Events.UpdateUpvalues = RunService.Heartbeat:Connect(function()
-    for i, closureLog in pairs(currentUpvalues) do
+    for _i, closureLog in pairs(currentUpvalues) do
         closureLog:Update()
     end
 end)

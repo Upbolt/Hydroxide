@@ -83,7 +83,7 @@ gmt.__namecall = newCClosure(function(instance, ...)
     return nmc(instance, ...)
 end)
 
-for name, hook in pairs(methodHooks) do
+for _name, hook in pairs(methodHooks) do
     local originalMethod
     originalMethod = hookFunction(hook, newCClosure(function(instance, ...)
         if not checkCaller() and remotesViewing[instance.ClassName] and instance ~= remoteDataEvent then

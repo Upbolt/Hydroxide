@@ -63,7 +63,7 @@ local function addModules(query)
     moduleList:Clear()
     moduleLogs = {}
 
-    for moduleInstance, moduleScript in pairs(Methods.Scan(query)) do
+    for _moduleInstance, moduleScript in pairs(Methods.Scan(query)) do
         Log.new(moduleScript)
     end
 

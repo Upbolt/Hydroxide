@@ -3,7 +3,6 @@ local TextService = game:GetService("TextService")
 local ConstantScanner = {}
 local ClosureSpy = import("modules/ClosureSpy")
 local Methods = import("modules/ConstantScanner")
-local Closure = import("objects/Closure")
 
 if not hasMethods(Methods.RequiredMethods) then
     return ConstantScanner
@@ -55,7 +54,7 @@ function Log.new(closureData, closure)
     local constants = closure.Constants
     local logHeight = 30
 
-    for i, constant in pairs(constants) do
+    for _i, constant in pairs(constants) do
         local constantLog = Assets.Constant:Clone()
         local value = constant.Value
         local valueType = type(value)

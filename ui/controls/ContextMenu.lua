@@ -72,7 +72,7 @@ function ContextMenu.new(contextMenuButtons)
 
     instance.Parent = Storage
     
-    for i, contextMenuButton in pairs(contextMenuButtons) do
+    for _i, contextMenuButton in pairs(contextMenuButtons) do
         local buttonInstance = contextMenuButton.Instance
         local textWidth = TextService:GetTextSize(buttonInstance.Label.Text, 18, "SourceSans", constants.textWidth).X
 

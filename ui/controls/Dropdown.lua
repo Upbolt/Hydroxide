@@ -11,7 +11,7 @@ function Dropdown.new(instance)
         dropdown.Collapsed = collapsed
     end)
 
-    for i,v in pairs(instance.Selection.Clip.List:GetChildren()) do
+    for _i, v in pairs(instance.Selection.Clip.List:GetChildren()) do
         if v:IsA("TextButton") then
             v.MouseButton1Click:Connect(function()
                 selection.Visible = false

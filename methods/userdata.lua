@@ -13,9 +13,9 @@ local function getInstancePath(instance)
     elseif instance == workspace then
         return "workspace"
     else
-        local success, result = pcall(game.GetService, game, instance.ClassName)
+        local success = pcall(game.GetService, game, instance.ClassName)
         
-        if result then
+        if success then
             head = ':GetService("' .. instance.ClassName .. '")'
         elseif instance == game:GetService("Players").LocalPlayer then
             head = '.LocalPlayer' 
