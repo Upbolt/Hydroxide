@@ -297,7 +297,7 @@ scriptContext:SetCallback(function()
                 v = tostring(v)
             end
 
-            script = script .. ("local oh%s%d = %s\n"):format(variableName, _i, v) 
+            script = script .. ("local oh%s%d = %s\n"):format(variableName, i, v) 
             args = args .. ("oh%s%d, "):format(variableName, i)
         end
 
@@ -456,7 +456,7 @@ function ArgsLog.new(log, args, callingScript)
     else
         for i = 1, #args do
             local v = args[i]
-            height = height + createArg(instance, _i, v)
+            height = height + createArg(instance, i, v)
         end
     end
 
