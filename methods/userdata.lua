@@ -2,7 +2,7 @@ local methods = {}
 
 local function getInstancePath(instance)
     local name = instance.Name
-    local head = '.' .. name
+    local head = (#name > 0 and '.' .. name) or "['']"
     
     if not instance.Parent and instance ~= game then
         return head .. " --[[ PARENTED TO NIL OR DESTROYED ]]"

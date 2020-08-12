@@ -13,6 +13,8 @@ function Remote.new(instance)
     remote.Ignore = Remote.ignore
     remote.BlockedArgs = {}
     remote.IgnoredArgs = {}
+    remote.BlockArg = Remote.blockArg
+    remote.IgnoreArg = Remote.ignoreArg
     remote.AreArgsBlocked = Remote.areArgsBlocked
     remote.AreArgsIgnored = Remote.areArgsIgnored
     remote.IncrementCalls = Remote.incrementCalls
@@ -34,13 +36,52 @@ function Remote.ignore(remote)
     remote.Ignored = not remote.Ignored
 end
 
+function Remote.blockArg(remote, index, value, byType)
+    local blockedArgs = remote.BlockedArgs
+    local blockedIndex = blockedArgs[index]
+
+    if not blockedIndex then
+        blockedIndex = {
+            types = {},
+            values = {}
+        }
+        blockedArgs[index] = blockedIndex
+    end
+
+    if byType then
+        blockedIndex.types[typeof(value)] = true
+    else
+        blockedIndex.values[value] = true
+    end
+end
+
+function Remote.ignoreArg(remote, index, value, type)
+    local ignoredArgs = remote.IgnoredArgs
+    local indexIgnore = ignoredArgs[index]
+
+    if not indexIgnore then
+        indexIgnore = {
+            types = {},
+            values = {}
+        }
+
+        ignoredArgs[index] = indexIgnore
+    end
+
+    if type then
+        indexIgnore.types[typeof(type)] = true
+    else
+        indexIgnore.values[value] = true
+    end
+end
+
 function Remote.areArgsBlocked(remote, args)
     local blockedArgs = remote.BlockedArgs
 
     for index, value in pairs(args) do
         local indexBlock = blockedArgs[index]
         
-        if indexBlock and ( indexBlock.types[type(v)] or indexBlock.values[v] ~= nil ) then
+        if indexBlock and ( indexBlock.types[typeof(value)] or indexBlock.values[value] ~= nil ) then
             return true
         end
     end
@@ -51,8 +92,8 @@ function Remote.areArgsIgnored(remote, args)
 
     for index, value in pairs(args) do
         local indexIgnore = ignoredArgs[index]
-        
-        if indexIgnore and ( indexIgnore.types[type(v)] or indexIgnore.values[v] ~= nil ) then
+
+        if indexIgnore and ( indexIgnore.types[typeof(value)] or indexIgnore.values[value] ~= nil ) then
             return true
         end
     end

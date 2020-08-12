@@ -84,7 +84,7 @@ local remoteListMenuSelected = ContextMenu.new({ pathContextSelected, clearConte
 local remoteLogsMenu = ContextMenu.new({ scriptContext, callingScriptContext, spyClosureContext, repeatCallContext })
 
 local function checkCurrentIgnored()
-    local selectedRemote = selected.remoteLog.Remote
+    local selectedRemote = (selected.remoteLog or selected.logContext).Remote
 
     LogsButtons.Ignore.Label.Text = (selectedRemote.Ignored and "Unignore") or "Ignore"
     LogsButtons.Ignore.Icon.Image = (selectedRemote.Ignored and icons.unignore) or icons.ignore

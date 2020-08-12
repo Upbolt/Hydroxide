@@ -69,7 +69,7 @@ local function selectTab(tabName)
     tab.Icon.ImageColor3 = constants.iconSelected
 
     oh.setStatus(page.Name:sub(1, 1) .. page.Name:sub(2):gsub('%u', function(c) return ' ' .. c end))
-
+    
     selectedTab = tab
     selectedPage = page
     return true

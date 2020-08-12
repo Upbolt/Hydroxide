@@ -1,3 +1,6 @@
+local TextService = game:GetService("TextService")
+local TweenService = game:GetService("TweenService")
+
 local ScriptScanner = {}
 local Methods = import("modules/ScriptScanner")
 
@@ -22,7 +25,7 @@ local ListResults = ScriptList.Results.Clip.Content
 
 local InfoScript = ScriptInfo.ScriptObject
 local InfoBack = ScriptInfo.Back
-local InfoOptions = ScriptInfo.Options
+local InfoOptions = ScriptInfo.Options.Clip.Content
 local InfoSections = ScriptInfo.Sections
 
 local InfoSource = InfoSections.Source
@@ -47,9 +50,18 @@ local ProtosResults = ProtosResultsClip.Content
 
 local scriptList = List.new(ListResults)
 local protosList = List.new(ProtosResults)
+local constantsList = List.new(ConstantsResults)
 
 local scriptLogs = {}
 local selected = {}
+local icons = {
+    LocalScript = "rbxassetid://4800244808"
+}
+
+local constants = {
+    fadeLength = TweenInfo.new(0.15),
+    textWidth = Vector2.new(133742069, 20)
+}
 
 local pathContext = ContextMenuButton.new("rbxassetid://4891705738", "Get Script Path")
 scriptList:BindContextMenu(ContextMenu.new({ pathContext }))
@@ -62,7 +74,7 @@ pathContext:SetCallback(function()
 end)
 
 local function createProto(index, value)
-    local instance = Assets.ProtoPod:CLone()
+    local instance = Assets.ProtoPod:Clone()
     local information = instance.Information
     local functionName = getInfo(value).name
 
@@ -108,34 +120,45 @@ function Log.new(localScript)
     local scriptInstance = localScript.Instance
     local button = Assets.ScriptLog:Clone()
     local listButton = ListButton.new(button, scriptList)
-    
-    button.Name = scriptInstance.Name
-    button:FindFirstChild("Name").Text = scriptInstance.Name
+    local scriptName = scriptInstance.Name
+
+    button.Name = scriptName
+    button:FindFirstChild("Name").Text = scriptName
     button.Protos.Text = #localScript.Protos
     button.Constants.Text = #localScript.Constants
 
-    -- listButton:SetCallback(function()
-    --     if selected.scriptLog ~= log then
-    --         protosList:Clear()
-    --         constantsList:Clear()
+    listButton:SetCallback(function()
+        if selected.scriptLog ~= log then
+            protosList:Clear()
+            constantsList:Clear()
             
-    --         for i,v in pairs(localScript.Protos) do
-    --             createProto(i, v)
-    --         end 
+            ScriptList.Visible = false
+            ScriptInfo.Visible = true
 
-    --         for i,v in pairs(localScript.Constants) do
-    --             createConstant(i, v)
-    --         end
+            local nameLength = TextService:GetTextSize(scriptName, 18, "SourceSans", constants.textWidth).X + 20
+            
+            InfoScript.Icon.Image = icons.LocalScript
+            InfoScript.Label.Text = scriptName
+            InfoScript.Label.Size = UDim2.new(0, nameLength, 0, 20)
+            InfoScript.Position = UDim2.new(1, -nameLength, 0, 0)
 
-    --         for i,v in pairs(localScript.Environment) do
-    --             createEnvironment(i, v)
-    --         end
+            for i,v in pairs(localScript.Protos) do
+                createProto(i, v)
+            end 
 
-    --         -- script decompilation here
+            for i,v in pairs(localScript.Constants) do
+                createConstant(i, v)
+            end
 
-    --         selected.scriptLog = log
-    --     end
-    -- end)
+            -- for i,v in pairs(localScript.Environment) do
+            --     createEnvironment(i, v)
+            -- end
+
+            -- script decompilation here
+
+            selected.scriptLog = log
+        end
+    end)
 
     listButton:SetRightCallback(function()
         selected.logContext = log
@@ -173,5 +196,51 @@ ListRefresh.MouseButton1Click:Connect(function()
 end)
 
 addScripts()
+
+InfoBack.MouseButton1Click:Connect(function()
+    ScriptInfo.Visible = false
+    ScriptList.Visible = true
+end)
+
+local selectedSection = InfoProtos
+local selectedSectionButton = InfoOptions.Protos
+local animationCache = {}
+
+for _i, sectionButton in pairs(InfoOptions:GetChildren()) do
+    if sectionButton:IsA("TextButton") then
+        local label = sectionButton.Label
+        local enterAnimation = TweenService:Create(label, constants.fadeLength, { TextTransparency = 0 })
+        local leaveAnimation = TweenService:Create(label, constants.fadeLength, { TextTransparency = 0.2 })
+
+        sectionButton.MouseButton1Click:Connect(function()
+            local section = InfoSections:FindFirstChild(sectionButton.Name)
+            
+            selectedSection.Visible = false
+            section.Visible = true
+            
+            selectedSection = section
+            selectedSectionButton = sectionButton
+
+            animationCache[selectedSectionButton].leave:Play()
+        end)
+
+        sectionButton.MouseEnter:Connect(function()
+            if selectedSectionButton ~= sectionButton then
+                enterAnimation:Play()
+            end
+        end)
+
+        sectionButton.MouseLeave:Connect(function()
+            if selectedSectionButton ~= sectionButton then
+                leaveAnimation:Play()
+            end
+        end)
+
+        animationCache[sectionButton] = {
+            enter = enterAnimation,
+            leave = leaveAnimation
+        }
+    end
+end
 
 return ScriptScanner

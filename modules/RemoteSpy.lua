@@ -65,6 +65,10 @@ gmt.__namecall = newCClosure(function(instance, ...)
             currentRemotes[instance] = remote
         end
 
+        if instance.Name == "RemoteEvent" then
+
+        end
+
         local remoteIgnored = remote.Ignored
         local remoteBlocked = remote.Blocked
         local argsIgnored = remote.AreArgsIgnored(remote, vargs)

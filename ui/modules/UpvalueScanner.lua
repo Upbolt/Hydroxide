@@ -211,8 +211,8 @@ local function updateUpvalue(closureLog, upvalue)
         if upvalue.TemporaryElements then
             local table = upvalue.Value
 
-            for index, _v in pairs(upvalue.TemporaryElements) do
-                updateElement(upvalueLog, index, table[index])
+            for idx, _v in pairs(upvalue.TemporaryElements) do
+                updateElement(upvalueLog, idx, table[index])
             end
         end
     else
