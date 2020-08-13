@@ -115,7 +115,7 @@ environment.oh = {
             boolean = Color3.fromRGB(127, 200, 255),
             userdata = Color3.fromRGB(225, 225, 225),
             ["function"] = Color3.fromRGB(225, 225, 225),
-            ["unnamed_function"] = Color3.fromRGB(185, 185, 185)
+            ["unnamed_function"] = Color3.fromRGB(175, 175, 175)
         }
     },
     Exit = function()

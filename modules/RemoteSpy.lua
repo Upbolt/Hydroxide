@@ -65,18 +65,19 @@ gmt.__namecall = newCClosure(function(instance, ...)
             currentRemotes[instance] = remote
         end
 
-        if instance.Name == "RemoteEvent" then
-
-        end
-
         local remoteIgnored = remote.Ignored
         local remoteBlocked = remote.Blocked
         local argsIgnored = remote.AreArgsIgnored(remote, vargs)
         local argsBlocked = remote.AreArgsBlocked(remote, vargs)
 
         if eventSet and (not remoteIgnored and not argsIgnored) then
-            remote.IncrementCalls(remote, vargs)
-            remoteDataEvent.Fire(remoteDataEvent, instance, vargs, getInfo(2).func, getCallingScript((is_protosmasher_closure and 2) or nil))
+            local call = {
+                script = getCallingScript((is_protosmasher_closure and 2) or nil),
+                args = vargs
+            }
+
+            remote.IncrementCalls(remote, call)
+            remoteDataEvent.Fire(remoteDataEvent, instance, call, getInfo(2).func)
         end
 
         if remoteBlocked or argsBlocked then

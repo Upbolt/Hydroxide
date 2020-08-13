@@ -10,6 +10,7 @@ end
 
 local CheckBox = import("ui/controls/CheckBox")
 local List, ListButton = import("ui/controls/List")
+local MessageBox, MessageType = import("ui/controls/MessageBox")
 local ContextMenu, ContextMenuButton = import("ui/controls/ContextMenu")
 
 local Page = import("rbxassetid://5042109928").Base.Body.Pages.RemoteSpy
@@ -362,35 +363,44 @@ function Log.new(remote)
     button.Label.Text = remoteInstanceName
     button.Icon.Image = icons[remoteClassName]
 
-    listButton:SetCallback(function()
-        if selected.remoteLog ~= log then
-            if selected.remoteLog then
-                for _i, argsLog in pairs(selected.remoteLog.Args) do
-                    argsLog.Instance.Visible = false
-                end
-            end
-
-            for _i, argsLog in pairs(log.Args) do
-                argsLog.Instance.Visible = true
-            end
-            
-            local nameLength = TextService:GetTextSize(remoteInstanceName, 18, "SourceSans", constants.textWidth).X + 20
-            
-            selected.remoteLog = log 
-
-            checkCurrentBlocked()
-            checkCurrentIgnored()
-
-            LogsRemote.Icon.Image = icons[remoteClassName]
-            LogsRemote.Label.Text = remoteInstanceName
-            LogsRemote.Label.Size = UDim2.new(0, nameLength, 0, 20)
-            LogsRemote.Position = UDim2.new(1, -nameLength, 0, 0)
-
-            remoteLogs:Recalculate()
+    local function viewLogs()
+        if selected.remoteLog then
+            remoteLogs:Clear()
         end
+        
+        local nameLength = TextService:GetTextSize(remoteInstanceName, 18, "SourceSans", constants.textWidth).X + 20
+        
+        selected.remoteLog = log
+
+        for _i, call in pairs(remote.Logs) do
+            ArgsLog.new(log, call)
+        end
+
+        checkCurrentBlocked()
+        checkCurrentIgnored()
+
+        LogsRemote.Icon.Image = icons[remoteClassName]
+        LogsRemote.Label.Text = remoteInstanceName
+        LogsRemote.Label.Size = UDim2.new(0, nameLength, 0, 20)
+        LogsRemote.Position = UDim2.new(1, -nameLength, 0, 0)
+
+        remoteLogs:Recalculate()
 
         RemoteList.Visible = false
         RemoteLogs.Visible = true
+    end
+
+    listButton:SetCallback(function()
+        if selected.remoteLog ~= log then
+            if #remote.Logs > 400 then
+                MessageBox.Show("Warning", 
+                    "This remote seems to have a lot of calls, opening this may cause your game to freeze for a few seconds.\n\nContinue?", 
+                    MessageType.YesNo, 
+                    viewLogs)
+            else
+                viewLogs()
+            end
+        end
     end)
 
     listButton:SetRightCallback(function()
@@ -410,7 +420,6 @@ function Log.new(remote)
 
     currentLogs[remoteInstance] = log
 
-    log.Args = {}
     log.Remote = remote
     log.Button = listButton
     log.BlockAnimation = blockAnimation
@@ -441,8 +450,9 @@ local function createArg(instance, index, value)
     return arg.AbsoluteSize.Y + 5
 end
 
-function ArgsLog.new(log, args, callingScript)
+function ArgsLog.new(log, call)
     local instance = Assets.CallPod:Clone()
+    local args = call.args
 
     if selected.remoteLog ~= log then
         instance.Visible = false
@@ -461,8 +471,8 @@ function ArgsLog.new(log, args, callingScript)
     end
 
     button:SetRightCallback(function()
-        selected.args = args
-        selected.callingScript = callingScript
+        selected.args = call.args
+        selected.callingScript = call.script
     end)
 
     button.Instance.Size = button.Instance.Size + UDim2.new(0, 0, 0, height)
@@ -501,16 +511,16 @@ function Log.clear(log)
     local logInstance = log.Button.Instance
 
     log.Remote:Clear()
-    
-    for _i, argsLog in pairs(log.Args) do
-        argsLog:Remove()
+
+    if selected.remoteLog == log then
+        remoteLogs:Clear()
     end
 
     logInstance.Calls.Text = 0
     log:Adjust()
 end
 
-function Log.incrementCalls(log, args, callingScript)
+function Log.incrementCalls(log, call)
     local buttonInstance = log.Button.Instance
     local remote = log.Remote
     local calls = remote.Calls
@@ -518,9 +528,9 @@ function Log.incrementCalls(log, args, callingScript)
     buttonInstance.Calls.Text = (calls < 10000 and calls) or "..."
 
     log:Adjust()
-    table.insert(log.Args, ArgsLog.new(log, args, callingScript))
-
+    
     if selected.remoteLog == log then
+        ArgsLog.new(log, call)
         remoteLogs:Recalculate()
     end
 end

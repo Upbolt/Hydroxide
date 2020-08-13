@@ -77,6 +77,7 @@ local function createProto(index, value)
     local instance = Assets.ProtoPod:Clone()
     local information = instance.Information
     local functionName = getInfo(value).name
+    local indexWidth = TextService:GetTextSize(index, 18, "SourceSans", constants.textWidth).X + 8
 
     if functionName == '' then
         functionName = "Unnamed function"
@@ -86,6 +87,11 @@ local function createProto(index, value)
     information.Index.Text = index
     information.Label.Text = functionName
 
+    information.Index.Size = UDim2.new(0, indexWidth, 0, 20)
+    information.Label.Size = UDim2.new(1, -(indexWidth + 20), 1, 0)
+    information.Icon.Position = UDim2.new(0, indexWidth, 0, 2)
+    information.Label.Position = UDim2.new(0, indexWidth + 20, 0, 0)
+
     ListButton.new(instance, protosList)
 end
 
@@ -93,9 +99,15 @@ local function createConstant(index, value)
     local instance = Assets.ConstantPod:Clone()
     local information = instance.Information
     local valueType = type(value)
-    
+    local indexWidth = TextService:GetTextSize(index, 18, "SourceSans", constants.textWidth).X + 8    
+
     information.Index.Text = index
-    
+
+    information.Index.Size = UDim2.new(0, indexWidth, 0, 20)
+    information.Label.Size = UDim2.new(1, -(indexWidth + 20), 1, 0)
+    information.Icon.Position = UDim2.new(0, indexWidth, 0, 2)
+    information.Label.Position = UDim2.new(0, indexWidth + 20, 0, 0)
+
     if valueType == "function" then
         local functionName = getInfo(value).name
 
@@ -214,6 +226,7 @@ for _i, sectionButton in pairs(InfoOptions:GetChildren()) do
 
         sectionButton.MouseButton1Click:Connect(function()
             local section = InfoSections:FindFirstChild(sectionButton.Name)
+            animationCache[selectedSectionButton].leave:Play()
             
             selectedSection.Visible = false
             section.Visible = true
@@ -221,7 +234,6 @@ for _i, sectionButton in pairs(InfoOptions:GetChildren()) do
             selectedSection = section
             selectedSectionButton = sectionButton
 
-            animationCache[selectedSectionButton].leave:Play()
         end)
 
         sectionButton.MouseEnter:Connect(function()
