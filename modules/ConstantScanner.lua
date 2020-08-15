@@ -3,12 +3,12 @@ local Closure = import("objects/Closure")
 local Constant = import("objects/Constant")
 
 local requiredMethods = {
-    getGc = true,
-    getInfo = true,
-    isXClosure = true,
-    getConstant = true,
-    setConstant = true,
-    getConstants = true
+    ["getGc"] = true,
+    ["getInfo"] = true,
+    ["isXClosure"] = true,
+    ["getConstant"] = true,
+    ["setConstant"] = true,
+    ["getConstants"] = true
 }
 
 local function compareConstant(query, constant)

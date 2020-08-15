@@ -105,7 +105,9 @@ environment.oh = {
             number = "rbxassetid://4666593882",
             boolean = "rbxassetid://4666593882",
             userdata = "rbxassetid://4666594723",
-            ["function"] = "rbxassetid://4666593447"
+            ["function"] = "rbxassetid://4666593447",
+
+            ["integral"] = "rbxassetid://4666593882"
         },
         Syntax = {
             ["nil"] = Color3.fromRGB(244, 135, 113),

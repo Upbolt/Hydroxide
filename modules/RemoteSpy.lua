@@ -2,16 +2,16 @@ local RemoteSpy = {}
 local Remote = import("objects/Remote")
 
 local requiredMethods = {
-    checkCaller = true,
-    newCClosure = true,
-    hookFunction = true,
-    isReadOnly = true,
-    setReadOnly = true,
-    getInfo = true,
-    getMetatable = true,
-    setClipboard = true,
-    getNamecallMethod = true,
-    getCallingScript = true,
+    ["checkCaller"] = true,
+    ["newCClosure"] = true,
+    ["hookFunction"] = true,
+    ["isReadOnly"] = true,
+    ["setReadOnly"] = true,
+    ["getInfo"] = true,
+    ["getMetatable"] = true,
+    ["setClipboard"] = true,
+    ["getNamecallMethod"] = true,
+    ["getCallingScript"] = true,
 }
 
 local remoteMethods = {
@@ -104,8 +104,13 @@ for _name, hook in pairs(methodHooks) do
             local argsIgnored = remote:AreArgsIgnored(vargs)
             
             if eventSet and (not remoteIgnored and not argsIgnored) then
-                remote:IncrementCalls(vargs)
-                remoteDataEvent:Fire(instance, vargs, getInfo(2).func, getCallingScript((is_protosmasher_closure and 2) or nil))
+                local call = {
+                    script = getCallingScript((is_protosmasher_closure and 2) or nil),
+                    args = vargs
+                }
+    
+                remote:IncrementCalls(call)
+                remoteDataEvent:Fire(instance, call, getInfo(2).func)
             end
 
             if remote.Blocked or remote:AreArgsBlocked(vargs) then

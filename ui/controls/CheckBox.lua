@@ -2,7 +2,7 @@ local CheckBox = {}
 
 function CheckBox.new(instance)
     local checkBox = {}
-    local toggle = instance.Toggle
+    local toggle = instance:FindFirstChild("Toggle") or instance
     local label = toggle.Label
 
     toggle.MouseButton1Click:Connect(function()

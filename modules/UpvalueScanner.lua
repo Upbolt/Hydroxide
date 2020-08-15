@@ -3,12 +3,12 @@ local Closure = import("objects/Closure")
 local Upvalue = import("objects/Upvalue")
 
 local requiredMethods = {
-    getGc = true,
-    getInfo = true,
-    isXClosure = true,
-    getUpvalue = true,
-    setUpvalue = true,
-    getUpvalues = true
+    ["getGc"] = true,
+    ["getInfo"] = true,
+    ["isXClosure"] = true,
+    ["getUpvalue"] = true,
+    ["setUpvalue"] = true,
+    ["getUpvalues"] = true
 }
 
 local function compareUpvalue(query, upvalue, ignore)

@@ -1,18 +1,18 @@
 local ClosureSpy = {}
 
 local requiredMethods = {
-    hookFunction = true,
-    newCClosure = true,
-    isLClosure = true,
-    getProtos = true,
-    getUpvalues = true,
-    getUpvalue = true,
-    getContext = true,
-    setContext = true,
-    setUpvalue = true,
-    getConstants = true,
-    getConstant = true,
-    setConstant = true
+    ["hookFunction"] = true,
+    ["newCClosure"] = true,
+    ["isLClosure"] = true,
+    ["getProtos"] = true,
+    ["getUpvalues"] = true,
+    ["getUpvalue"] = true,
+    ["getContext"] = true,
+    ["setContext"] = true,
+    ["setUpvalue"] = true,
+    ["getConstants"] = true,
+    ["getConstant"] = true,
+    ["setConstant"] = true
 }
 
 local eventCallback

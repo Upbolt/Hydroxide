@@ -74,6 +74,13 @@ Drag.InputBegan:Connect(function(input)
 	end
 end)
 
+oh.Events.Drag = UserInput.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
+		local delta = input.Position - dragStart
+	    Base.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+end)
+
 Open.MouseButton1Click:Connect(function()
     Open:TweenPosition(constants.conceal, "Out", "Quad", 0.15)
     Base:TweenPosition(constants.opened, "Out", "Quad", 0.15)
@@ -84,12 +91,5 @@ Collapse.MouseButton1Click:Connect(function()
     Open:TweenPosition(constants.reveal, "Out", "Quad", 0.15)
 end)
 
-oh.Events.Drag = UserInput.InputChanged:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
-		local delta = input.Position - dragStart
-	    Base.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-	end
-end)
-
-MessageBox.Show("Welcome to Hydroxide", "This is not a finished product\n\nAlso: table elements in the Upvalue Scanner causes the scrolling frame to go all fucky wucky, not an issue i can fix :pepehands:\n\nMight make my own list function or something though, we'll see", MessageType.OK)
+MessageBox.Show("Welcome to Hydroxide", "This is not a finished product", MessageType.OK)
 Interface.Parent = CoreGui

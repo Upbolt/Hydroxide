@@ -46,7 +46,8 @@ local function userdataValue(data)
         dataType == "Vector2" or
         dataType == "CFrame" or
         dataType == "Color3" or
-        dataType == "UDim2" 
+        dataType == "UDim2" or
+        dataType == "UDim"
     then
         return dataType .. ".new(" .. tostring(data) .. ")"
     elseif dataType == "Ray" then
@@ -63,6 +64,20 @@ local function userdataValue(data)
     return tostring(data)
 end
 
+local function isUserdata(type)
+    return type == "Instance" 
+        or type == "Vector3" 
+        or type == "Vector2"
+        or type == "CFrame"
+        or type == "Color3"
+        or type == "UDim2"
+        or type == "UDim"
+        or type == "Ray"
+        or type == "ColorSequence"
+        or type == "ColorSequenceKeypoint"
+end
+
+methods.isUserdata = isUserdata
 methods.userdataValue = userdataValue
 methods.getInstancePath = getInstancePath
 return methods

@@ -49,13 +49,13 @@ function Remote.blockArg(remote, index, value, byType)
     end
 
     if byType then
-        blockedIndex.types[typeof(value)] = true
+        blockedIndex.types[value] = true
     else
         blockedIndex.values[value] = true
     end
 end
 
-function Remote.ignoreArg(remote, index, value, type)
+function Remote.ignoreArg(remote, index, value, byType)
     local ignoredArgs = remote.IgnoredArgs
     local indexIgnore = ignoredArgs[index]
 
@@ -68,8 +68,8 @@ function Remote.ignoreArg(remote, index, value, type)
         ignoredArgs[index] = indexIgnore
     end
 
-    if type then
-        indexIgnore.types[typeof(type)] = true
+    if byType then
+        indexIgnore.types[value] = true
     else
         indexIgnore.values[value] = true
     end
