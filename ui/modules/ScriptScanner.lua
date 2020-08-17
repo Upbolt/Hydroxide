@@ -76,7 +76,7 @@ end)
 local function createProto(index, value)
     local instance = Assets.ProtoPod:Clone()
     local information = instance.Information
-    local functionName = getInfo(value).name
+    local functionName = getInfo(value).name or ""
     local indexWidth = TextService:GetTextSize(index, 18, "SourceSans", constants.textWidth).X + 8
 
     if functionName == '' then

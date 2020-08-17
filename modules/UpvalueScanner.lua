@@ -25,7 +25,7 @@ local function compareUpvalue(query, upvalue, ignore)
 
         return toString(upvalue) == query
     elseif upvalueType == "function" then
-        local closureName = getInfo(upvalue).name
+        local closureName = getInfo(upvalue).name 
         return query == closureName or closureName:lower():find(query:lower())
     end
 

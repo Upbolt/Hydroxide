@@ -575,6 +575,10 @@ ConditionsButtons.New.MouseButton1Click:Connect(function()
 end)
 
 NewConditionButtons.Add.MouseButton1Click:Connect(function()
+    if not conditionStatus.Selected then
+        return MessageBox.Show("Error", "Invalid condition status", MessageType.OK)
+    end
+
     local status = conditionStatus.Selected.Name
     local type = conditionType.Selected.Name
     local valueType = conditionValueType.Selected.Name

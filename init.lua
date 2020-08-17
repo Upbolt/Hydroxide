@@ -4,7 +4,7 @@ if oh then
     oh.Exit()
 end
 
-local web = true
+local web = false
 local importCache = {}
 
 -- local read, result = pcall(readfile, "ohaux.lua")

@@ -53,6 +53,7 @@ local changeUpvalueContext = ContextMenuButton.new("rbxassetid://5458573463", "C
 local changeTableContext = ContextMenuButton.new("rbxassetid://5458573463", "Change Upvalue")
 local viewElementsContext = ContextMenuButton.new("rbxassetid://5179169654", "View All Elements")
 local changeElementContext = ContextMenuButton.new("rbxassetid://5458573463", "Change Element")
+local scriptContext = ContextMenuButton.new("", "Generate Script")
 
 local closureContextMenu = ContextMenu.new({ spyClosureContext, viewUpvaluesContext })
 local tableContextMenu = ContextMenu.new({ changeTableContext, viewElementsContext })
