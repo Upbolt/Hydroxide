@@ -67,7 +67,7 @@ local pathContext = ContextMenuButton.new("rbxassetid://4891705738", "Get Script
 scriptList:BindContextMenu(ContextMenu.new({ pathContext }))
 
 pathContext:SetCallback(function()
-    local selectedInstance = selected.log.LocalScript.Instance
+    local selectedInstance = selected.logContext.LocalScript.Instance
 
     setClipboard(getInstancePath(selectedInstance))
     MessageBox.Show("Success", ("%s's path was copied to your clipboard."):format(selectedInstance.Name), MessageType.OK)
