@@ -166,7 +166,7 @@ local function addUpvalue(upvalue, temporary)
         end
 
         if valueType == "function" then
-            local closureName = getInfo(value).name
+            local closureName = getInfo(value).name or ''
             upvalueLog.Value.Text = (closureName == '' and "Unnamed function") or closureName
         else
             upvalueLog.Value.Text = toString(value)
@@ -202,7 +202,7 @@ local function updateUpvalue(closureLog, upvalue)
     local valueType = type(newValue)
 
     if valueType == "function" then
-        local closureName = getInfo(newValue).name
+        local closureName = getInfo(newValue).name or ''
         upvalueLog.Value.Text = (closureName == '' and "Unnamed function") or closureName
     elseif valueType == "table" and upvalue.Scanned then
         for i, v in pairs(upvalue.Scanned) do
@@ -288,7 +288,7 @@ local function addUpvalues()
         for _i, closure in pairs(Methods.Scan(query, deepSearchFlag)) do
             local closureData = closure.Data
 
-            if getInfo(closureData).name == "" then
+            if getInfo(closureData).name == '' then
                 unnamedFunctions[closureData] = closure
             else
                 Log.new(closure)
