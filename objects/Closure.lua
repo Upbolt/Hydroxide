@@ -7,9 +7,9 @@ function Closure.new(data)
     end
 
     local closure = {}
-    local name = getInfo(data).name or ""
+    local name = getInfo(data).name or ''
     
-    closure.Name = (name ~= "" and name) or "Unnamed function"
+    closure.Name = (name ~= '' and name) or "Unnamed function"
     closure.Data = data
     closure.Environment = getfenv(data)
 

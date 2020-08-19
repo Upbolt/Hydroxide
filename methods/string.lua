@@ -21,7 +21,7 @@ local function toString(value)
     elseif type(value) == "userdata" then
         return userdataValue(value)
     elseif dataType == "function" then
-        local closureName = getInfo(value).name
+        local closureName = getInfo(value).name or ''
         return (closureName == '' and "Unnamed function") or closureName
     else
         return tostring(value)

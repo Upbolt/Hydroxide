@@ -19,7 +19,7 @@ local function compareConstant(query, constant)
     local userDataCheck = constantType == "userdata" and toString(constant) == query
 
     if constantType == "function" then
-        local closureName = getInfo(constant).name
+        local closureName = getInfo(constant).name or ''
         return query == closureName or closureName:lower():find(query:lower())
     end
 

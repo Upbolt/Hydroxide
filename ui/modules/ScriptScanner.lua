@@ -76,7 +76,7 @@ end)
 local function createProto(index, value)
     local instance = Assets.ProtoPod:Clone()
     local information = instance.Information
-    local functionName = getInfo(value).name or ""
+    local functionName = getInfo(value).name or ''
     local indexWidth = TextService:GetTextSize(index, 18, "SourceSans", constants.textWidth).X + 8
 
     if functionName == '' then
@@ -109,11 +109,11 @@ local function createConstant(index, value)
     information.Label.Position = UDim2.new(0, indexWidth + 20, 0, 0)
 
     if valueType == "function" then
-        local functionName = getInfo(value).name
+        local functionName = getInfo(value).name or ''
 
         if functionName == '' then
             functionName = "Unnamed function"
-                information.Label.TextColor3 = oh.Constants.Syntax["unnamed_function"]
+            information.Label.TextColor3 = oh.Constants.Syntax["unnamed_function"]
         end
         
         information.Label.Text = functionName

@@ -61,8 +61,8 @@ function Log.new(closureData, closure)
         local valueColor = oh.Constants.Syntax[valueType]
 
         if valueType == "function" then
-            local name = getInfo(value).name
-            value = (name ~= "" and name) or "Unnamed function"
+            local name = getInfo(value).name or ''
+            value = (name == '' and "Unnamed function") or name
             valueColor = Color3.fromRGB(127, 127, 127)
         end
 
