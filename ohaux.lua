@@ -20,8 +20,8 @@ local function matchConstants(closure, list)
 end
 
 local function searchClosure(script, name, constants)
-    for i,v in pairs(getgc()) do
-        if type(v) == "function" and rawget(getfenv(v), "script") == script then
+    for _i, v in pairs(getgc()) do
+        if type(v) == "function" and ((script and rawget(getfenv(v), "script") == script) or true) then
             if ((name and name ~= '') and debug.getinfo(v).name == name) or matchConstants(v, constants) then
                 return v
             end
