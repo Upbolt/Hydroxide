@@ -440,6 +440,7 @@ local closure = aux.searchClosure(scriptPath, closureName, closureConstants)
 local index = %s
 local value = YOUR_NEW_VALUE_HERE
 
+-- DO NOT RELY ON THIS FEATURE TO PRODUCT 100% FUNCTIONAL SCRIPTS
 debug.setupvalue(closure, index, value)]]
 
     local currentConstants = {}
