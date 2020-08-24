@@ -7,7 +7,7 @@ assert(getGc and getInfo, "Your exploit is not supported")
 
 local function matchConstants(closure, list)
     if not list then
-        return false
+        return true
     end
     
     for index in pairs(debug.getconstants(closure)) do
