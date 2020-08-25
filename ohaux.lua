@@ -14,8 +14,10 @@ local function matchConstants(closure, list)
         return true
     end
     
-    for index in pairs(getConstants(closure)) do
-        if not list[index] then
+    local constants = getConstants(closure)
+    
+    for index in pairs(list) do
+        if not constants[index] then
             return false
         end
     end
