@@ -441,7 +441,7 @@ local closure = aux.searchClosure(scriptPath, closureName, upvalueIndex, closure
 local value = YOUR_NEW_VALUE_HERE
 
 -- DO NOT RELY ON THIS FEATURE TO PRODUCE %s FUNCTIONAL SCRIPTS
-debug.setupvalue(closure, index, value)]]
+debug.setupvalue(closure, upvalueIndex, value)]]
 
     local currentConstants = {}
     local currentIndex = 0
