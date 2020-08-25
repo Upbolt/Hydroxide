@@ -23,7 +23,7 @@ end
 
 local function searchClosure(script, name, constants)
     for _i, v in pairs(getGc()) do
-        if type(v) == "function" and not isXClosure and (not script or (script and rawget(getfenv(v), "script") == script)) then
+        if type(v) == "function" and not isXClosure(v) and (not script or (script and rawget(getfenv(v), "script") == script)) then
             if ((name and name ~= "Unnamed function") and getInfo(v).name == name) and matchConstants(v, constants) then
                 return v
             elseif (not name or name == "Unnamed function") and matchConstants(v, constants) then
