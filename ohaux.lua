@@ -2,8 +2,10 @@ local aux = {}
 
 local getGc = getgc
 local getInfo = debug.getinfo or getinfo
+local getUpvalue = debug.getupvalue or getupvalue or getupval
 local getConstants = debug.getconstants or getconstants or getconsts
 local isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure
+local isLClosure = islclosure or is_l_closure or (iscclosure and function(f) return not iscclosure(f) end)
 
 assert(getGc and getInfo and getConstants and isXClosure, "Your exploit is not supported")
 
@@ -21,9 +23,18 @@ local function matchConstants(closure, list)
     return true
 end
 
-local function searchClosure(script, name, constants)
+local function searchClosure(script, name, upvalueIndex, constants)
     for _i, v in pairs(getGc()) do
-        if type(v) == "function" and not isXClosure(v) and (not script or (script and rawget(getfenv(v), "script") == script)) then
+        local parentScript = rawget(getfenv(v), "script")
+
+        if type(v) == "function" and 
+            isLClosure(v) and 
+            not isXClosure(v) and 
+            (
+                (script == nil and parentScript.Parent == nil) or script == parentScript
+            ) 
+            and pcall(getUpvalue, v, upvalueIndex)
+        then
             if ((name and name ~= "Unnamed function") and getInfo(v).name == name) and matchConstants(v, constants) then
                 return v
             elseif (not name or name == "Unnamed function") and matchConstants(v, constants) then
