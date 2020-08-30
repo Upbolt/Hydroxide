@@ -28,7 +28,11 @@ end, function(err)
 end)
 
 if not modulesLoaded then
-    Interface.Parent = CoreGui
+    if is_protosmasher_caller() then
+        Interface.Parent = get_hidden_gui()
+    else
+        syn.protect_gui(Interface)
+        Interface.Parent = CoreGui
     return
 end
 
