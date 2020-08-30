@@ -4,7 +4,7 @@ if oh then
     oh.Exit()
 end
 
-local web = true
+local web = false
 local importCache = {}
 
 -- local read, result = pcall(readfile, "ohaux.lua")
@@ -62,6 +62,7 @@ local globalMethods = {
     getSenv = getsenv,
     getMenv = getmenv or getsenv,
     getContext = getthreadcontext or get_thread_context or (syn and syn.get_thread_identity),
+    getConnections = get_signal_cons or getconnections,
     getScriptClosure = get_script_function or getscriptclosure,
     getNamecallMethod = getnamecallmethod or get_namecall_method,
     getCallingScript = getcallingscript or get_calling_script,
@@ -83,10 +84,9 @@ local globalMethods = {
     isLClosure = islclosure or is_l_closure or (iscclosure and function(closure) return not iscclosure(closure) end),
     isReadOnly = isreadonly or is_readonly,
     isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure,
-    getConnections = get_signal_cons or getconnections
 }
 
-if is_protosmasher_closure then
+if is_protosmasher_caller then
     globalMethods.getConstant = function(closure, index)
         return globalMethods.getConstants(closure)[index]
     end
@@ -158,11 +158,13 @@ environment.oh = {
     end
 }
 
-for __, connection in pairs(getConnections(game:GetService("ScriptContext").Error)) do
-    if is_protosmasher_caller() then
-        connection:Disconnect()
-    else
-        connection:Disable()
+if getConnections then
+    for __, connection in pairs(getConnections(game:GetService("ScriptContext").Error)) do
+        if is_protosmasher_caller() then
+            connection:Disconnect()
+        else
+            connection:Disable()
+        end
     end
 end
 

@@ -6,7 +6,6 @@ local Interface = import("rbxassetid://5042109928")
 import("ui/controls/TabSelector")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 
-local modulesLoaded = true
 local RemoteSpy
 local ClosureSpy
 local ScriptScanner
@@ -22,15 +21,20 @@ xpcall(function()
     UpvalueScanner = import("ui/modules/UpvalueScanner")
     ConstantScanner = import("ui/modules/ConstantScanner")
 end, function(err)
-    MessageBox.Show("An error has occurred", "A module in Hydroxide has errored. This typically happens when a section's UI is modified, so please rejoin and execute again.\n\nIf that doesn't work, press F9 and send the error message marked with <HYDROXIDE-ERROR> to hush in the Hydroxide Discord server.\n\nhttps://nrv-ous.xyz/hydroxide/discord", MessageType.OK)
-    warn('<HYDROXIDE-ERROR>: ' .. err)
-    modulesLoaded = false
-end)
+    local message 
 
-if not modulesLoaded then
-    Interface.Parent = CoreGui
-    return
-end
+    if err:find("valid member") then
+        message = "The UI has updated, please rejoin and restart. If you get this message more than once, screenshot this message and report it in the Hydroxide server.\n\n" .. err
+    else
+        message = "Report this error in Hydroxide's server:\n\n" .. err
+    end
+
+    MessageBox.Show("An error has occurred", message, 
+        MessageType.OK, 
+        function()
+            Interface:Destroy() 
+        end)
+end)
 
 local constants = {
     opened = UDim2.new(0.5, -325, 0.5, -175),
@@ -92,4 +96,14 @@ Collapse.MouseButton1Click:Connect(function()
 end)
 
 MessageBox.Show("Welcome to Hydroxide", "This is not a finished product", MessageType.OK)
-Interface.Parent = CoreGui
+
+
+if is_protosmasher_caller then
+    Interface.Parent = get_hidden_gui()
+else
+    if syn then
+        syn.protect_gui(Interface)
+    end
+    
+    Interface.Parent = CoreGui
+end
