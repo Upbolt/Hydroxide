@@ -55,8 +55,8 @@ local function userdataValue(data)
         local origin = split[1]:gsub('{', "Vector3.new("):gsub('}', ')')
         local direction = split[2]:gsub('{', "Vector3.new("):gsub('}', ')')
         return "Ray.new(" .. origin .. "), " .. direction .. ')'
-    elseif dataType == "ColorSequence" then
-        return "ColorSequence.new(" .. tableToString(v.Keypoints) .. ')'
+    elseif dataType == "ColorSequence" then 
+        return "ColorSequence.new(" .. tableToString(data.Keypoints) .. ')'
     elseif dataType == "ColorSequenceKeypoint" then
         return "ColorSequenceKeypoint.new(" .. data.Time .. ", Color3.new(" .. tostring(data.Value) .. "))"
     end
