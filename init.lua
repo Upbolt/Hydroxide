@@ -86,7 +86,7 @@ local globalMethods = {
     isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure,
 }
 
-if is_protosmasher_caller then
+if PROTOSMASHER_LOADED then
     globalMethods.getConstant = function(closure, index)
         return globalMethods.getConstants(closure)[index]
     end
@@ -160,7 +160,7 @@ environment.oh = {
 
 if getConnections then
     for __, connection in pairs(getConnections(game:GetService("ScriptContext").Error)) do
-        if is_protosmasher_caller() then
+        if PROTOSMASHER_LOADED then
             connection:Disconnect()
         else
             connection:Disable()
