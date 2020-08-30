@@ -82,7 +82,8 @@ local globalMethods = {
     setReadOnly = setreadonly or make_readonly,
     isLClosure = islclosure or is_l_closure or (iscclosure and function(closure) return not iscclosure(closure) end),
     isReadOnly = isreadonly or is_readonly,
-    isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure
+    isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure,
+    getConnections = get_signal_cons or getconnections
 }
 
 if is_protosmasher_closure then
@@ -156,6 +157,14 @@ environment.oh = {
         end
     end
 }
+
+for __, connection in pairs(getConnections(game:GetService("ScriptContext").Error)) do
+    if is_protosmasher_caller() then
+        connection:Disconnect()
+    else
+        connection:Disable()
+    end
+end
 
 useMethods(globalMethods)
 useMethods(import("methods/string"))
