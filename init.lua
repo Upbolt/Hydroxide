@@ -4,7 +4,7 @@ if oh then
     oh.Exit()
 end
 
-local web = true
+local web = false
 local importCache = {}
 
 -- local read, result = pcall(readfile, "ohaux.lua")
@@ -86,7 +86,7 @@ local globalMethods = {
     isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure,
 }
 
-if PROTOSMASHER_LOADED then
+if PROTOSMASHER_LOADED ~= nil then
     globalMethods.getConstant = function(closure, index)
         return globalMethods.getConstants(closure)[index]
     end
@@ -160,7 +160,7 @@ environment.oh = {
 
 if getConnections then
     for __, connection in pairs(getConnections(game:GetService("ScriptContext").Error)) do
-        if PROTOSMASHER_LOADED then
+        if PROTOSMASHER_LOADED ~= nil then
             connection:Disconnect()
         else
             connection:Disable()

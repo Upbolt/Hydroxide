@@ -97,8 +97,7 @@ end)
 
 MessageBox.Show("Welcome to Hydroxide", "This is not a finished product", MessageType.OK)
 
-
-if PROTOSMASHER_LOADED then
+if PROTOSMASHER_LOADED ~= nil then
     Interface.Parent = get_hidden_gui()
 else
     if syn then
