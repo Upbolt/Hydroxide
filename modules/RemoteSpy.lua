@@ -72,7 +72,7 @@ gmt.__namecall = newCClosure(function(instance, ...)
 
         if eventSet and (not remoteIgnored and not argsIgnored) then
             local call = {
-                script = getCallingScript((PROTOSMASHER_LOADED and 2) or nil),
+                script = getCallingScript((PROTOSMASHER_LOADED ~= nil and 2) or nil),
                 args = vargs
             }
 
@@ -105,7 +105,7 @@ for _name, hook in pairs(methodHooks) do
             
             if eventSet and (not remoteIgnored and not argsIgnored) then
                 local call = {
-                    script = getCallingScript((PROTOSMASHER_LOADED and 2) or nil),
+                    script = getCallingScript((PROTOSMASHER_LOADED ~= nil and 2) or nil),
                     args = vargs
                 }
     
