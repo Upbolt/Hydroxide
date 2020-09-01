@@ -80,6 +80,7 @@ local globalMethods = {
     setContext = setthreadcontext or set_thread_context or (syn and syn.set_thread_identity),
     setUpvalue = debug.setupvalue or setupvalue or setupval,
     setStack = debug.setstack or setstack,
+    setWriteable = make_writeable -- even more proto retardation :D
     setReadOnly = setreadonly or make_readonly,
     isLClosure = islclosure or is_l_closure or (iscclosure and function(closure) return not iscclosure(closure) end),
     isReadOnly = isreadonly or is_readonly,
@@ -158,11 +159,24 @@ environment.oh = {
     end
 }
 
-if getConnections then
+if getConnections then -- kakashiiii > hush
     for __, connection in pairs(getConnections(game:GetService("ScriptContext").Error)) do
+
+        local conn = getrawmetatable(connection)
+        local old = conn.__index
+        if PROTOSMASHER_LOADED ~= nil then setWriteable(conn) else setReadOnly(conn, false) end
+        c.__index = newcclosure(function(t, k)
+            if k == "Connected" then
+                return true
+            end
+            return old(t, k)
+        end)
+
         if PROTOSMASHER_LOADED ~= nil then
+            setReadOnly(conn)
             connection:Disconnect()
         else
+            setReadOnly(conn, true)
             connection:Disable()
         end
     end
