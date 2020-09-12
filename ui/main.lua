@@ -14,12 +14,12 @@ local UpvalueScanner
 local ConstantScanner
 
 xpcall(function()
---    RemoteSpy = import("ui/modules/RemoteSpy")
---    ClosureSpy = import("ui/modules/ClosureSpy")
---    ScriptScanner = import("ui/modules/ScriptScanner")
---    ModuleScanner = import("ui/modules/ModuleScanner")
---    UpvalueScanner = import("ui/modules/UpvalueScanner")
---    ConstantScanner = import("ui/modules/ConstantScanner")
+    RemoteSpy = import("ui/modules/RemoteSpy")
+    ClosureSpy = import("ui/modules/ClosureSpy")
+    ScriptScanner = import("ui/modules/ScriptScanner")
+    ModuleScanner = import("ui/modules/ModuleScanner")
+    UpvalueScanner = import("ui/modules/UpvalueScanner")
+    ConstantScanner = import("ui/modules/ConstantScanner")
 end, function(err)
     local message 
 
@@ -100,7 +100,7 @@ MessageBox.Show("Welcome to Hydroxide", "This is not a finished product", Messag
 if PROTOSMASHER_LOADED ~= nil then
     Interface.Parent = get_hidden_gui()
 else
-    if syn then
+    if syn and not is_sirhurt_closure then
         syn.protect_gui(Interface)
     end
     
