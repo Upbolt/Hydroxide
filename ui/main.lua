@@ -14,6 +14,7 @@ local UpvalueScanner
 local ConstantScanner
 
 xpcall(function()
+    print("This is a test.")
 --    RemoteSpy = import("ui/modules/RemoteSpy")
 --    ClosureSpy = import("ui/modules/ClosureSpy")
 --    ScriptScanner = import("ui/modules/ScriptScanner")
