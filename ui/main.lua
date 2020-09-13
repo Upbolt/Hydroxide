@@ -13,42 +13,34 @@ local Interface = import("rbxassetid://5042109928")
 import("ui/controls/TabSelector")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 
-DEBUG();wait(2)
-local RemoteSpy = import("ui/modules/RemoteSpy")
-DEBUG();wait(2)
-local ClosureSpy = import("ui/modules/ClosureSpy")
-DEBUG();wait(2)
---local ScriptScanner = import("ui/modules/ScriptScanner")
---DEBUG();wait(2)
---local ModuleScanner = import("ui/modules/ModuleScanner")  Let's try this?
---DEBUG();wait(2)
-local UpvalueScanner = import("ui/modules/UpvalueScanner")
-DEBUG();wait(2)
-local ConstantScanner = import("ui/modules/ConstantScanner")
-DEBUG()
+local RemoteSp
+local ClosureSpy
+local ScriptScanner
+local ModuleScanner
+local UpvalueScanner
+local ConstantScanner
 
---xpcall(function()
---    RemoteSpy = import("ui/modules/RemoteSpy")
---    ClosureSpy = import("ui/modules/ClosureSpy")
---    ScriptScanner = import("ui/modules/ScriptScanner")
---    ModuleScanner = import("ui/modules/ModuleScanner")
---    UpvalueScanner = import("ui/modules/UpvalueScanner")
---    ConstantScanner = import("ui/modules/ConstantScanner")
---end, function(err)
---    local message 
---
---    if err:find("valid member") then
---        message = "The UI has updated, please rejoin and restart. If you get this message more than once, screenshot this message and report it in the Hydroxide server.\n\n" .. err
---    else
---        message = "Report this error in Hydroxide's server:\n\n" .. err
---    end
---
---    MessageBox.Show("An error has occurred", message, 
---        MessageType.OK, 
---        function()
---            Interface:Destroy() 
---        end)
---end)
+xpcall(function()
+    RemoteSpy = import("ui/modules/RemoteSpy")
+    ClosureSpy = import("ui/modules/ClosureSpy")
+    --ScriptScanner = import("ui/modules/ScriptScanner")
+    --ModuleScanner = import("ui/modules/ModuleScanner")
+    UpvalueScanner = import("ui/modules/UpvalueScanner")
+    ConstantScanner = import("ui/modules/ConstantScanner")
+end, function(err)
+    local message
+    if err:find("valid member") then
+        message = "The UI has updated, please rejoin and restart. If you get this message more than once, screenshot this message and report it in the Hydroxide server.\n\n" .. err
+    else
+        message = "Report this error in Hydroxide's server:\n\n" .. err
+    end
+
+    MessageBox.Show("An error has occurred", message, 
+        MessageType.OK, 
+        function()
+            Interface:Destroy() 
+        end)
+end)
 
 local constants = {
     opened = UDim2.new(0.5, -325, 0.5, -175),
