@@ -5,49 +5,51 @@ local function DEBUG()
     wait()
 end
 
-
-DEBUG()
 local CoreGui = game:GetService("CoreGui")
 local UserInput = game:GetService("UserInputService")
 
 local Interface = import("rbxassetid://5042109928")
 
-DEBUG()
 import("ui/controls/TabSelector")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 
-local RemoteSpy
-local ClosureSpy
-local ScriptScanner
-local ModuleScanner
-local UpvalueScanner
-local ConstantScanner
-
 DEBUG()
-xpcall(function()
-    RemoteSpy = import("ui/modules/RemoteSpy")
-    ClosureSpy = import("ui/modules/ClosureSpy")
-    ScriptScanner = import("ui/modules/ScriptScanner")
-    ModuleScanner = import("ui/modules/ModuleScanner")
-    UpvalueScanner = import("ui/modules/UpvalueScanner")
-    ConstantScanner = import("ui/modules/ConstantScanner")
-end, function(err)
-    local message 
-
-    if err:find("valid member") then
-        message = "The UI has updated, please rejoin and restart. If you get this message more than once, screenshot this message and report it in the Hydroxide server.\n\n" .. err
-    else
-        message = "Report this error in Hydroxide's server:\n\n" .. err
-    end
-
-    MessageBox.Show("An error has occurred", message, 
-        MessageType.OK, 
-        function()
-            Interface:Destroy() 
-        end)
-end)
-
+local RemoteSpy = import("ui/modules/RemoteSpy")
 DEBUG()
+local ClosureSpy = import("ui/modules/ClosureSpy")
+DEBUG()
+local ScriptScanner = import("ui/modules/ScriptScanner")
+DEBUG()
+local ModuleScanner = import("ui/modules/ModuleScanner")
+DEBUG()
+local UpvalueScanner = import("ui/modules/UpvalueScanner")
+DEBUG()
+local ConstantScanner = import("ui/modules/ConstantScanner")
+DEBUG()
+
+--xpcall(function()
+--    RemoteSpy = import("ui/modules/RemoteSpy")
+--    ClosureSpy = import("ui/modules/ClosureSpy")
+--    ScriptScanner = import("ui/modules/ScriptScanner")
+--    ModuleScanner = import("ui/modules/ModuleScanner")
+--    UpvalueScanner = import("ui/modules/UpvalueScanner")
+--    ConstantScanner = import("ui/modules/ConstantScanner")
+--end, function(err)
+--    local message 
+--
+--    if err:find("valid member") then
+--        message = "The UI has updated, please rejoin and restart. If you get this message more than once, screenshot this message and report it in the Hydroxide server.\n\n" .. err
+--    else
+--        message = "Report this error in Hydroxide's server:\n\n" .. err
+--    end
+--
+--    MessageBox.Show("An error has occurred", message, 
+--        MessageType.OK, 
+--        function()
+--            Interface:Destroy() 
+--        end)
+--end)
+
 local constants = {
     opened = UDim2.new(0.5, -325, 0.5, -175),
     closed = UDim2.new(0.5, -325, 0, -400),
@@ -69,7 +71,6 @@ function oh.getStatus()
     return Status.Text:gsub('• Status: ', '')
 end
 
-DEBUG()
 local dragging
 local dragStart
 local startPos
@@ -98,7 +99,6 @@ oh.Events.Drag = UserInput.InputChanged:Connect(function(input)
 	end
 end)
 
-DEBUG()
 Open.MouseButton1Click:Connect(function()
     Open:TweenPosition(constants.conceal, "Out", "Quad", 0.15)
     Base:TweenPosition(constants.opened, "Out", "Quad", 0.15)
@@ -111,7 +111,6 @@ end)
 
 MessageBox.Show("Welcome to Hydroxide", "This is not a finished product", MessageType.OK)
 
-DEBUG()
 if PROTOSMASHER_LOADED ~= nil then
     Interface.Parent = get_hidden_gui()
 else
