@@ -20,7 +20,7 @@ local ClosureSpy = import("ui/modules/ClosureSpy")
 DEBUG();wait(2)
 --local ScriptScanner = import("ui/modules/ScriptScanner")
 --DEBUG();wait(2)
---local ModuleScanner = import("ui/modules/ModuleScanner")  This stupid thing won't update
+--local ModuleScanner = import("ui/modules/ModuleScanner")  Let's try this?
 --DEBUG();wait(2)
 local UpvalueScanner = import("ui/modules/UpvalueScanner")
 DEBUG();wait(2)
