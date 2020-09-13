@@ -1,10 +1,3 @@
-local DEBUGCOUNT = 0
-local function DEBUG()
-    DEBUGCOUNT += 1
-    print(DEBUGCOUNT)
-    wait()
-end
-
 local CoreGui = game:GetService("CoreGui")
 local UserInput = game:GetService("UserInputService")
 
@@ -23,8 +16,8 @@ local ConstantScanner
 xpcall(function()
     RemoteSpy = import("ui/modules/RemoteSpy")
     ClosureSpy = import("ui/modules/ClosureSpy")
-    --ScriptScanner = import("ui/modules/ScriptScanner")
-    --ModuleScanner = import("ui/modules/ModuleScanner")
+    ScriptScanner = import("ui/modules/ScriptScanner")
+    ModuleScanner = import("ui/modules/ModuleScanner")
     UpvalueScanner = import("ui/modules/UpvalueScanner")
     ConstantScanner = import("ui/modules/ConstantScanner")
 end, function(err)

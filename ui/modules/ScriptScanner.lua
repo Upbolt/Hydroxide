@@ -254,5 +254,6 @@ for _i, sectionButton in pairs(InfoOptions:GetChildren()) do
         }
     end
 end
+DEBUG()
 
 return ScriptScanner
