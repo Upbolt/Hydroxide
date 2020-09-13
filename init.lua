@@ -159,7 +159,7 @@ environment.oh = {
     end
 }
 
-if getConnections then -- kakashiiii > hush
+if getConnections then 
     for __, connection in pairs(getConnections(game:GetService("ScriptContext").Error)) do
 
         local conn = getrawmetatable(connection)
