@@ -2,7 +2,7 @@ local DEBUGCOUNT = 0
 local function DEBUG()
     DEBUGCOUNT += 1
     print(DEBUGCOUNT)
-    wait()
+    wait(3)
 end
 
 local CoreGui = game:GetService("CoreGui")
@@ -18,8 +18,8 @@ local RemoteSpy = import("ui/modules/RemoteSpy")
 DEBUG()
 local ClosureSpy = import("ui/modules/ClosureSpy")
 DEBUG()
---local ScriptScanner = import("ui/modules/ScriptScanner")
---DEBUG()
+local ScriptScanner = import("ui/modules/ScriptScanner")
+DEBUG()
 local ModuleScanner = import("ui/modules/ModuleScanner")
 DEBUG()
 local UpvalueScanner = import("ui/modules/UpvalueScanner")
