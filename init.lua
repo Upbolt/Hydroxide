@@ -26,7 +26,7 @@ local function import(asset)
     if asset:find("rbxassetid://") then
         assets = { game:GetObjects(asset)[1] }
     elseif web then
-        assets = { loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/Upbolt/Hydroxide/revision/" .. asset .. ".lua"), asset .. '.lua')() }
+        assets = { webImport(asset) }
     else
         assets = { loadstring(readfile("hydroxide/" .. asset .. ".lua"), asset .. '.lua')() }
     end
