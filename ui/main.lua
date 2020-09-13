@@ -6,7 +6,7 @@ local Interface = import("rbxassetid://5042109928")
 import("ui/controls/TabSelector")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 
-local RemoteSp
+local RemoteSpy
 local ClosureSpy
 local ScriptScanner
 local ModuleScanner
