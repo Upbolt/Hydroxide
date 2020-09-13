@@ -4,11 +4,11 @@ local function webImport(file)
 
     local owner = "LiamBogur"
     local branch = "revision"
-    local website = "https://raw.githubusercontent.com/%s/Hydroxide/%s/"):format(owner,branch)
+    local website = ("https://raw.githubusercontent.com/%s/Hydroxide/%s/"):format(owner,branch)
     local url = "%s/%s"
     local extension = ".lua"
 
-    return loadstring(game:HttpGetAsync((url:format(website,file..extension)), file..extension)()
+    return loadstring(game:HttpGetAsync((url:format(website,file..extension))), file..extension)()
 end
 
 webImport("init")
