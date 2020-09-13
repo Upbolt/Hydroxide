@@ -1,8 +1,18 @@
+local DEBUGCOUNT = 0
+local function DEBUG()
+    DEBUGCOUNT += 1
+    print(DEBUGCOUNT)
+    wait()
+end
+
+
+DEBUG()
 local CoreGui = game:GetService("CoreGui")
 local UserInput = game:GetService("UserInputService")
 
 local Interface = import("rbxassetid://5042109928")
 
+DEBUG()
 import("ui/controls/TabSelector")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 
@@ -13,14 +23,14 @@ local ModuleScanner
 local UpvalueScanner
 local ConstantScanner
 
+DEBUG()
 xpcall(function()
-    print("This is a test.")
---    RemoteSpy = import("ui/modules/RemoteSpy")
---    ClosureSpy = import("ui/modules/ClosureSpy")
---    ScriptScanner = import("ui/modules/ScriptScanner")
---    ModuleScanner = import("ui/modules/ModuleScanner")
---    UpvalueScanner = import("ui/modules/UpvalueScanner")
---    ConstantScanner = import("ui/modules/ConstantScanner")
+    RemoteSpy = import("ui/modules/RemoteSpy")
+    ClosureSpy = import("ui/modules/ClosureSpy")
+    ScriptScanner = import("ui/modules/ScriptScanner")
+    ModuleScanner = import("ui/modules/ModuleScanner")
+    UpvalueScanner = import("ui/modules/UpvalueScanner")
+    ConstantScanner = import("ui/modules/ConstantScanner")
 end, function(err)
     local message 
 
@@ -37,6 +47,7 @@ end, function(err)
         end)
 end)
 
+DEBUG()
 local constants = {
     opened = UDim2.new(0.5, -325, 0.5, -175),
     closed = UDim2.new(0.5, -325, 0, -400),
@@ -58,6 +69,7 @@ function oh.getStatus()
     return Status.Text:gsub('• Status: ', '')
 end
 
+DEBUG()
 local dragging
 local dragStart
 local startPos
@@ -86,6 +98,7 @@ oh.Events.Drag = UserInput.InputChanged:Connect(function(input)
 	end
 end)
 
+DEBUG()
 Open.MouseButton1Click:Connect(function()
     Open:TweenPosition(constants.conceal, "Out", "Quad", 0.15)
     Base:TweenPosition(constants.opened, "Out", "Quad", 0.15)
@@ -98,6 +111,7 @@ end)
 
 MessageBox.Show("Welcome to Hydroxide", "This is not a finished product", MessageType.OK)
 
+DEBUG()
 if PROTOSMASHER_LOADED ~= nil then
     Interface.Parent = get_hidden_gui()
 else
