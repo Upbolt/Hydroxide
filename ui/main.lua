@@ -2,7 +2,7 @@ local DEBUGCOUNT = 0
 local function DEBUG()
     DEBUGCOUNT += 1
     print(DEBUGCOUNT)
-    wait(3)
+    wait(3000)
 end
 
 local CoreGui = game:GetService("CoreGui")
