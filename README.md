@@ -4,7 +4,7 @@ function webImport(file)
 
     local owner = "LiamBogur"
     local branch = "revision"
-    local website = ("https://raw.githubusercontent.com/%s/Hydroxide/%s/"):format(owner,branch)
+    local website = ("https://raw.githubusercontent.com/%s/Hydroxide/%s"):format(owner,branch)
     local url = "%s/%s"
     local extension = ".lua"
 
