@@ -2,7 +2,7 @@ local DEBUGCOUNT = 0
 local function DEBUG()
     DEBUGCOUNT += 1
     print(DEBUGCOUNT)
-    wait(3000)
+    wait()
 end
 
 local CoreGui = game:GetService("CoreGui")
@@ -13,17 +13,17 @@ local Interface = import("rbxassetid://5042109928")
 import("ui/controls/TabSelector")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 
-DEBUG()
+DEBUG();wait(2)
 local RemoteSpy = import("ui/modules/RemoteSpy")
-DEBUG()
+DEBUG();wait(2)
 local ClosureSpy = import("ui/modules/ClosureSpy")
-DEBUG()
+DEBUG();wait(2)
 local ScriptScanner = import("ui/modules/ScriptScanner")
-DEBUG()
+DEBUG();wait(2)
 local ModuleScanner = import("ui/modules/ModuleScanner")
-DEBUG()
+DEBUG();wait(2)
 local UpvalueScanner = import("ui/modules/UpvalueScanner")
-DEBUG()
+DEBUG();wait(2)
 local ConstantScanner = import("ui/modules/ConstantScanner")
 DEBUG()
 
