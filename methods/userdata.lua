@@ -41,40 +41,72 @@ local function userdataValue(data)
         return toString(data)
     elseif dataType == "Instance" then
         return data.Name
-    elseif 
+    elseif
+        dataType == "BrickColor" or
+        dataType == "TweenInfo" or
         dataType == "Vector3" or
         dataType == "Vector2" or
         dataType == "CFrame" or
         dataType == "Color3" or
+        dataType == "Random" or
+        dataType == "Faces" or
         dataType == "UDim2" or
-        dataType == "UDim"
+        dataType == "UDim" or
+        dataType == "Rect" or
+        dataType == "Axes" or
+        dataType == "NumberRange" or
+        dataType == "RaycastParams" or
+        dataType == "PhysicalProperties"
     then
         return dataType .. ".new(" .. tostring(data) .. ")"
-    elseif dataType == "Ray" then
+    elseif dataType == "DateTime" then
+        return dataType .. ".now()"
+    elseif dataType == "PathWaypoint" then
         local split = tostring(data):split('}, ')
-        local origin = split[1]:gsub('{', "Vector3.new("):gsub('}', ')')
-        local direction = split[2]:gsub('{', "Vector3.new("):gsub('}', ')')
-        return "Ray.new(" .. origin .. "), " .. direction .. ')'
-    elseif dataType == "ColorSequence" then 
-        return "ColorSequence.new(" .. tableToString(data.Keypoints) .. ')'
+        local vector = split[1]:gsub('{', "Vector3.new(")
+        return dataType .. ".new(" .. vector .. "), " .. split[2] .. ')'
+    elseif dataType == "Ray" or dataType == "Region3" then
+        local split = tostring(data):split('}, ')
+        local vprimary = split[1]:gsub('{', "Vector3.new(")
+        local vsecondary = split[2]:gsub('{', "Vector3.new("):gsub('}', ')')
+        return dataType .. ".new(" .. vprimary .. "), " .. vsecondary .. ')'
+    elseif dataType == "ColorSequence" or dataType == "NumberSequence" then 
+        return dataType .. ".new(" .. tableToString(data.Keypoints) .. ')'
     elseif dataType == "ColorSequenceKeypoint" then
         return "ColorSequenceKeypoint.new(" .. data.Time .. ", Color3.new(" .. tostring(data.Value) .. "))"
+    elseif dataType == "NumberSequenceKeypoint" then
+        local envelop = data.Envelop and data.Value .. ", " .. data.Envelop or data.Value
+        return "NumberSequenceKeypoint.new(" .. data.Time .. ", " .. envelop .. ")"
     end
 
     return tostring(data)
 end
 
 local function isUserdata(type)
-    return type == "Instance" 
+    return type == "BrickColor"
+        or type == "TweenInfo"
+        or type == "Instance"
+        or type == "DateTime"
         or type == "Vector3" 
         or type == "Vector2"
+        or type == "Region3"
         or type == "CFrame"
         or type == "Color3"
+        or type == "Random"
+        or type == "Faces"
         or type == "UDim2"
         or type == "UDim"
+        or type == "Rect"
+        or type == "Axes"
         or type == "Ray"
+        or type == "RaycastParams"
+        or type == "PathWaypoint"
+        or type == "PhysicalProperties"
         or type == "ColorSequence"
         or type == "ColorSequenceKeypoint"
+        or type == "NumberRange"
+        or type == "NumberSequence"
+        or type == "NumberSequenceKeypoint"
 end
 
 methods.isUserdata = isUserdata
