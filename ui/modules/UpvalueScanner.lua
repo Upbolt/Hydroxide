@@ -100,13 +100,19 @@ local function addElement(upvalueLog, upvalue, index, value, temporary)
         elementLog.Border.ImageColor3 = constants.tempBorderColor
     end
 
+    print(value, elementValueType)
+    print(oh.Constants.Types[elementValueType])
+
     elementLog.Name = indexText
     elementLog.Index.Label.Text = indexText
     elementLog.Value.Label.Text = toString(value)
     elementLog.Index.Label.TextColor3 = oh.Constants.Syntax[elementIndexType]
-    elementLog.Value.Label.TextColor3 = oh.Constants.Syntax[elementValueType]
     elementLog.Index.Icon.Image = oh.Constants.Types[elementIndexType]
-    elementLog.Value.Icon.Image = oh.Constants.Types[elementValueType]
+
+    if value ~= nil then
+        elementLog.Value.Label.TextColor3 = oh.Constants.Syntax[elementValueType]
+        elementLog.Value.Icon.Image = oh.Constants.Types[elementValueType]
+    end
 
     elementLog.MouseButton2Click:Connect(function()
         selectedUpvalue = upvalue
@@ -215,7 +221,7 @@ local function updateUpvalue(closureLog, upvalue)
             local table = upvalue.Value
 
             for idx, _v in pairs(upvalue.TemporaryElements) do
-                updateElement(upvalueLog, idx, table[index])
+                updateElement(upvalueLog, idx, table[idx])
             end
         end
     else
