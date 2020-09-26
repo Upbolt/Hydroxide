@@ -436,7 +436,7 @@ local closure = aux.searchClosure(scriptPath, closureName, upvalueIndex, closure
 local value = YOUR_NEW_VALUE_HERE
 ]]
 
-    if elementIndex then
+    if elementIndex and elementIndex ~= "nil" then
         generatedScript = generatedScript .. ("local elementIndex = %s\n"):format(elementIndex)
         generatedScript = generatedScript .. "\n\n-- DO NOT RELY ON THIS FEATURE TO PRODUCE %s FUNCTIONAL SCRIPTS\n"
         return generatedScript .. "debug.getupvalue(closure, upvalueIndex)[elementIndex] = value"
