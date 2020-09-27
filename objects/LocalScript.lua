@@ -1,15 +1,15 @@
 local LocalScript = {}
+LocalScript.__index = LocalScript
 
 function LocalScript.new(instance)
-    local localScript = {}
-    local closure = getScriptClosure(instance)
+	local closure = getScriptClosure(instance)
 
-    localScript.Instance = instance
-    localScript.Environment = getSenv(instance)
-    localScript.Constants = getConstants(closure)
-    localScript.Protos = getProtos(closure)
-
-    return localScript
+	return setmetatable({
+		Instance = instance,
+		Environment = getSenv(instance),
+		Constants = getConstants(closure),
+		Protos = getProtos(closure),
+	}, LocalScript)
 end
 
 return LocalScript
