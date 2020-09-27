@@ -1,25 +1,26 @@
 local Closure = {}
+Closure.__index = Closure
+
 local closureCache = {}
 
 function Closure.new(data)
-    if closureCache[data] then
-        return closureCache[data]
-    end
-
-    local closure = {}
-    local name = getInfo(data).name or ''
+	if closureCache[data] then
+		return closureCache[data]
+	end
     
-    closure.Name = (name ~= '' and name) or "Unnamed function"
-    closure.Data = data
-    closure.Environment = getfenv(data)
+	local name = getInfo(data).name or ''
+    
+	return setmetatable({
+		Name = (name ~= '' and name) or "Unnamed function",
+		Data = data,
+		Environment = getfenv(data),
 
-    closure.Upvalues = {}
-    closure.Constants = {}
+		Upvalues = {},
+		Constants = {},
 
-    closure.TemporaryUpvalues = {}
-    closure.TemporaryConstants = {}
-
-    return closure
+		TemporaryUpvalues = {},
+		TemporaryConstants = {}
+	}, Closure)
 end
 
 return Closure
