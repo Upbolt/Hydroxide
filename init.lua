@@ -165,7 +165,7 @@ if getConnections then
         local conn = getrawmetatable(connection)
         local old = conn.__index
         if PROTOSMASHER_LOADED ~= nil then setWriteable(conn) else setReadOnly(conn, false) end
-        c.__index = newcclosure(function(t, k)
+        conn.__index = newcclosure(function(t, k)
             if k == "Connected" then
                 return true
             end
