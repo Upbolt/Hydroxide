@@ -19,8 +19,14 @@ local eventCallback
 
 -- Define as global function in order to reduce upvalue count in hooks
 function log(hook, callingScript, ...)
-    if eventCallback then
-        eventCallback(hook, callingScript, ...)
+    local vargs = {...}
+    
+    if eventCallback and not hook:AreArgsIgnored(vargs) then
+        local call = {
+            script = callingScript,
+            args = vargs
+        }
+        eventCallback(hook, call)
     end
 end
 
@@ -31,20 +37,21 @@ local function setEvent(callback)
 end
 
 local Hook = {}
+local hookMap = {}
 hookCache = {}
 
 function Hook.new(closure)
     local hook = {}
     local data = closure.Data
 
-    if getInfo(closureData).nups < 1 then
+    if getInfo(data).nups < 1 then
         return
-    elseif hookCache[closureData] or table.find(oh.Hooks, closureData) then
+    elseif hookCache[data] then
         return false
     end
 
     local wrap = { hook, data }
-    hookMap[data] = hookFunction(closureData, function(...)
+    hookCache[data] = hookFunction(data, function(...)
         local vargs = {...}
         local uHook = wrap[1]
         local uData = wrap[2]
@@ -52,13 +59,13 @@ function Hook.new(closure)
         if not uHook.Ignored and not uHook:AreArgsIgnored(vargs) then
             log(uHook, getCallingScript(), ...)
         end
-        
+
         if not uHook.Blocked and not uHook:AreArgsBlocked(vargs) then
             return hookCache[uData](...)
         end
     end)
 
-    closure.Data = hookMap[data]
+    closure.Data = hookCache[data]
 
     hook.Closure = closure
     hook.Calls = 0
@@ -67,6 +74,8 @@ function Hook.new(closure)
     hook.Blocked = false
     hook.Ignore = Hook.ignore
     hook.Block = Hook.block
+    hook.IgnoreArg = Hook.ignoreArg
+    hook.BlockArg = Hook.blockArg
     hook.Remove = Hook.remove
     hook.Clear = Hook.clear
     hook.BlockedArgs = {}
@@ -76,7 +85,7 @@ function Hook.new(closure)
     hook.IncrementCalls = Hook.incrementCalls
     hook.DecrementCalls = Hook.decrementCalls
 
-    hookCache[data] = hook
+    hookMap[data] = hook
 
     return hook
 end
@@ -97,16 +106,57 @@ function Hook.ignore(hook)
     hook.Ignored = not hook.Ignored
 end
 
+function Hook.blockArg(hook, index, value, byType)
+    local blockedArgs = hook.BlockedArgs
+    local blockedIndex = blockedArgs[index]
+
+    if not blockedIndex then
+        blockedIndex = {
+            types = {},
+            values = {}
+        }
+        blockedArgs[index] = blockedIndex
+    end
+
+    if byType then
+        blockedIndex.types[value] = true
+    else
+        blockedIndex.values[value] = true
+    end
+end
+
+function Hook.ignoreArg(hook, index, value, byType)
+    local ignoredArgs = hook.IgnoredArgs
+    local indexIgnore = ignoredArgs[index]
+
+    if not indexIgnore then
+        indexIgnore = {
+            types = {},
+            values = {}
+        }
+
+        ignoredArgs[index] = indexIgnore
+    end
+
+    if byType then
+        indexIgnore.types[value] = true
+    else
+        indexIgnore.values[value] = true
+    end
+end
+
 function Hook.areArgsBlocked(hook, args)
     local blockedArgs = hook.BlockedArgs
 
     for index, value in pairs(args) do
         local indexBlock = blockedArgs[index]
         
-        if indexBlock and ( indexBlock.types[type(value)] or indexBlock.values[value] ~= nil ) then
+        if indexBlock and ( indexBlock.types[typeof(value)] or indexBlock.values[value] ~= nil ) then
             return true
         end
     end
+
+    return false
 end
 
 function Hook.areArgsIgnored(hook, args)
@@ -114,11 +164,13 @@ function Hook.areArgsIgnored(hook, args)
 
     for index, value in pairs(args) do
         local indexIgnore = ignoredArgs[index]
-        
-        if indexIgnore and ( indexIgnore.types[type(value)] or indexIgnore.values[value] ~= nil ) then
+
+        if indexIgnore and ( indexIgnore.types[typeof(value)] or indexIgnore.values[value] ~= nil ) then
             return true
         end
     end
+
+    return false
 end
 
 function Hook.incrementCalls(hook, vargs)

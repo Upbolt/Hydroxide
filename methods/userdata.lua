@@ -1,5 +1,8 @@
 local methods = {}
 
+local players = game:GetService("Players")
+local client = players.LocalPlayer
+
 local function getInstancePath(instance)
     local name = instance.Name
     local head = (#name > 0 and '.' .. name) or "['']"
@@ -17,7 +20,7 @@ local function getInstancePath(instance)
         
         if result then
             head = ':GetService("' .. instance.ClassName .. '")'
-        elseif instance == game:GetService("Players").LocalPlayer then
+        elseif instance == client then
             head = '.LocalPlayer' 
         else
             local nonAlphaNum = name:gsub('[%w_]', '')

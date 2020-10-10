@@ -942,7 +942,7 @@ conditionValueType:SetCallback(function(_dropdown, selected)
     icon.Border.Image = iconCondition
 end)
 
-Methods.ConnectEvent(function(remoteInstance, vargs, callingFunction)
+Methods.ConnectEvent(function(remoteInstance, vargs)
     if not removed[remoteInstance] then
         local remote = currentRemotes[remoteInstance]
         local log = currentLogs[remoteInstance] or Log.new(remote)
