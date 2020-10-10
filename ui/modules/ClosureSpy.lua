@@ -88,7 +88,6 @@ local ignoreContext = ContextMenuButton.new("rbxassetid://4842578510", "Ignore C
 local blockContext = ContextMenuButton.new("rbxassetid://4891641806", "Block Calls")
 local removeContext = ContextMenuButton.new("rbxassetid://4702831188", "Remove Log")
 
-local scriptContext = ContextMenuButton.new("rbxassetid://4800244808", "Generate Script")
 local callingScriptContext = ContextMenuButton.new("rbxassetid://4800244808", "Get Calling Script")
 local spyClosureContext = ContextMenuButton.new("rbxassetid://4666593447", "Spy Calling Function")
 
@@ -105,7 +104,7 @@ local removeConditionContextSelected = ContextMenuButton.new("rbxassetid://47028
 
 local closureListMenu = ContextMenu.new({ conditionContext, clearContext, ignoreContext, blockContext, removeContext })
 local closureListMenuSelected = ContextMenu.new({ clearContextSelected, ignoreContextSelected, unignoreContextSelected, blockContextSelected, unblockContextSelected, removeContextSelected })
-local hookLogsMenu = ContextMenu.new({ scriptContext, callingScriptContext, spyClosureContext, repeatCallContext })
+local hookLogsMenu = ContextMenu.new({ callingScriptContext, spyClosureContext, repeatCallContext })
 local closureConditionMenu = ContextMenu.new({ removeConditionContext })
 local closureConditionMenuSelected = ContextMenu.new({ removeConditionContextSelected })
 
@@ -345,7 +344,7 @@ function Log.new(hook)
         end
     end)
 
-    hookLogs[hook] = log
+    currentLogs[hook] = log
 
     log.Hook = hook
     log.Button = listButton
@@ -486,9 +485,9 @@ end
 -- UI Functionality
 ListSearch.FocusLost:Connect(function(returned)
     if returned then
-        for hook, log in pairs(hookLogs) do
+        for hook, log in pairs(currentLogs) do
             local instance = log.Button.Instance
-            instance.Visible = not (instance.Visible and not hook.Closure.Name:lower():find(Search.Text))
+            instance.Visible = not (instance.Visible and not hook.Closure.Name:lower():find(ListSearch.Text))
         end
 
         closureList:Recalculate()
@@ -506,34 +505,36 @@ LogsBack.MouseButton1Click:Connect(function()
 end)
 
 LogsButtons.Ignore.MouseButton1Click:Connect(function()
-    local selectedClosure = selected.hookLog.Closure
+    local selectedLog = selected.hookLog
+    local hook = selectedLog.Hook
 
-    selectedClosure:Ignore()
+    hook:Ignore()
 
     checkCurrentIgnored()
 
-    if selectedClosure.Blocked then
-        selected.hookLog:PlayBlock()
-    elseif selectedClosure.Ignored then
-        selected.hookLog:PlayIgnore()
+    if hook.Blocked then
+        selectedLog:PlayBlock()
+    elseif hook.Ignored then
+        selectedLog:PlayIgnore()
     else
-        selected.hookLog:PlayNormal()
+        selectedLog:PlayNormal()
     end
 end)
 
 LogsButtons.Block.MouseButton1Click:Connect(function()
-    local selectedHook = selected.hookLog.Hook
+    local selectedLog = selected.hookLog
+    local hook = selectedLog.Hook
 
-    selectedHook:Block()
+    hook:Block()
 
     checkCurrentBlocked()
 
-    if selectedHook.Blocked then
-        selected.hookLog:PlayBlock()
-    elseif selectedHook.Ignored then
-        selected.hookLog:PlayIgnore()
+    if hook.Blocked then
+        selectedLog:PlayBlock()
+    elseif hook.Ignored then
+        selectedLog:PlayIgnore()
     else
-        selected.hookLog:PlayNormal()
+        selectedLog:PlayNormal()
     end
 end)
 
@@ -664,34 +665,36 @@ clearContext:SetCallback(function()
 end)
 
 ignoreContext:SetCallback(function()
-    local selectedHook = selected.logContext
-
-    selected.logContext.Closure:Ignore()
+    local selectedLog = selected.logContext
+    local hook = selectedLog.Hook
+    
+    hook:Ignore()
 
     checkCurrentIgnored()
 
-    if selectedHook.Blocked then
-        selected.logContext:PlayBlock()
-    elseif selectedHook.Ignored then
-        selected.logContext:PlayIgnore()
+    if hook.Blocked then
+        selectedLog:PlayBlock()
+    elseif hook.Ignored then
+        selectedLog:PlayIgnore()
     else
-        selected.logContext:PlayNormal()
+        selectedLog:PlayNormal()
     end
 end)
 
 blockContext:SetCallback(function()
-    local selectedHook = selected.logContext
+    local selectedLog = selected.logContext
+    local hook = selectedLog.Hook
 
-    selected.logContext.Closure:Block()
+    hook:Block()
 
     checkCurrentBlocked()
     
-    if selectedHook.Blocked then
-        selected.logContext:PlayBlock()
-    elseif selectedHook.Ignored then
-        selected.logContext:PlayIgnore()
+    if hook.Blocked then
+        selectedLog:PlayBlock()
+    elseif hook.Ignored then
+        selectedLog:PlayIgnore()
     else
-        selected.logContext:PlayNormal()
+        selectedLog:PlayNormal()
     end
 end)
 
@@ -702,13 +705,15 @@ end)
 
 ignoreContextSelected:SetCallback(function()
     for _i, log in pairs(selected.logs) do
-        local closure = log.Hook
+        local hook = log.Hook
 
-        closure:Ignore()
+        if not hook.Ignored then
+            hook:Ignore()
+        end
 
-        if closure.Blocked then
+        if log.Blocked then
             log:PlayBlock()
-        elseif closure.Ignored then
+        elseif hook.Ignored then
             log:PlayIgnore()
         end
     end
@@ -718,13 +723,13 @@ end)
 
 unignoreContextSelected:SetCallback(function()
     for _i, log in pairs(selected.logs) do
-        local closure = log.Hook
+        local hook = log.Hook
 
-        if closure.Ignored then
-            closure:Ignore()
+        if hook.Ignored then
+            hook:Ignore()
         end
 
-        if closure.Blocked then
+        if hook.Blocked then
             log:PlayBlock()
         else
             log:PlayNormal()
@@ -736,15 +741,15 @@ end)
 
 blockContextSelected:SetCallback(function()
     for _i, log in pairs(selected.logs) do
-        local closure = log.Hook
+        local hook = log.Hook
 
-        if closure.Blocked then
-            closure:Block()
+        if not hook.Blocked then
+            hook:Block()
         end
 
-        if closure.Blocked then
+        if hook.Blocked then
             log:PlayBlock()
-        elseif closure.Ignored then
+        elseif hook.Ignored then
             log:PlayIgnore()
         end
     end
@@ -754,11 +759,13 @@ end)
 
 unblockContextSelected:SetCallback(function()
     for _i, log in pairs(selected.logs) do
-        local closure = log.Hook
+        local hook = log.Hook
 
-        closure:Unblock()
+        if hook.Blocked then
+            hook:Block()
+        end
 
-        if closure.Ignored then
+        if hook.Ignored then
             log:PlayIgnore()
         else
             log:PlayNormal()
@@ -837,7 +844,7 @@ Methods.SetEvent(function(hook, call)
     setContext(7)
 
     if not removed[hook] then
-        local log = hookLogs[hook] or Log.new(hook)
+        local log = currentLogs[hook] or Log.new(hook)
         log:IncrementCalls(call)
     end
     
