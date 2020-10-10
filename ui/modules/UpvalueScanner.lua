@@ -177,7 +177,6 @@ local function addUpvalue(upvalue, temporary)
     
     upvalueLog.Name = index
     upvalueLog.Index.Text = index
-    upvalueLog.Value.Text = toString(value)
     upvalueLog.Value.TextColor3 = oh.Constants.Syntax[valueType]
     upvalueLog.Icon.Image = oh.Constants.Types[valueType]
 
@@ -200,7 +199,7 @@ local function updateUpvalue(closureLog, upvalue)
     local upvalueLog = closureLog.Instance.Upvalues[tostring(upvalue.Index)]
     local closure = upvalue.Closure
     local index = upvalue.Index
-    local newValue = getUpvalue(closure.Data, index)
+    local newValue = getUpvalue(closure, index)
     local valueType = type(newValue)
 
     if valueType == "function" then
@@ -282,28 +281,26 @@ local function addUpvalues()
         end
 
         local unnamedFunctions = {}
-        local results = 0
+        local showResultLabel = false
 
         upvalueList:Clear()
         currentUpvalues = {}
 
         for _i, closure in pairs(Methods.Scan(query, deepSearchFlag)) do
-            local closureData = closure.Data
-
-            if getInfo(closureData).name == '' then
-                unnamedFunctions[closureData] = closure
+            if closure.Name == '' then
+                unnamedFunctions[closure.Data] = closure
             else
                 Log.new(closure)
             end
 
-            results = results + 1
+            showResultLabel = true
         end
 
         for _i, closure in pairs(unnamedFunctions) do
             Log.new(closure)
         end
 
-        ResultStatus.Visible = results ~= 0
+        ResultStatus.Visible = showResultLabel
 
         upvalueList:Recalculate()
     else
@@ -513,7 +510,6 @@ viewUpvaluesContext:SetCallback(function()
         local newHeight = 0
 
         if temporaryUpvalues then
-
             for _i, upvalueLog in pairs(temporaryUpvalues) do
                 newHeight = newHeight - (upvalueLog.AbsoluteSize.Y + 5)
                 upvalueLog:Destroy()
@@ -526,7 +522,7 @@ viewUpvaluesContext:SetCallback(function()
             
             temporaryUpvalues = {}
 
-            for i,v in pairs(getUpvalues(closure.Data)) do
+            for i,v in pairs(getUpvalues(closure)) do
                 if not closure.Upvalues[i] then
                     local upvalue = Upvalue.new(closure, i, v)
                     

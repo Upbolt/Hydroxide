@@ -31,36 +31,35 @@ local function setEvent(callback)
 end
 
 local Hook = {}
-local hookMap = {}
-local hookCache = {}
+hookCache = {}
 
 function Hook.new(closure)
     local hook = {}
+    local data = closure.Data
 
-    local closureData = closure.Data
-    local original
-    
-    if getInfo(closureData).nups < 2 then
+    if getInfo(closureData).nups < 1 then
         return
     elseif hookCache[closureData] or table.find(oh.Hooks, closureData) then
         return false
     end
 
-    original = hookFunction(closureData, function(...)
+    local wrap = { hook, data }
+    hookMap[data] = hookFunction(closureData, function(...)
         local vargs = {...}
+        local uHook = wrap[1]
+        local uData = wrap[2]
 
-        if not hook.Ignored and not hook:AreArgsIgnored(vargs) then
-            log(hook, getCallingScript(), ...)
+        if not uHook.Ignored and not uHook:AreArgsIgnored(vargs) then
+            log(uHook, getCallingScript(), ...)
         end
         
-        if not hook.Blocked and not hook:AreArgsBlocked(vargs) then
-            return original(...)
+        if not uHook.Blocked and not uHook:AreArgsBlocked(vargs) then
+            return hookCache[uData](...)
         end
     end)
 
-    closure.Data = original
-    
-    hook.Original = original
+    closure.Data = hookMap[data]
+
     hook.Closure = closure
     hook.Calls = 0
     hook.Logs = {}
@@ -73,24 +72,17 @@ function Hook.new(closure)
     hook.BlockedArgs = {}
     hook.IgnoredArgs = {}
     hook.AreArgsBlocked = Hook.areArgsBlocked
-    hook.AreArgsIgnored = Hook.areArgsIgnored 
+    hook.AreArgsIgnored = Hook.areArgsIgnored
     hook.IncrementCalls = Hook.incrementCalls
     hook.DecrementCalls = Hook.decrementCalls
 
-    oh.Hooks[original] = closureData
-    hookCache[closureData] = hook
+    hookCache[data] = hook
 
     return hook
 end
 
 function Hook.remove(hook)
-    local closure = hook.Closure
-    local original = hook.Original
-
-    hookMap[original] = nil
-
-    hookfunction(closure.Data, original)
-    closure.Data = original
+    hookMap[hook.Closure.Data] = nil
 end
 
 function Hook.clear(hook)

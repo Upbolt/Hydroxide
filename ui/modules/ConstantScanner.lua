@@ -8,6 +8,8 @@ if not hasMethods(Methods.RequiredMethods) then
     return ConstantScanner
 end
 
+local Constant = import("objects/Constant")
+
 local List, ListButton = import("ui/controls/List")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 local ContextMenu, ContextMenuButton = import("ui/controls/ContextMenu")
@@ -27,27 +29,49 @@ local selectedLog
 local spyClosureContext = ContextMenuButton.new("rbxassetid://4666593447", "Spy Closure")
 local viewConstantsContext = ContextMenuButton.new("rbxassetid://5179169654", "View All Constants")
 
+local constants = {
+    tempConstantColor = Color3.fromRGB(40, 20, 20),
+    tempBorderColor = Color3.fromRGB(20, 0, 0)
+}
+
 constantList:BindContextMenu(ContextMenu.new({ spyClosureContext, viewConstantsContext }))
 
-spyClosureContext:SetCallback(function()
-    local selectedClosure = selectedLog.Closure
+local function addConstant(constant, temporary)
+    local constantLog = Assets.Constant:Clone()
+    local index = constant.Index
+    local value = constant.Value
+    local valueType = type(value)
+    local valueText = toString(value)
 
-    if TabSelector.SelectTab("ClosureSpy") then
-        local result = ClosureSpy.SpyClosure(selectedClosure)
-
-        if result == false then
-            MessageBox.Show("Already hooked", "You are already spying " .. selectedClosure.Name)
-        elseif result == nil then
-            MessageBox.Show("Cannot hook", ('Cannot hook "%s" because there are no upvalues'):format(selectedClosure.Name))
-        end
+    if temporary then
+        constantLog.ImageColor3 = constants.tempConstantColor
+        constantLog.Border.ImageColor3 = constants.tempBorderColor
     end
-end)
+
+    if valueType == "function" then
+        local closureName = getInfo(value).name or ''
+        constantLog.Value.Text = (closureName == '' and "Unnamed function") or closureName
+    else
+        constantLog.Value.Text = toString(value)
+    end
+
+    constantLog.Name = index
+    constantLog.Index.Text = index
+    constantLog.Value.TextColor3 = oh.Constants.Syntax[valueType]
+    constantLog.Icon.Image = oh.Constants.Types[valueType]
+
+    -- constantLog.MouseButton1Click:Connect(function()
+    --     selectedConstant = constant
+    --     selectedConstantLog = constantLog
+    -- end)
+
+    return constantLog
+end
 
 -- Log Object
-
 local Log = {}
 
-function Log.new(closureData, closure)
+function Log.new(closure)
     local log = {}
     local button = Assets.ClosureLog:Clone()
     local listButton = ListButton.new(button, constantList) 
@@ -55,22 +79,7 @@ function Log.new(closureData, closure)
     local logHeight = 30
 
     for _i, constant in pairs(constants) do
-        local constantLog = Assets.Constant:Clone()
-        local value = constant.Value
-        local valueType = type(value)
-        local valueColor = oh.Constants.Syntax[valueType]
-
-        if valueType == "function" then
-            local name = getInfo(value).name or ''
-            value = (name == '' and "Unnamed function") or name
-            valueColor = Color3.fromRGB(127, 127, 127)
-        end
-
-        constantLog.Name = constant.Index
-        constantLog.Icon.Image = oh.Constants.Types[valueType]
-        constantLog.Index.Text = constant.Index
-        constantLog.Value.Text = toString(value)
-        constantLog.Value.TextColor3 = valueColor
+        local constantLog = addConstant(constant)
         constantLog.Parent = button.Constants
 
         logHeight = logHeight + constantLog.AbsoluteSize.Y + 5
@@ -87,7 +96,7 @@ function Log.new(closureData, closure)
         selectedLog = log
     end)
 
-    constantLogs[closureData] = log
+    constantLogs[closure.Data] = log
 
     log.Closure = closure
     log.Constants = constants
@@ -96,7 +105,6 @@ function Log.new(closureData, closure)
 end
 
 -- UI Functinoality
-
 local function addConstants()
     local query = SearchBox.Text
 
@@ -108,8 +116,8 @@ local function addConstants()
         constantList:Clear()
         constantLogs = {}
 
-        for closureData, closure in pairs(Methods.Scan(query)) do
-            Log.new(closureData, closure)
+        for _i, closure in pairs(Methods.Scan(query)) do
+            Log.new(closure)
         end
 
         constantList:Recalculate()
@@ -119,6 +127,64 @@ local function addConstants()
 
     SearchBox.Text = ''
 end
+
+spyClosureContext:SetCallback(function()
+    local selectedClosure = selectedLog.Closure
+
+    if TabSelector.SelectTab("ClosureSpy") then
+        local result = ClosureSpy.SpyClosure(selectedClosure)
+
+        if result == false then
+            MessageBox.Show("Already hooked", "You are already spying " .. selectedClosure.Name)
+        elseif result == nil then
+            MessageBox.Show("Cannot hook", ('Cannot hook "%s" because there are no upvalues'):format(selectedClosure.Name))
+        end
+    end
+end)
+
+viewConstantsContext:SetCallback(function()
+    if selectedLog then
+        local temporaryConstants = selectedLog.TemporaryConstants 
+        local instance = selectedLog.Button.Instance
+        local newHeight = 0
+
+        if temporaryConstants then
+            for _i, constantLog in pairs(temporaryConstants) do
+                newHeight = newHeight - (constantLog.AbsoluteSize.Y + 5)
+                constantLog:Destroy()
+            end
+
+            selectedLog.TemporaryConstants = nil
+            selectedLog.Closure.TemporaryConstants = {}
+        else
+            local closure = selectedLog.Closure
+
+            temporaryConstants = {}
+
+            for i,v in pairs(getConstants(closure.Data)) do
+                if not closure.Constants[i] then
+                    local constant = Constant.new(closure, i, v) 
+
+                    local constantLog = addConstant(constant, true)
+                    constantLog.Parent = instance.Constants
+                    
+                    newHeight = newHeight + constantLog.AbsoluteSize.Y + 5
+                    temporaryConstants[i] = constantLog
+                    closure.TemporaryConstants[i] = constant
+                end
+            end
+
+            selectedLog.TemporaryConstants = temporaryConstants
+        end
+
+        newHeight = UDim2.new(0, 0, 0, newHeight)
+
+        instance.Constants.Size = instance.Constants.Size + newHeight
+        instance.Size = instance.Size + newHeight
+
+        constantList:Recalculate()
+    end
+end)
 
 Search.MouseButton1Click:Connect(addConstants)
 SearchBox.FocusLost:Connect(function(returned)

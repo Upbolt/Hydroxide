@@ -8,15 +8,6 @@ local web = true
 local user = "Upbolt" -- change if you're using a fork
 local importCache = {}
 
--- local read, result = pcall(readfile, "ohaux.lua")
--- if web and read and readfile then
---     local webAux = game:HttpGetAsync('https://raw.githubusercontent.com/Upbolt/Hydroxide/revision/ohaux.lua')
-
---     if not read or webAux ~= result then
---         writefile("ohaux.lua", webAux)
---     end
--- end
-
 local function import(asset)
     if importCache[asset] then
         return unpack(importCache[asset])
@@ -91,6 +82,25 @@ if PROTOSMASHER_LOADED ~= nil then
     globalMethods.getConstant = function(closure, index)
         return globalMethods.getConstants(closure)[index]
     end
+end
+
+local oldGetUpvalue = globalMethods.getUpvalue
+local oldGetUpvalues = globalMethods.getUpvalues
+
+globalMethods.getUpvalue = function(closure, index)
+    if type(closure) == "table" then
+        return oldGetUpvalue(closure.Data, index)
+    end
+
+    return oldGetUpvalue(closure, index)
+end
+
+globalMethods.getUpvalues = function(closure)
+    if type(closure) == "table" then
+        return oldGetUpvalues(closure.Data)
+    end
+
+    return oldGetUpvalues(closure)
 end
 
 environment.import = import
