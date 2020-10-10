@@ -13,6 +13,7 @@ webImport("ui/main")
 
 # Hydroxide
 <i>General purpose pen-testing tool for games on the Roblox engine</i>
+Report issues to our Discord server: https://discord.gg/DJxBwAX
 
 <p align="center">
     <img src="https://cdn.discordapp.com/attachments/633472429917995038/722143730500501534/Hydroxide_Logo.png"/>
