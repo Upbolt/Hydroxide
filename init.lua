@@ -75,7 +75,7 @@ local globalMethods = {
     setReadOnly = setreadonly or (make_writeable and function(table, readonly) if readonly then make_readonly(table) else make_writeable(table) end end),
     isLClosure = islclosure or is_l_closure or (iscclosure and function(closure) return not iscclosure(closure) end),
     isReadOnly = isreadonly or is_readonly,
-    isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure,
+    isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or iselectronfunction or checkclosure,
 }
 
 if PROTOSMASHER_LOADED ~= nil then
