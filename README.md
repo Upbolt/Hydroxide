@@ -47,12 +47,7 @@ Report issues to our Discord server: https://discord.gg/DJxBwAX
 More to come, soon.
 
 ## Images/Videos
-### Upvalue Scanner
 <p align="center">
     <img src="https://i.gyazo.com/63afdd764cdca533af5ebca843217a7e.gif" />
 </p>
 
-### Remote Spy
-<p align="center">
-    <img src="https://i.gyazo.com/aed8690c3161468ca9a3156dfdb665e2.gif" />
-</p>
