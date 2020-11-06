@@ -55,7 +55,7 @@ local globalMethods = {
     getMenv = getmenv or getsenv,
     getContext = getthreadcontext or get_thread_context or (syn and syn.get_thread_identity),
     getConnections = get_signal_cons or getconnections,
-    getScriptClosure = nil, -- (removed until exploits fix) get_script_function or getscriptclosure,
+    getScriptClosure = getscriptclosure, -- or get_script_function,
     getNamecallMethod = getnamecallmethod or get_namecall_method,
     getCallingScript = getcallingscript or get_calling_script,
     getLoadedModules = getloadedmodules or get_loaded_modules,
@@ -75,7 +75,7 @@ local globalMethods = {
     setReadOnly = setreadonly or (make_writeable and function(table, readonly) if readonly then make_readonly(table) else make_writeable(table) end end),
     isLClosure = islclosure or is_l_closure or (iscclosure and function(closure) return not iscclosure(closure) end),
     isReadOnly = isreadonly or is_readonly,
-    isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or checkclosure,
+    isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or iselectronfunction or checkclosure,
 }
 
 if PROTOSMASHER_LOADED ~= nil then
