@@ -78,8 +78,8 @@ local function userdataValue(data)
     elseif dataType == "ColorSequenceKeypoint" then
         return "ColorSequenceKeypoint.new(" .. data.Time .. ", Color3.new(" .. tostring(data.Value) .. "))"
     elseif dataType == "NumberSequenceKeypoint" then
-        local envelop = data.Envelop and data.Value .. ", " .. data.Envelop or data.Value
-        return "NumberSequenceKeypoint.new(" .. data.Time .. ", " .. envelop .. ")"
+        local envelope = data.Envelope and data.Value .. ", " .. data.Envelope or data.Value
+        return "NumberSequenceKeypoint.new(" .. data.Time .. ", " .. envelope .. ")"
     end
 
     return tostring(data)
