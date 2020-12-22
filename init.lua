@@ -45,6 +45,12 @@ local function useMethods(module)
     end
 end
 
+if htgetf and syn then
+    getgenv().getscriptclosure = nil
+elseif Window and PROTOSMASHER_LOADED then
+    getgenv().get_script_function = nil
+end
+
 local globalMethods = {
     checkCaller = checkcaller,
     newCClosure = newcclosure,
@@ -55,7 +61,7 @@ local globalMethods = {
     getMenv = getmenv or getsenv,
     getContext = getthreadcontext or get_thread_context or (syn and syn.get_thread_identity),
     getConnections = get_signal_cons or getconnections,
-    getScriptClosure = (not htgetf and getscriptclosure) or (not Window and get_script_function),
+    getScriptClosure = getscriptclosure and get_script_function,
     getNamecallMethod = getnamecallmethod or get_namecall_method,
     getCallingScript = getcallingscript or get_calling_script,
     getLoadedModules = getloadedmodules or get_loaded_modules,
