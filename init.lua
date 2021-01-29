@@ -45,9 +45,7 @@ local function useMethods(module)
     end
 end
 
-if htgetf and syn then
-    getgenv().getscriptclosure = nil
-elseif Window and PROTOSMASHER_LOADED then
+if Window and PROTOSMASHER_LOADED then
     getgenv().get_script_function = nil
 end
 
