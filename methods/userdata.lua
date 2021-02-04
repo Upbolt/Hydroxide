@@ -44,8 +44,9 @@ local function userdataValue(data)
         return toString(data)
     elseif dataType == "Instance" then
         return data.Name
+    elseif dataType == "BrickColor" then
+        return dataType .. ".new(\"" .. tostring(data) .. "\")"
     elseif
-        dataType == "BrickColor" or
         dataType == "TweenInfo" or
         dataType == "Vector3" or
         dataType == "Vector2" or
