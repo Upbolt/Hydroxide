@@ -1,5 +1,6 @@
 local CoreGui = game:GetService("CoreGui")
 local UserInput = game:GetService("UserInputService")
+local HttpService = game:GetService("HttpService")
 
 local Interface = import("rbxassetid://5042109928")
 
@@ -94,6 +95,7 @@ end)
 
 MessageBox.Show("Welcome to Hydroxide", "This is not a finished product", MessageType.OK)
 
+Interface.Name = HttpService:GenerateGUID(false)
 if PROTOSMASHER_LOADED ~= nil then
 	Interface.Parent = get_hidden_gui()
 else
