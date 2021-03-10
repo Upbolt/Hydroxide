@@ -96,7 +96,7 @@ end)
 MessageBox.Show("Welcome to Hydroxide", "This is not a finished product", MessageType.OK)
 
 Interface.Name = HttpService:GenerateGUID(false)
-if PROTOSMASHER_LOADED ~= nil then
+if get_hidden_gui then
 	Interface.Parent = get_hidden_gui()
 else
 	if syn then
