@@ -1,4 +1,4 @@
-local environment = assert(getgenv, "<OH> ~ Your exploit is not supported")()
+local environment = assert(getgenv, "<OH> ~ Your executor is not supported")()
 
 if oh then
 	oh.Exit()
