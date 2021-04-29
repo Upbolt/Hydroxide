@@ -20,7 +20,7 @@ local function compareUpvalue(query, upvalue, ignore)
 	if upvalueType == "userdata" then
 		if typeof(upvalueType) == "Instance" then
 			local instanceName = upvalue.Name
-			return (instanceName == query or instanceName:find(query))
+			return (instanceName == query or string.match(instanceName, query))
 		end
 
 		return toString(upvalue) == query
