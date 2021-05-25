@@ -173,29 +173,6 @@ environment.oh = {
     end
 }
 
-if getConnections then 
-    for __, connection in pairs(getConnections(game:GetService("ScriptContext").Error)) do
-
-        local conn = getrawmetatable(connection)
-        local old = conn.__index
-        if PROTOSMASHER_LOADED ~= nil then setWriteable(conn) else setReadOnly(conn, false) end
-        conn.__index = newcclosure(function(t, k)
-            if k == "Connected" then
-                return true
-            end
-            return old(t, k)
-        end)
-
-        if PROTOSMASHER_LOADED ~= nil then
-            setReadOnly(conn)
-            connection:Disconnect()
-        else
-            setReadOnly(conn, true)
-            connection:Disable()
-        end
-    end
-end
-
 useMethods(globalMethods)
 useMethods(import("methods/string"))
 useMethods(import("methods/table"))
