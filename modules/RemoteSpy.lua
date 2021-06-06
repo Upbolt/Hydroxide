@@ -73,11 +73,12 @@ gmt.__namecall = newCClosure(function(instance, ...)
         if eventSet and (not remoteIgnored and not argsIgnored) then
             local call = {
                 script = getCallingScript((PROTOSMASHER_LOADED ~= nil and 2) or nil),
-                args = vargs
+                args = vargs,
+                func = getInfo(2).func
             }
 
             remote.IncrementCalls(remote, call)
-            remoteDataEvent.Fire(remoteDataEvent, instance, call, getInfo(2).func)
+            remoteDataEvent.Fire(remoteDataEvent, instance, call)
         end
 
         if remoteBlocked or argsBlocked then
@@ -106,11 +107,12 @@ for _name, hook in pairs(methodHooks) do
             if eventSet and (not remoteIgnored and not argsIgnored) then
                 local call = {
                     script = getCallingScript((PROTOSMASHER_LOADED ~= nil and 2) or nil),
-                    args = vargs
+                    args = vargs,
+                    func = getInfo(2).func
                 }
     
                 remote:IncrementCalls(call)
-                remoteDataEvent:Fire(instance, call, getInfo(2).func)
+                remoteDataEvent:Fire(instance, call)
             end
 
             if remote.Blocked or remote:AreArgsBlocked(vargs) then
