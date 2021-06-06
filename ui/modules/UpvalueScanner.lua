@@ -25,8 +25,6 @@ local Assets = import("rbxassetid://5042114982").UpvalueScanner
 local Prompts = Base.Prompts
 local Page = Base.Body.Pages.UpvalueScanner
 
-local SpyHook = ClosureSpy.Hook
-
 local Query = Page.Query
 local Search = Query.Search
 local SearchBox = Query.Query
@@ -489,6 +487,7 @@ elementScriptContext:SetCallback(function()
     generateScript(selectedElement)
 end)
 
+local SpyHook = ClosureSpy.Hook
 spyClosureContext:SetCallback(function()
     local closure = selectedLog.Closure
 
