@@ -128,11 +128,12 @@ local function addConstants()
     SearchBox.Text = ''
 end
 
+local SpyHook = ClosureSpy.Hook
 spyClosureContext:SetCallback(function()
     local selectedClosure = selectedLog.Closure
 
     if TabSelector.SelectTab("ClosureSpy") then
-        local result = ClosureSpy.SpyClosure(selectedClosure)
+        local result = SpyHook.new(selectedClosure)
 
         if result == false then
             MessageBox.Show("Already hooked", "You are already spying " .. selectedClosure.Name)
