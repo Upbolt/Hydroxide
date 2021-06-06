@@ -887,7 +887,7 @@ local SpyHook = ClosureSpy.Hook
 spyClosureContext:SetCallback(function()
     if TabSelector.SelectTab("ClosureSpy") then
         local selectedClosure = Closure.new(selected.func)
-        local result = SpyHook.new(selected)
+        local result = SpyHook.new(selectedClosure)
 
         if result == false then
             MessageBox.Show("Already hooked", "You are already spying " .. selectedClosure.Name)
