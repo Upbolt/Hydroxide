@@ -3,6 +3,8 @@ local TweenService = game:GetService("TweenService")
 
 local RemoteSpy = {}
 local Methods = import("modules/RemoteSpy")
+local ClosureSpy = import("modules/ClosureSpy")
+local Closure = import("objects/Closure")
 
 if not hasMethods(Methods.RequiredMethods) then
     return RemoteSpy
@@ -14,6 +16,7 @@ local Dropdown = import("ui/controls/Dropdown")
 local List, ListButton = import("ui/controls/List")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 local ContextMenu, ContextMenuButton = import("ui/controls/ContextMenu")
+local TabSelector = import("ui/controls/TabSelector")
 
 local Base = import("rbxassetid://5042109928").Base
 local Assets = import("rbxassetid://5042114982").RemoteSpy
@@ -373,9 +376,9 @@ local function createArg(instance, index, value)
     return arg.AbsoluteSize.Y + 5
 end
 
-function ArgsLog.new(log, call)
+function ArgsLog.new(log, callInfo)
     local instance = Assets.CallPod:Clone()
-    local args = call.args
+    local args = callInfo.args
 
     if selected.remoteLog ~= log then
         instance.Visible = false
@@ -394,8 +397,9 @@ function ArgsLog.new(log, call)
     end
 
     button:SetRightCallback(function()
-        selected.args = call.args
-        selected.callingScript = call.script
+        selected.args = callInfo.args
+        selected.callingScript = callInfo.script
+        selected.func = callInfo.func
     end)
 
     button.Instance.Size = button.Instance.Size + UDim2.new(0, 0, 0, height)
@@ -443,7 +447,7 @@ function Log.clear(log)
     log:Adjust()
 end
 
-function Log.incrementCalls(log, call)
+function Log.incrementCalls(log, callInfo)
     local buttonInstance = log.Button.Instance
     local remote = log.Remote
     local calls = remote.Calls
@@ -453,7 +457,7 @@ function Log.incrementCalls(log, call)
     log:Adjust()
     
     if selected.remoteLog == log then
-        ArgsLog.new(log, call)
+        ArgsLog.new(log, callInfo)
         remoteLogs:Recalculate()
     end
 end
@@ -879,6 +883,20 @@ callingScriptContext:SetCallback(function()
     oh.setStatus(oldStatus)
 end)
 
+local SpyHook = ClosureSpy.Hook
+spyClosureContext:SetCallback(function()
+    if TabSelector.SelectTab("ClosureSpy") then
+        local selectedClosure = Closure.new(selected.func)
+        local result = SpyHook.new(selected)
+
+        if result == false then
+            MessageBox.Show("Already hooked", "You are already spying " .. selectedClosure.Name)
+        elseif result == nil then
+            MessageBox.Show("Cannot hook", ('Cannot hook "%s" because there are no upvalues'):format(selectedClosure.Name))
+        end
+    end
+end)
+
 repeatCallContext:SetCallback(function()
     local remoteInstance = selected.remoteLog.Remote.Instance
     local remoteClassName = remoteInstance.ClassName
@@ -942,12 +960,12 @@ conditionValueType:SetCallback(function(_dropdown, selected)
     icon.Border.Image = iconCondition
 end)
 
-Methods.ConnectEvent(function(remoteInstance, vargs)
+Methods.ConnectEvent(function(remoteInstance, callInfo)
     if not removed[remoteInstance] then
         local remote = currentRemotes[remoteInstance]
         local log = currentLogs[remoteInstance] or Log.new(remote)
 
-        log:IncrementCalls(vargs)
+        log:IncrementCalls(callInfo)
     end
 end)
 
