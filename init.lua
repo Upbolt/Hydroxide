@@ -121,8 +121,8 @@ environment.oh = {
             number = "rbxassetid://4666593882",
             boolean = "rbxassetid://4666593882",
             userdata = "rbxassetid://4666594723",
+            vector = "rbxassetid://4666594723",
             ["function"] = "rbxassetid://4666593447",
-
             ["integral"] = "rbxassetid://4666593882"
         },
         Syntax = {
@@ -132,6 +132,7 @@ environment.oh = {
             number = Color3.fromRGB(170, 225, 127),
             boolean = Color3.fromRGB(127, 200, 255),
             userdata = Color3.fromRGB(225, 225, 225),
+            vector = Color3.fromRGB(225, 225, 225),
             ["function"] = Color3.fromRGB(225, 225, 225),
             ["unnamed_function"] = Color3.fromRGB(175, 175, 175)
         }
