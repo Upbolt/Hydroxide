@@ -80,6 +80,7 @@ local globalMethods = {
     isLClosure = islclosure or is_l_closure or (iscclosure and function(closure) return not iscclosure(closure) end),
     isReadOnly = isreadonly or is_readonly,
     isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or iselectronfunction or checkclosure,
+	identifyexecutor = identifyexecutor
 }
 
 if PROTOSMASHER_LOADED ~= nil then
