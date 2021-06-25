@@ -12,6 +12,7 @@ local requiredMethods = {
     ["setClipboard"] = true,
     ["getNamecallMethod"] = true,
     ["getCallingScript"] = true,
+	["identifyexecutor"] = true
 }
 
 local remoteMethods = {
@@ -55,7 +56,7 @@ end
 
 setReadOnly(gmt, false)
 
-gmt.__namecall = newCClosure(function(instance, ...)
+local function namecallFunction(instance, ...)
     if not checkCaller() and remotesViewing[instance.ClassName] and instance ~= remoteDataEvent and remoteMethods[getNamecallMethod()] then
         local remote = currentRemotes[instance]
         local vargs = {...}
@@ -86,7 +87,14 @@ gmt.__namecall = newCClosure(function(instance, ...)
     end
 
     return nmc(instance, ...)
-end)
+end
+
+if identifyexecutor() == "ScriptWare" then
+	local old
+	old = hookfunction(gmt.__namecall, function(...) namecallFunction(...) end)
+elseif syn then
+	gmt.__namecall = namecallFunction
+end
 
 for _name, hook in pairs(methodHooks) do
     local originalMethod
