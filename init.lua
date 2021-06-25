@@ -1,4 +1,4 @@
-local environment = assert(getgenv, "<OH> ~ Your exploit is not supported")()
+local environment = assert(getgenv, "<OH> ~ Your exploit is not supported")
 
 if oh then
     oh.Exit()
@@ -29,7 +29,7 @@ end
 
 local function hasMethods(methods)
     for name in pairs(methods) do
-        if not environment[name] then
+        if not environment()[name] then
             return false
         end
     end
@@ -40,7 +40,7 @@ end
 local function useMethods(module)
     for name, method in pairs(module) do
         if method then
-            environment[name] = method
+            environment()[name] = method
         end
     end
 end
@@ -79,8 +79,7 @@ local globalMethods = {
     setReadOnly = setreadonly or (make_writeable and function(table, readonly) if readonly then make_readonly(table) else make_writeable(table) end end),
     isLClosure = islclosure or is_l_closure or (iscclosure and function(closure) return not iscclosure(closure) end),
     isReadOnly = isreadonly or is_readonly,
-    isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or iselectronfunction or checkclosure,
-	identifyexecutor = identifyexecutor
+    isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or iselectronfunction or checkclosure
 }
 
 if PROTOSMASHER_LOADED ~= nil then
@@ -108,9 +107,9 @@ globalMethods.getUpvalues = function(closure)
     return oldGetUpvalues(closure)
 end
 
-environment.import = import
-environment.hasMethods = hasMethods
-environment.oh = {
+environment().import = import
+environment().hasMethods = hasMethods
+environment().oh = {
     Events = {},
     Hooks = {},
     Methods = globalMethods,
