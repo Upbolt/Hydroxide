@@ -1,11 +1,11 @@
-local environment = assert(getgenv, "<OH> ~ Your exploit is not supported")()
+local environment = assert(getgenv, "<OH> ~ Your exploit is not supported")
 
 if oh then
     oh.Exit()
 end
 
 local web = true
-local user = "Upbolt" -- change if you're using a fork
+local user = "CandyWirus" -- change if you're using a fork
 local importCache = {}
 
 local function import(asset)
@@ -29,7 +29,7 @@ end
 
 local function hasMethods(methods)
     for name in pairs(methods) do
-        if not environment[name] then
+        if not environment()[name] then
             return false
         end
     end
@@ -40,7 +40,7 @@ end
 local function useMethods(module)
     for name, method in pairs(module) do
         if method then
-            environment[name] = method
+            environment()[name] = method
         end
     end
 end
@@ -80,6 +80,7 @@ local globalMethods = {
     isLClosure = islclosure or is_l_closure or (iscclosure and function(closure) return not iscclosure(closure) end),
     isReadOnly = isreadonly or is_readonly,
     isXClosure = is_synapse_function or issentinelclosure or is_protosmasher_closure or is_sirhurt_closure or iselectronfunction or checkclosure,
+	identifyexecutor = identifyexecutor
 }
 
 if PROTOSMASHER_LOADED ~= nil then
@@ -107,9 +108,9 @@ globalMethods.getUpvalues = function(closure)
     return oldGetUpvalues(closure)
 end
 
-environment.import = import
-environment.hasMethods = hasMethods
-environment.oh = {
+environment().import = import
+environment().hasMethods = hasMethods
+environment().oh = {
     Events = {},
     Hooks = {},
     Methods = globalMethods,
@@ -173,29 +174,6 @@ environment.oh = {
         end
     end
 }
-
-if getConnections then 
-    for __, connection in pairs(getConnections(game:GetService("ScriptContext").Error)) do
-
-        local conn = getrawmetatable(connection)
-        local old = conn.__index
-        if PROTOSMASHER_LOADED ~= nil then setWriteable(conn) else setReadOnly(conn, false) end
-        conn.__index = newcclosure(function(t, k)
-            if k == "Connected" then
-                return true
-            end
-            return old(t, k)
-        end)
-
-        if PROTOSMASHER_LOADED ~= nil then
-            setReadOnly(conn)
-            connection:Disconnect()
-        else
-            setReadOnly(conn, true)
-            connection:Disable()
-        end
-    end
-end
 
 useMethods(globalMethods)
 useMethods(import("methods/string"))
