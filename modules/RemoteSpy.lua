@@ -56,7 +56,7 @@ end
 setReadOnly(gmt, false)
 
 gmt.__namecall = newCClosure(function(instance, ...)
-    if not checkCaller() and remotesViewing[instance.ClassName] and instance ~= remoteDataEvent and remoteMethods[getNamecallMethod()] then
+    if remotesViewing[instance.ClassName] and instance ~= remoteDataEvent and remoteMethods[getNamecallMethod()] then
         local remote = currentRemotes[instance]
         local vargs = {...}
 
@@ -92,7 +92,7 @@ end)
 for _name, hook in pairs(methodHooks) do
     local originalMethod
     originalMethod = hookFunction(hook, newCClosure(function(instance, ...)
-        if not checkCaller() and remotesViewing[instance.ClassName] and instance ~= remoteDataEvent then
+        if remotesViewing[instance.ClassName] and instance ~= remoteDataEvent then
             local remote = currentRemotes[instance]
             local vargs = {...}
 
