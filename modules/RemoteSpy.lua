@@ -56,7 +56,7 @@ end
 setReadOnly(gmt, false)
 
 local nmcTrampoline
-nmcTrampoline = hookfunction(gmt.__namecall, function(...)
+nmcTrampoline = hookMetaMethod(game, "__namecall", function(...)
     local instance = ...
     
     if remotesViewing[instance.ClassName] and instance ~= remoteDataEvent and remoteMethods[getNamecallMethod()] then
