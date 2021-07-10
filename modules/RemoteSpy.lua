@@ -55,11 +55,16 @@ end
 
 setReadOnly(gmt, false)
 
-gmt.__namecall = newCClosure(function(instance, ...)
+local nmcTrampoline
+nmcTrampoline = hookfunction(gmt.__namecall, function(...)
+    local instance = ...
+    
     if remotesViewing[instance.ClassName] and instance ~= remoteDataEvent and remoteMethods[getNamecallMethod()] then
         local remote = currentRemotes[instance]
         local vargs = {...}
 
+        table.remove(vargs, 1)
+            
         if not remote then
             remote = Remote.new(instance)
             currentRemotes[instance] = remote
@@ -86,7 +91,7 @@ gmt.__namecall = newCClosure(function(instance, ...)
         end
     end
 
-    return nmc(instance, ...)
+    return nmcTrampoline(...)
 end)
 
 for _name, hook in pairs(methodHooks) do
