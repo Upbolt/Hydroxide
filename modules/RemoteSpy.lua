@@ -37,11 +37,6 @@ local methodHooks = {
 
 local currentRemotes = {}
 
-local gmt = getMetatable(game)
-local nmc = gmt.__namecall
-
-oh.Namecall = nmc
-
 local remoteDataEvent = Instance.new("BindableEvent")
 local eventSet = false
 
@@ -52,8 +47,6 @@ local function connectEvent(callback)
         eventSet = true
     end
 end
-
-setReadOnly(gmt, false)
 
 local nmcTrampoline
 nmcTrampoline = hookMetaMethod(game, "__namecall", function(...)
