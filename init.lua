@@ -152,16 +152,6 @@ environment.oh = {
             end
         end
 
-        local gmt = getrawmetatable(game)
-
-        if isReadOnly(gmt) then
-            setReadOnly(gmt, false) 
-        end
-
-        if oh.Namecall then
-            gmt.__namecall = oh.Namecall
-        end
-
         local ui = importCache["rbxassetid://5042109928"]
         local assets = importCache["rbxassetid://5042114982"]
 
