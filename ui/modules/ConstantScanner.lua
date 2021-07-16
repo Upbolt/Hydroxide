@@ -28,13 +28,14 @@ local selectedLog
 
 local spyClosureContext = ContextMenuButton.new("rbxassetid://4666593447", "Spy Closure")
 local viewConstantsContext = ContextMenuButton.new("rbxassetid://5179169654", "View All Constants")
+local getScriptContext = ContextMenuButton.new("rbxassetid://5179169654", "View All Constants")
 
 local constants = {
     tempConstantColor = Color3.fromRGB(40, 20, 20),
     tempBorderColor = Color3.fromRGB(20, 0, 0)
 }
 
-constantList:BindContextMenu(ContextMenu.new({ spyClosureContext, viewConstantsContext }))
+constantList:BindContextMenu(ContextMenu.new({ spyClosureContext, viewConstantsContext, getScriptContext }))
 
 local function addConstant(constant, temporary)
     local constantLog = Assets.Constant:Clone()
@@ -184,6 +185,16 @@ viewConstantsContext:SetCallback(function()
         instance.Size = instance.Size + newHeight
 
         constantList:Recalculate()
+    end
+end)
+
+getScriptContext:SetCallback(function()
+    if selectedLog then
+        local script = getfenv(selectedLog.Closure.Data).script
+            
+        if typeof(script) == "Instance" then
+            setClipboard(getInstancePath(script))
+        end
     end
 end)
 
