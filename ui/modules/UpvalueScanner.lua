@@ -54,8 +54,9 @@ local changeElementContext = ContextMenuButton.new("rbxassetid://5458573463", "C
 local upvalueScriptContext = ContextMenuButton.new("rbxassetid://4800244808", "Generate Script")
 local tableScriptContext = ContextMenuButton.new("rbxassetid://4800244808", "Generate Script")
 local elementScriptContext = ContextMenuButton.new("rbxassetid://4800244808", "Generate Script")
+local getScriptContext = ContextMenuButton.new("rbxassetid://4800244808", "Get Script Path")
 
-local closureContextMenu = ContextMenu.new({ spyClosureContext, viewUpvaluesContext })
+local closureContextMenu = ContextMenu.new({ spyClosureContext, viewUpvaluesContext, getScriptContext })
 local tableContextMenu = ContextMenu.new({ changeTableContext, viewElementsContext, tableScriptContext })
 local upvalueContextMenu = ContextMenu.new({ changeUpvalueContext, upvalueScriptContext })
 local elementContextMenu = ContextMenu.new({ changeElementContext, elementScriptContext })
@@ -547,6 +548,16 @@ viewUpvaluesContext:SetCallback(function()
         instance.Size = instance.Size + newHeight
 
         upvalueList:Recalculate()
+    end
+end)
+
+getScriptContext:SetCallback(function()
+    if selectedLog then
+        local script = getfenv(selectedLog.Closure.Data).script
+            
+        if typeof(script) == "Instance" then
+            setClipboard(getInstancePath(script))
+        end
     end
 end)
 
