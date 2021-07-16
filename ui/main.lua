@@ -96,8 +96,8 @@ end)
 MessageBox.Show("Welcome to Hydroxide", "This is not a finished product", MessageType.OK)
 
 Interface.Name = HttpService:GenerateGUID(false)
-if get_hidden_gui then
-	Interface.Parent = get_hidden_gui()
+if getHui then
+	Interface.Parent = getHui()
 else
 	if syn then
 		syn.protect_gui(Interface)
