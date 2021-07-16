@@ -71,6 +71,7 @@ local globalMethods = {
     getUpvalue = debug.getupvalue or getupvalue or getupval,
     getProto = debug.getproto or getproto,
     getMetatable = getrawmetatable or debug.getmetatable,
+    getHui = get_hidden_gui or gethui,
     setClipboard = setclipboard or writeclipboard,
     setConstant = debug.setconstant or setconstant or setconst,
     setContext = setthreadcontext or set_thread_context or (syn and syn.set_thread_identity),
