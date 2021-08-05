@@ -452,8 +452,10 @@ local function generateScript(elementIndex)
     local currentConstants = {}
     local currentIndex = 0
 
-    if not closureScript.Parent then
-        closureScript = nil
+    if closureScript then
+        if not closureScript.Parent then
+            closureScript = nil
+        end
     end
 
     for idx, constant in pairs(getConstants(closureData)) do
