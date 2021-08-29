@@ -87,9 +87,23 @@ nmcTrampoline = hookMetaMethod(game, "__namecall", function(...)
     return nmcTrampoline(...)
 end)
 
+-- vuln fix
+
+local pcall = pcall
+
+local function checkPermission(instance)
+    if (self.ClassName) then end
+end
+
 for _name, hook in pairs(methodHooks) do
     local originalMethod
     originalMethod = hookFunction(hook, newCClosure(function(instance, ...)
+
+        do
+            local success = pcall(checkPermission, instance)
+            if (not success) then return old(instance, ...) end
+        end
+
         if remotesViewing[instance.ClassName] and instance ~= remoteDataEvent then
             local remote = currentRemotes[instance]
             local vargs = {...}
