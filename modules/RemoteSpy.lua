@@ -92,7 +92,7 @@ end)
 local pcall = pcall
 
 local function checkPermission(instance)
-    if (self.ClassName) then end
+    if (instance.ClassName) then end
 end
 
 for _name, hook in pairs(methodHooks) do
@@ -101,7 +101,7 @@ for _name, hook in pairs(methodHooks) do
 
         do
             local success = pcall(checkPermission, instance)
-            if (not success) then return old(instance, ...) end
+            if (not success) then return originalMethod(instance, ...) end
         end
 
         if remotesViewing[instance.ClassName] and instance ~= remoteDataEvent then
