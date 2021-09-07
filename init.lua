@@ -4,6 +4,12 @@ if oh then
     oh.Exit()
 end
 
+local loadstring = loadstring 
+local pairs = pairs
+local unpack = unpack
+local type = type
+local getgenv = getgenv
+
 local web = true
 local user = "Upbolt" -- change if you're using a fork
 local importCache = {}
