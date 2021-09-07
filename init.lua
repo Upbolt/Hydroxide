@@ -84,7 +84,7 @@ local globalMethods = {
     hookMetaMethod = hookmetamethod or (hookfunction and function(object, method, hook) return hookfunction(getMetatable(object)[method], hook) end)
 }
 
-if PROTOSMASHER_LOADED ~= nil then
+if PROTOSMASHER_LOADED then
     globalMethods.getConstant = function(closure, index)
         return globalMethods.getConstants(closure)[index]
     end
