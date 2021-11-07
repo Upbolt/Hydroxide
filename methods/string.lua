@@ -33,6 +33,7 @@ local function dataToString(data)
 
     if dataType == "string" then
         return '"' .. data:gsub('"', '\\"')
+            :gsub('\\', "\\\\")
             :gsub('\n', "\\n")
             :gsub("\t", "\\t")
             :gsub('\f', '\\f')
