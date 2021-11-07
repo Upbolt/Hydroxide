@@ -222,13 +222,13 @@ if readFile and writeFile then
                     local file = (hasFolderFunctions and "hydroxide/user/" .. user .. '/' .. asset .. ".lua") or ("hydroxide-" .. user .. '-' .. asset:gsub('/', '-') .. ".lua")
                     local content
 
-                    if isFile and not isFile(file) then
+                    if (isFile and not isFile(file)) or not importCache[asset] then
                         content = game:HttpGetAsync("https://raw.githubusercontent.com/" .. user .. "/Hydroxide/" .. branch .. '/' .. asset .. ".lua")
                         writeFile(file, content)
                     else
                         local ran, result = pcall(readFile, file)
 
-                        if not ran then
+                        if (not ran) or not importCache[asset] then
                             content = game:HttpGetAsync("https://raw.githubusercontent.com/" .. user .. "/Hydroxide/" .. branch .. '/' .. asset .. ".lua")
                             writeFile(file, content)
                         else
