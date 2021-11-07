@@ -32,7 +32,12 @@ local function dataToString(data)
     local dataType = type(data)
 
     if dataType == "string" then
-        return '"' .. data:gsub('"', '\\"') .. '"'
+        return '"' .. data:gsub('"', '\\"')
+            :gsub('\n', "\\n")
+            :gsub("\t", "\\t")
+            :gsub('\f', '\\f')
+            :gsub('\r', '\\r')
+            :gsub('\v', '\\v') .. '"'
     elseif dataType == "table" then
         return tableToString(data)
     elseif dataType == "userdata" then
