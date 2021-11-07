@@ -369,7 +369,13 @@ local function createArg(instance, index, value)
 
     arg.Icon.Image = oh.Constants.Types[valueType]
     arg.Index.Text = index
-    arg.Label.Text = toString(value)
+    
+    if valueType == "table" then
+        arg.Label.Text = toString(value)
+    else
+        arg.Label.Text = dataToString(value)
+    end
+    
     arg.Label.TextColor3 = oh.Constants.Syntax[valueType]
     arg.Parent = instance.Contents
 
@@ -858,7 +864,7 @@ scriptContext:SetCallback(function()
             elseif valueType == "table" then
                 v = tableToString(v)
             elseif valueType == "string" then
-                v = '"' .. dataToString(v) .. '"'
+                v = dataToString(v)
             else
                 v = toString(v)
             end
