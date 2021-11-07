@@ -105,3 +105,5 @@ else
 
 	Interface.Parent = CoreGui
 end
+
+return Interface
