@@ -858,9 +858,9 @@ scriptContext:SetCallback(function()
             elseif valueType == "table" then
                 v = tableToString(v)
             elseif valueType == "string" then
-                v = '"' .. toString(v) .. '"'
+                v = '"' .. dataToString(v) .. '"'
             else
-                v = tostring(v)
+                v = toString(v)
             end
 
             script = script .. ("local oh%s%d = %s\n"):format(variableName, i, v) 
