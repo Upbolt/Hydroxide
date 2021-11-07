@@ -4,6 +4,10 @@ local HttpService = game:GetService("HttpService")
 
 local Interface = import("rbxassetid://5042109928")
 
+if oh.Cache["ui/main"] then
+	return Interface
+end
+
 import("ui/controls/TabSelector")
 local MessageBox, MessageType = import("ui/controls/MessageBox")
 

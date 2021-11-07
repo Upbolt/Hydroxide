@@ -100,6 +100,7 @@ environment.hasMethods = hasMethods
 environment.oh = {
     Events = {},
     Hooks = {},
+    Cache = importCache,
     Methods = globalMethods,
     Constants = {
         Types = {
