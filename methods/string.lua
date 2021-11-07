@@ -37,7 +37,9 @@ local function dataToString(data)
             :gsub("\t", "\\t")
             :gsub('\f', '\\f')
             :gsub('\r', '\\r')
-            :gsub('\v', '\\v') .. '"'
+            :gsub('\v', '\\v')
+            :gsub('\a', '\\a')
+            :gsub('\b', '\\b') .. '"'
     elseif dataType == "table" then
         return tableToString(data)
     elseif dataType == "userdata" then
