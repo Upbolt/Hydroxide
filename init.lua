@@ -259,7 +259,17 @@ if readFile and writeFile then
                 assets = { game:GetObjects(asset)[1] }
             elseif web then
                 local file = (hasFolderFunctions and "hydroxide/user/" .. user .. '/' .. asset .. ".lua") or ("hydroxide-" .. user .. '-' .. asset:gsub('/', '-') .. ".lua")
-                assets = { loadstring(readFile(file), asset .. '.lua')() }
+                local ran, result = pcall(readFile, file)
+                local content
+
+                if not ran then
+                    content = game:HttpGetAsync("https://raw.githubusercontent.com/" .. user .. "/Hydroxide/" .. branch .. '/' .. asset .. ".lua")
+                    writeFile(file, content)
+                else
+                    content = result
+                end
+
+                assets = { loadstring(content, asset .. '.lua')() }
             else
                 assets = { loadstring(readFile("hydroxide/" .. asset .. ".lua"), asset .. '.lua')() }
             end
