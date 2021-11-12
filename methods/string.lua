@@ -28,20 +28,24 @@ local function toString(value)
     end
 end
 
+local gsubCharacters = {
+    ["\""] = "\\\"",
+    ["\\"] = "\\\\",
+    ["\0"] = "\\0",
+    ["\n"] = "\\n",
+    ["\t"] = "\\t",
+    ["\f"] = "\\f",
+    ["\r"] = "\\r",
+    ["\v"] = "\\v",
+    ["\a"] = "\\a",
+    ["\b"] = "\\b"
+}
+
 local function dataToString(data)
     local dataType = type(data)
 
     if dataType == "string" then
-        return '"' .. data:gsub('"', '\\"')
-            :gsub('\\', "\\\\")
-            :gsub('\0', '\\0')
-            :gsub('\n', "\\n")
-            :gsub("\t", "\\t")
-            :gsub('\f', '\\f')
-            :gsub('\r', '\\r')
-            :gsub('\v', '\\v')
-            :gsub('\a', '\\a')
-            :gsub('\b', '\\b') .. '"'
+        return '"' .. data:gsub("[%c%z\\]", gsubCharacters) .. '"'
     elseif dataType == "table" then
         return tableToString(data)
     elseif dataType == "userdata" then
