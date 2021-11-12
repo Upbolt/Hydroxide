@@ -1,5 +1,12 @@
 local methods = {}
 
+local type = type
+local typeof = typeof
+local gsub = string.gsub
+local tostring = tostring
+local rawget = rawget
+local rawset = rawset
+
 local function toString(value)
     local dataType = typeof(value)
 
@@ -13,7 +20,7 @@ local function toString(value)
 
         rawset(mt, "__tostring", nil)
         
-        value = tostring(value):gsub((dataType == "userdata" and "userdata: ") or "table: ", '')
+        value = gsub(tostring(value), (dataType == "userdata" and "userdata: ") or "table: ", '')
         
         rawset(mt, "__tostring", __tostring)
 
@@ -45,7 +52,7 @@ local function dataToString(data)
     local dataType = type(data)
 
     if dataType == "string" then
-        return '"' .. data:gsub("[%c%z\\\"]", gsubCharacters) .. '"'
+        return '"' .. gsub(data, "[%c%z\\\"]", gsubCharacters) .. '"'
     elseif dataType == "table" then
         return tableToString(data)
     elseif dataType == "userdata" then
