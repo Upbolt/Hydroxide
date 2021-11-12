@@ -45,7 +45,7 @@ local function dataToString(data)
     local dataType = type(data)
 
     if dataType == "string" then
-        return '"' .. data:gsub("[%c%z\\]", gsubCharacters) .. '"'
+        return '"' .. data:gsub("[%c%z\\\"]", gsubCharacters) .. '"'
     elseif dataType == "table" then
         return tableToString(data)
     elseif dataType == "userdata" then
