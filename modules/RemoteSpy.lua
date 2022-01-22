@@ -52,6 +52,10 @@ local nmcTrampoline
 nmcTrampoline = hookMetaMethod(game, "__namecall", function(...)
     local instance = ...
     
+    if typeof(instance) ~= "Instance" then
+        return nmcTrampoline(...)
+    end
+        
     if remotesViewing[instance.ClassName] and instance ~= remoteDataEvent and remoteMethods[getNamecallMethod()] then
         local remote = currentRemotes[instance]
         local vargs = {...}
@@ -98,7 +102,10 @@ end
 for _name, hook in pairs(methodHooks) do
     local originalMethod
     originalMethod = hookFunction(hook, newCClosure(function(instance, ...)
-
+        if typeof(instance) ~= "Instance" then
+            return originalMethod(instance, ...)
+        end
+                
         do
             local success = pcall(checkPermission, instance)
             if (not success) then return originalMethod(instance, ...) end
