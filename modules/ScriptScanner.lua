@@ -18,9 +18,9 @@ local function scan(query)
         if type(v) == "function" and not isXClosure(v) then
             local script = rawget(getfenv(v), "script")
 
-            if typeof(script) == "Instance" and 
-                not scripts[script] and 
-                script:IsA("LocalScript") and 
+            if typeof(script) == "Instance" and
+                not scripts[script] and
+                script:IsA("LocalScript") and
                 script.Name:lower():find(query) and
                 getScriptClosure(script) and
                 pcall(function() getsenv(script) end)
