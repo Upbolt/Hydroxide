@@ -58,9 +58,7 @@ nmcTrampoline = hookMetaMethod(game, "__namecall", function(...)
         
     if remotesViewing[instance.ClassName] and instance ~= remoteDataEvent and remoteMethods[getNamecallMethod()] then
         local remote = currentRemotes[instance]
-        local vargs = {...}
-
-        table.remove(vargs, 1)
+        local vargs = {select(2, ...)}
             
         if not remote then
             remote = Remote.new(instance)
@@ -101,19 +99,21 @@ end
 
 for _name, hook in pairs(methodHooks) do
     local originalMethod
-    originalMethod = hookFunction(hook, newCClosure(function(instance, ...)
+    originalMethod = hookFunction(hook, newCClosure(function(...)
+        local instance = ...
+
         if typeof(instance) ~= "Instance" then
-            return originalMethod(instance, ...)
+            return originalMethod(...)
         end
                 
         do
             local success = pcall(checkPermission, instance)
-            if (not success) then return originalMethod(instance, ...) end
+            if (not success) then return originalMethod(...) end
         end
 
         if remotesViewing[instance.ClassName] and instance ~= remoteDataEvent then
             local remote = currentRemotes[instance]
-            local vargs = {...}
+            local vargs = {select(2, ...)}
 
             if not remote then
                 remote = Remote.new(instance)
@@ -139,7 +139,7 @@ for _name, hook in pairs(methodHooks) do
             end
         end
         
-        return originalMethod(instance, ...)
+        return originalMethod(...)
     end))
 
     oh.Hooks[originalMethod] = hook
