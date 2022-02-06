@@ -18,9 +18,8 @@ local requiredMethods = {
 local eventCallback
 
 -- Define as global function in order to reduce upvalue count in hooks
-function log(hook, callingScript, ...)
+function Log(hook, callingScript, ...)
     local vargs = {...}
-    
     if eventCallback and not hook:AreArgsIgnored(vargs) then
         local call = {
             script = callingScript,
@@ -38,7 +37,7 @@ end
 
 local Hook = {}
 local hookMap = {}
-hookCache = {}
+local hookCache = {}
 
 function Hook.new(closure)
     local hook = {}
@@ -57,7 +56,7 @@ function Hook.new(closure)
         local uData = wrap[2]
 
         if not uHook.Ignored and not uHook:AreArgsIgnored(vargs) then
-            log(uHook, getCallingScript(), ...)
+            Log(uHook, getCallingScript(), ...)
         end
 
         if not uHook.Blocked and not uHook:AreArgsBlocked(vargs) then

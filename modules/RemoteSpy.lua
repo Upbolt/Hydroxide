@@ -94,7 +94,7 @@ end)
 local pcall = pcall
 
 local function checkPermission(instance)
-    if (instance.ClassName) then end
+    return assert(instance.ClassName)
 end
 
 for _name, hook in pairs(methodHooks) do
