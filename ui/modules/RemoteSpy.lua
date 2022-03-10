@@ -102,6 +102,7 @@ local scriptContext = ContextMenuButton.new("rbxassetid://4800244808", "Generate
 local callingScriptContext = ContextMenuButton.new("rbxassetid://4800244808", "Get Calling Script")
 local spyClosureContext = ContextMenuButton.new("rbxassetid://4666593447", "Spy Calling Function")
 local repeatCallContext = ContextMenuButton.new("rbxassetid://4907151581", "Repeat Call")
+local viewAsHexContext = ContextMenuButton.new("rbxassetid://9058292613", "Toggle String Hex View")
 
 local removeConditionContext = ContextMenuButton.new("rbxassetid://4702831188", "Remove Condition")
 
@@ -117,7 +118,7 @@ local removeConditionContextSelected = ContextMenuButton.new("rbxassetid://47028
 
 local remoteListMenu = ContextMenu.new({ pathContext, conditionContext, clearContext, ignoreContext, blockContext, removeContext })
 local remoteListMenuSelected = ContextMenu.new({ pathContextSelected, clearContextSelected, ignoreContextSelected, unignoreContextSelected, blockContextSelected, unblockContextSelected, removeContextSelected })
-local remoteLogsMenu = ContextMenu.new({ scriptContext, callingScriptContext, spyClosureContext, repeatCallContext })
+local remoteLogsMenu = ContextMenu.new({ scriptContext, callingScriptContext, spyClosureContext, repeatCallContext, viewAsHexContext })
 local remoteConditionMenu = ContextMenu.new({ removeConditionContext })
 local remoteConditionMenuSelected = ContextMenu.new({ removeConditionContextSelected })
 
@@ -377,6 +378,7 @@ local function createArg(instance, index, value)
     end
     
     arg.Label.TextColor3 = oh.Constants.Syntax[valueType]
+    arg.Name = tostring(index)
     arg.Parent = instance.Contents
 
     return arg.AbsoluteSize.Y + 5
@@ -406,6 +408,7 @@ function ArgsLog.new(log, callInfo)
         selected.args = callInfo.args
         selected.callingScript = callInfo.script
         selected.func = callInfo.func
+        selected.callPodButton = button
     end)
 
     button.Instance.Size = button.Instance.Size + UDim2.new(0, 0, 0, height)
@@ -926,6 +929,29 @@ repeatCallContext:SetCallback(function()
     wait(0.25)
 
     oh.setStatus(oldStatus)
+end)
+
+viewAsHexContext:SetCallback(function()
+    selected.callPodButton.hexViewEnabled = not selected.callPodButton.hexViewEnabled
+    if not selected.callPodButton.oldStrings then
+        selected.callPodButton.oldStrings = {}
+    end
+
+    for idx, arg in pairs(selected.args) do
+        if type(arg) == "string" then
+            local textObject = selected.callPodButton.Instance.Contents[tostring(idx)].Label
+            if selected.callPodButton.hexViewEnabled then
+                selected.callPodButton.oldStrings[idx] = arg
+                local hexString = ""
+                for i = 1, #arg do
+                    hexString = hexString .. string.format("%02X ", arg:byte(i, i))
+                end
+                textObject.Text = hexString
+            else
+                textObject.Text = dataToString(selected.callPodButton.oldStrings[idx])
+            end
+        end
+    end
 end)
 
 removeConditionContext:SetCallback(function()
