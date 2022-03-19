@@ -862,7 +862,7 @@ scriptContext:SetCallback(function()
             local robloxValueType = typeof(v)
             local variableName = robloxValueType:sub(1, 1):upper() .. robloxValueType:sub(2)
 
-            if valueType == "userdata" then
+            if valueType == "userdata" or valueType == "vector" then
                 v = (typeof(v) == "Instance" and getInstancePath(v)) or userdataValue(v)
             elseif valueType == "table" then
                 v = tableToString(v)
