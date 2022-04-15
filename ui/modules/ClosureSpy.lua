@@ -491,7 +491,7 @@ ListSearch.FocusLost:Connect(function(returned)
         end
 
         closureList:Recalculate()
-        Search.Text = ""
+        ListSearch.Text = ""
     end
 end)
 
