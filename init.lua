@@ -20,9 +20,11 @@ local function hasMethods(methods)
 end
 
 local function useMethods(module)
-    for name, method in pairs(module) do
-        if method then
-            environment[name] = method
+    if type(module) == 'table' and not module == nil then
+        for name, method in pairs(module) do
+            if method then
+                environment[name] = method
+            end
         end
     end
 end
