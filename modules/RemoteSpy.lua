@@ -48,7 +48,8 @@ local function connectEvent(callback)
     end
 end
 
-local isv3 = identifyexecutor() == "Synapse X"
+local executor, version = identifyexecutor()
+local isv3 = executor == "Synapse X" and not version:find("v2")
 
 local nmcTrampoline
 nmcTrampoline = hookMetaMethod(game, "__namecall", function(...)
