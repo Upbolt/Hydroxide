@@ -5,8 +5,8 @@ if oh then
 end
 
 local web = true
-local user = "strawbberrys" -- change if you're using a fork
-local branch = "patch-1"
+local user = "Upbolt" -- change if you're using a fork
+local branch = "revision"
 local importCache = {}
 
 local function hasMethods(methods)
