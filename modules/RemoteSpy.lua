@@ -97,8 +97,6 @@ local function checkPermission(instance)
     if (instance.ClassName) then end
 end
 
-local exec = identifyexecutor()
-
 for _name, hook in pairs(methodHooks) do
     local originalMethod
     originalMethod = hookFunction(hook, newCClosure(function(...)
@@ -129,7 +127,7 @@ for _name, hook in pairs(methodHooks) do
                 local call = {
                     script = getCallingScript((PROTOSMASHER_LOADED ~= nil and 2) or nil),
                     args = vargs,
-                    func = exec == "Synapse X" and getInfo(2).func or getInfo(3).func
+                    func = getInfo(3).func
                 }
     
                 remote:IncrementCalls(call)
