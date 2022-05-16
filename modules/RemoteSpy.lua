@@ -47,7 +47,7 @@ local function connectEvent(callback)
         eventSet = true
     end
 end
-
+print'a'
 local isv3 = identifyexecutor() == "Synapse X"
 
 local nmcTrampoline
