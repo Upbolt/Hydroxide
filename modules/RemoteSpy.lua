@@ -48,6 +48,8 @@ local function connectEvent(callback)
     end
 end
 
+local isv3 = identifyexecutor() == "Synapse X"
+
 local nmcTrampoline
 nmcTrampoline = hookMetaMethod(game, "__namecall", function(...)
     local instance = ...
@@ -74,7 +76,7 @@ nmcTrampoline = hookMetaMethod(game, "__namecall", function(...)
             local call = {
                 script = getCallingScript((PROTOSMASHER_LOADED ~= nil and 2) or nil),
                 args = vargs,
-                func = getInfo(2).func
+                func = isv3 and getInfo(2).func or getInfo(3).func
             }
 
             remote.IncrementCalls(remote, call)
@@ -127,7 +129,7 @@ for _name, hook in pairs(methodHooks) do
                 local call = {
                     script = getCallingScript((PROTOSMASHER_LOADED ~= nil and 2) or nil),
                     args = vargs,
-                    func = getInfo(3).func
+                    func = isv3 and getInfo(2).func or getInfo(3).func
                 }
     
                 remote:IncrementCalls(call)
