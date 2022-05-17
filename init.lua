@@ -187,7 +187,7 @@ local releaseInfo = HttpService:JSONDecode(game:HttpGetAsync("https://api.github
 
 if readFile and writeFile then
     local hasFolderFunctions = (isFolder and makeFolder) ~= nil
-    local ran, result = pcall(readFile, "version.oh")
+    local ran, result = pcall(readFile, "version_oh.txt")
 
     if not ran or releaseInfo.tag_name ~= result then
         if hasFolderFunctions then
