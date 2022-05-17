@@ -5,7 +5,7 @@ if oh then
 end
 
 local web = true
-local user = "Iaying6564" -- change if you're using a fork
+local user = "Upbolt" -- change if you're using a fork
 local branch = "revision"
 local importCache = {}
 
@@ -183,7 +183,7 @@ end
 useMethods(globalMethods)
 
 local HttpService = game:GetService("HttpService")
-local releaseInfo = HttpService:JSONDecode(game:HttpGetAsync("https://api.github.com/repos/Upbolt/Hydroxide/releases"))[1] -- ez fix
+local releaseInfo = HttpService:JSONDecode(game:HttpGetAsync("https://api.github.com/repos/" .. user .. "/Hydroxide/releases"))[1] -- dumb system
 
 if readFile and writeFile then
     local hasFolderFunctions = (isFolder and makeFolder) ~= nil
