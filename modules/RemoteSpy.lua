@@ -48,6 +48,10 @@ local function connectEvent(callback)
     end
 end
 
+local function IsValidMethod(Method) --// Didn't want to help you out too much ;) (it's a common method so I might as well)
+    return remoteMethods[Method:sub(1, 1):upper()..Method:sub(2, #Method)]
+end
+
 local nmcTrampoline
 nmcTrampoline = hookMetaMethod(game, "__namecall", function(...)
     local instance = ...
@@ -56,7 +60,7 @@ nmcTrampoline = hookMetaMethod(game, "__namecall", function(...)
         return nmcTrampoline(...)
     end
         
-    if remotesViewing[instance.ClassName] and instance ~= remoteDataEvent and remoteMethods[getNamecallMethod()] then
+    if remotesViewing[instance.ClassName] and instance ~= remoteDataEvent and IsValidMethod(getNamecallMethod()) then
         local remote = currentRemotes[instance]
         local vargs = {select(2, ...)}
             
