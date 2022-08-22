@@ -112,6 +112,7 @@ environment.oh = {
             userdata = "rbxassetid://4666594723",
             vector = "rbxassetid://4666594723",
             ["function"] = "rbxassetid://4666593447",
+            ["thread"] = "rbxassetid://4666593447",
             ["integral"] = "rbxassetid://4666593882"
         },
         Syntax = {
@@ -123,6 +124,7 @@ environment.oh = {
             userdata = Color3.fromRGB(225, 225, 225),
             vector = Color3.fromRGB(225, 225, 225),
             ["function"] = Color3.fromRGB(225, 225, 225),
+            ["thread"] = Color3.fromRGB(225, 225, 225),
             ["unnamed_function"] = Color3.fromRGB(175, 175, 175)
         }
     },
