@@ -134,7 +134,7 @@ local function checkCurrentIgnored()
 end
 
 local function checkCurrentBlocked()
-    local selectedRemote = selected.remoteLog.Remote
+    local selectedRemote = (selected.remoteLog or selected.logContext).Remote
 
     LogsButtons.Block.Label.Text = (selectedRemote.Blocked and "Unblock") or "Block"
     LogsButtons.Block.Icon.Image = (selectedRemote.Blocked and icons.unblock) or icons.block
@@ -886,8 +886,12 @@ end)
 callingScriptContext:SetCallback(function()
     local oldStatus = oh.getStatus()
 
-    oh.setStatus("Copying " .. selected.callingScript.Name .. "'s path")
-    setClipboard(getInstancePath(selected.callingScript))
+    if selected.callingScript then
+        oh.setStatus("Copying " .. selected.callingScript.Name .. "'s path")
+        setClipboard(getInstancePath(selected.callingScript))
+    else
+        oh.setStatus("Calling script not found")
+    end
     wait(0.25)
     oh.setStatus(oldStatus)
 end)

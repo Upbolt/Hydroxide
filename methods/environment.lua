@@ -1,5 +1,6 @@
 local client = game:GetService("Players").LocalPlayer
-local control = client.PlayerScripts:FindFirstChild("Control Script")
+local playerScripts = client:FindFirstChildOfClass("PlayerScripts")
+local control = playerScripts and playerScripts:FindFirstChild("Control Script")
 
 local methods = {}
 
