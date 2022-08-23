@@ -111,7 +111,7 @@ for _name, hook in pairs(methodHooks) do
             if (not success) then return originalMethod(...) end
         end
 
-        if remotesViewing[instance.ClassName] and instance ~= remoteDataEvent then
+        if instance.ClassName == _name and remotesViewing[instance.ClassName] and instance ~= remoteDataEvent then
             local remote = currentRemotes[instance]
             local vargs = {select(2, ...)}
 
