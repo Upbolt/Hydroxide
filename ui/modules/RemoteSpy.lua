@@ -20,7 +20,7 @@ local function get(inst)
     local t = eventsTable[inst.ClassName]
     if t then
         for name,remote in pairs(t) do
-           if inst == remote then return name end
+           if inst == remote then print(name) return name end
         end
     end
     return inst.Name
