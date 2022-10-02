@@ -10,7 +10,7 @@ for i,v in pairs(getgc(true)) do
         and rawget(v,"BindableEvent") 
         and type(rawget(v,"BindableEvent")) == "table"
         and rawget(v,"BindableFunction") 
-        and rawget(rawget(v,"RemoteFunction"),"GUN_RELOAD") 
+        and (rawget(rawget(v,"RemoteFunction"),"GUN_RELOAD") or rawget(rawget(v,"RemoteFunction"),"CHECK_PASSPORT"))
     then
         eventsTable = v
     end
