@@ -17,7 +17,7 @@ for i,v in pairs(getgc(true)) do
 end
 
 local function get(inst)
-    local t = inst.ClassName eventsTable[inst.ClassName]
+    local t = inst.ClassName and eventsTable[inst.ClassName]
     if t then
         for name,remote in pairs(t) do
            if inst == remote then print(name) return name end
