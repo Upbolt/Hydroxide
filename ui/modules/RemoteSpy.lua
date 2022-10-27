@@ -1,6 +1,32 @@
 local TextService = game:GetService("TextService")
 local TweenService = game:GetService("TweenService")
 
+local eventsTable
+for i,v in pairs(getgc(true)) do
+    if
+        type(v) == "table"
+        and rawget(v,"RemoteEvent") 
+        and rawget(v,"RemoteFunction") 
+        and rawget(v,"BindableEvent") 
+        and type(rawget(v,"BindableEvent")) == "table"
+        and rawget(v,"BindableFunction") 
+        and (rawget(rawget(v,"RemoteFunction"),"GUN_RELOAD") or rawget(rawget(v,"RemoteFunction"),"CHECK_PASSPORT") or rawget(rawget(v,"RemoteEvent"),"GUN_RELOAD"))
+    then
+        eventsTable = v
+    end
+end
+
+local function get(inst)
+    print(typeof(inst),type(inst))
+    local t = inst.ClassName and eventsTable[inst.ClassName]
+    if t then
+        for name,remote in pairs(t) do
+           if inst == remote then return name end
+        end
+    end
+    return inst.Name
+end
+
 local RemoteSpy = {}
 local Methods = import("modules/RemoteSpy")
 local ClosureSpy = import("modules/ClosureSpy")
@@ -234,7 +260,7 @@ local function createConditions(remote)
     RemoteConditions.Visible = true
 
     local remoteInstance = remote.Instance
-    local remoteInstanceName = remoteInstance.Name
+    local remoteInstanceName = get(remoteInstance)
     local remoteClassName = remoteInstance.ClassName
     local nameLength = TextService:GetTextSize(remoteInstanceName, 18, "SourceSans", constants.textWidth).X + 20
 
@@ -278,7 +304,7 @@ function Log.new(remote)
     local log = {}
     local button = Assets.RemoteLog:Clone()
     local remoteInstance = remote.Instance
-    local remoteInstanceName = remoteInstance.Name
+    local remoteInstanceName = get(remoteInstance)
     local remoteClassName = remoteInstance.ClassName
     local listButton = ListButton.new(button, remoteList)
     
@@ -514,7 +540,7 @@ ListSearch.FocusLost:Connect(function(returned)
     if returned then
         for remoteInstance, log in pairs(currentLogs) do
             local instance = log.Button.Instance
-            instance.Visible = not (instance.Visible and not remoteInstance.Name:lower():find(ListSearch.Text))
+            instance.Visible = not (instance.Visible and not get(remoteInstance):lower():find(ListSearch.Text))
         end
 
         remoteList:Recalculate()
@@ -682,7 +708,7 @@ pathContext:SetCallback(function()
     local selectedInstance = selected.logContext.Remote.Instance
     local oldStatus = oh.getStatus()
 
-    oh.setStatus("Copying " .. selectedInstance.Name .. "'s path")
+    oh.setStatus("Copying " .. get(selectedInstance) .. "'s path")
     setClipboard(getInstancePath(selectedInstance))
     wait(0.25)
     oh.setStatus(oldStatus)
@@ -922,7 +948,7 @@ repeatCallContext:SetCallback(function()
     end
 
     local oldStatus = oh.getStatus()
-    oh.setStatus("Recalling " .. remoteInstance.Name)
+    oh.setStatus("Recalling " .. get(remoteInstance))
 
     remoteInstance[method](remoteInstance, unpack(selected.args))
 
