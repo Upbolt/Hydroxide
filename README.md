@@ -1,3 +1,5 @@
+https://discord.gg/cbdP5jgHhe
+
 ## Script
 ```lua
 local owner = "Kinatera"
