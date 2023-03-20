@@ -461,7 +461,9 @@ function Log.incrementCalls(log, callInfo)
     local remote = log.Remote
     local calls = remote.Calls
 
-    buttonInstance.Calls.Text = (calls < 10000 and calls) or "..."
+    if buttonInstance.Calls then
+        buttonInstance.Calls.Text = (calls < 10000 and calls) or "..."
+    end
 
     log:Adjust()
     
