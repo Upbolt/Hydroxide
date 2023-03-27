@@ -55,6 +55,14 @@ nmcTrampoline = hookMetaMethod(game, "__namecall", function(...)
     if typeof(instance) ~= "Instance" then
         return nmcTrampoline(...)
     end
+
+    local method = getNamecallMethod()
+
+    if method == "fireServer" then
+        method = "FireServer"
+    elseif method == "invokeServer" then
+        method = "InvokeServer"
+    end
         
     if remotesViewing[instance.ClassName] and instance ~= remoteDataEvent and remoteMethods[getNamecallMethod()] then
         local remote = currentRemotes[instance]
