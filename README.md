@@ -21,7 +21,7 @@ webImport("ui/main")
 <p align="center">
     <img src="https://cdn.discordapp.com/attachments/633472429917995038/722143730500501534/Hydroxide_Logo.png"/>
     </br>
-    <img src="https://cdn.discordapp.com/attachments/694726636138004593/742408546334933002/unknown.png" width="677px"/>
+    <img src="https://cdn.discordapp.com/attachments/793261581244039178/1211126698184282142/eed361c8-9348-4bbd-a8b2-7d7bbcfce0a8.png" width="677px"/>
 </p>
 
 ## Features
