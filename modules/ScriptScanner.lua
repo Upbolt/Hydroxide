@@ -1,6 +1,18 @@
 local ScriptScanner = {}
 local LocalScript = import("objects/LocalScript")
 
+local getGc = getGc or get_gc_objects
+local getSenv = getsenv
+local getProtos = getprotos
+local getConstants = getconstants
+local getScriptClosure = getscriptclosure
+local isXClosure = isXClosure
+local getfenv = getfenv
+local rawget = rawget
+local type = type
+local pairs = pairs
+local typeof = typeof
+
 local requiredMethods = {
     ["getGc"] = true,
     ["getSenv"] = true,

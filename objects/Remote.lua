@@ -1,5 +1,12 @@
 local Remote = {}
 
+local pairs = pairs
+local type = type
+local table_insert = table.insert
+local table_remove = table.remove
+local table_find = table.find
+local typeof = typeof
+
 function Remote.new(instance)
     local remote = {}
 
@@ -85,6 +92,8 @@ function Remote.areArgsBlocked(remote, args)
             return true
         end
     end
+    
+    return false
 end
 
 function Remote.areArgsIgnored(remote, args)
@@ -97,18 +106,20 @@ function Remote.areArgsIgnored(remote, args)
             return true
         end
     end
+    
+    return false
 end
 
 function Remote.incrementCalls(remote, vargs)
     remote.Calls = remote.Calls + 1
-    table.insert(remote.Logs, vargs)
+    table_insert(remote.Logs, vargs)
 end
 
 function Remote.decrementCalls(remote, vargs)
     local logs = remote.Logs
 
     remote.Calls = remote.Calls - 1
-    table.remove(logs, table.find(logs, vargs))
+    table_remove(logs, table_find(logs, vargs))
 end
 
 return Remote

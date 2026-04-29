@@ -5,7 +5,7 @@ function ModuleScript.new(instance)
     local closure = getScriptClosure(instance)
 
     moduleScript.Instance = instance
-    moduleScript.Constants = getConstants(closure)
+    moduleScript.Constants = oh.Methods.getConstants(closure)
     moduleScript.Protos = getProtos(closure)
     --moduleScript.ReturnValue = require(instance) // causes detection
 

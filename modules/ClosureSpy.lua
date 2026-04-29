@@ -1,5 +1,26 @@
 local ClosureSpy = {}
 
+local hookFunction = hookFunction
+local newCClosure = newcclosure
+local isLClosure = islclosure
+local getProtos = getprotos
+local getUpvalues = getupvalues
+local getUpvalue = getupvalue
+local getContext = getthreadcontext
+local setContext = setthreadcontext
+local setUpvalue = setupvalue
+local getConstants = getconstants
+local getConstant = getconstant
+local setConstant = setconstant
+local getCallingScript = getcallingscript
+local pairs = pairs
+local type = type
+local table_insert = table.insert
+local table_remove = table.remove
+local table_find = table.find
+local typeof = typeof
+local getInfo = debug.getinfo or getinfo
+
 local requiredMethods = {
     ["hookFunction"] = true,
     ["newCClosure"] = true,
@@ -38,7 +59,7 @@ end
 
 local Hook = {}
 local hookMap = {}
-hookCache = {}
+local hookCache = {}
 
 function Hook.new(closure)
     local hook = {}
@@ -175,14 +196,14 @@ end
 
 function Hook.incrementCalls(hook, vargs)
     hook.Calls = hook.Calls + 1
-    table.insert(hook.Logs, vargs)
+    table_insert(hook.Logs, vargs)
 end
 
 function Hook.decrementCalls(hook, vargs)
     local logs = hook.Logs
 
     hook.Calls = hook.Calls - 1
-    table.remove(logs, table.find(logs, vargs))
+    table_remove(logs, table_find(logs, vargs))
 end
 
 ClosureSpy.Hook = Hook

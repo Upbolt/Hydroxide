@@ -2,6 +2,17 @@ local ConstantScanner = {}
 local Closure = import("objects/Closure")
 local Constant = import("objects/Constant")
 
+local getGc = getGc or get_gc_objects
+local getInfo = debug.getinfo or getinfo
+local isXClosure = isXClosure
+local isLClosure = islclosure
+local getConstant = getconstant
+local setConstant = setconstant
+local getConstants = getconstants
+local type = type
+local pairs = pairs
+local toString = toString
+
 local requiredMethods = {
     ["getGc"] = true,
     ["getInfo"] = true,

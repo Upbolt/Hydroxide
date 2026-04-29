@@ -13,12 +13,12 @@ function Constant.new(closure, index, value)
 end
 
 function Constant.set(constant, value)
-    setConstant(constant.Closure, constant.Index, value)
+    oh.Methods.setConstant(constant.Closure, constant.Index, value)
     constant.Value = value
 end
 
 function Constant.update(constant)
-    constant.Value = getConstant(constant.Closure, constant.Index)
+    constant.Value = oh.Methods.getConstant(constant.Closure, constant.Index)
 end
 
 return Constant

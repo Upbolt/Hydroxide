@@ -1,6 +1,23 @@
 local RemoteSpy = {}
 local Remote = import("objects/Remote")
 
+local checkCaller = checkcaller
+local newCClosure = newcclosure
+local hookFunction = hookFunction
+local isReadOnly = isreadonly
+local setReadOnly = setreadonly
+local getInfo = debug.getinfo or getinfo
+local getMetatable = getrawmetatable or debug.getmetatable
+local setClipboard = setclipboard
+local getNamecallMethod = getnamecallmethod
+local getCallingScript = getcallingscript
+local pairs = pairs
+local type = type
+local select = select
+local typeof = typeof
+local pcall = pcall
+local Instance_new = Instance.new
+
 local requiredMethods = {
     ["checkCaller"] = true,
     ["newCClosure"] = true,
@@ -29,15 +46,15 @@ local remotesViewing = {
 }
 
 local methodHooks = {
-    RemoteEvent = Instance.new("RemoteEvent").FireServer,
-    RemoteFunction = Instance.new("RemoteFunction").InvokeServer,
-    BindableEvent = Instance.new("BindableEvent").Fire,
-    BindableFunction = Instance.new("BindableFunction").Invoke
+    RemoteEvent = Instance_new("RemoteEvent").FireServer,
+    RemoteFunction = Instance_new("RemoteFunction").InvokeServer,
+    BindableEvent = Instance_new("BindableEvent").Fire,
+    BindableFunction = Instance_new("BindableFunction").Invoke
 }
 
 local currentRemotes = {}
 
-local remoteDataEvent = Instance.new("BindableEvent")
+local remoteDataEvent = Instance_new("BindableEvent")
 local eventSet = false
 
 local function connectEvent(callback)
@@ -98,8 +115,6 @@ nmcTrampoline = hookMetaMethod(game, "__namecall", function(...)
 end)
 
 -- vuln fix
-
-local pcall = pcall
 
 local function checkPermission(instance)
     if (instance.ClassName) then end

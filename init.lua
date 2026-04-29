@@ -5,9 +5,16 @@ if oh then
 end
 
 local web = true
-local user = "Upbolt" -- change if you're using a fork
+local user = "Upbolt"
 local branch = "revision"
 local importCache = {}
+
+local pairs = pairs
+local type = type
+local unpack = unpack
+local getfenv = getfenv
+local rawget = rawget
+local pcall = pcall
 
 local function hasMethods(methods)
     for name in pairs(methods) do

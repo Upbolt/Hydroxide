@@ -2,6 +2,17 @@ local UpvalueScanner = {}
 local Closure = import("objects/Closure")
 local Upvalue = import("objects/Upvalue")
 
+local getGc = getGc or get_gc_objects
+local isXClosure = isXClosure
+local getUpvalue = getUpvalue or getupvalue
+local setUpvalue = setUpvalue or setupvalue
+local getUpvalues = getUpvalues or getupvalues
+local type = type
+local pairs = pairs
+local typeof = typeof
+local getInfo = getInfo or debug.getinfo
+local toString = toString
+
 local requiredMethods = {
     ["getGc"] = true,
     ["getInfo"] = true,
@@ -18,7 +29,7 @@ local function compareUpvalue(query, upvalue, ignore)
     local numberCheck = not ignore and upvalueType == "number" and not isTableIndex and (tonumber(query) == upvalue or ("%.2f"):format(upvalue) == query)
     
     if upvalueType == "userdata" then
-        if typeof(upvalueType) == "Instance" then
+        if typeof(upvalue) == "Instance" then
             local instanceName = upvalue.Name
             return (instanceName == query or instanceName:find(query))
         end
@@ -29,7 +40,7 @@ local function compareUpvalue(query, upvalue, ignore)
         return query == closureName or closureName:lower():find(query:lower())
     end
 
-    return stringCheck or numberCheck or userDataCheck
+    return stringCheck or numberCheck
 end
 
 local function scan(query, deepSearch)

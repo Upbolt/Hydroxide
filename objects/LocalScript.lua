@@ -6,7 +6,7 @@ function LocalScript.new(instance)
 
     localScript.Instance = instance
     localScript.Environment = getSenv(instance)
-    localScript.Constants = getConstants(closure)
+    localScript.Constants = oh.Methods.getConstants(closure)
     localScript.Protos = getProtos(closure)
 
     return localScript
